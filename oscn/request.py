@@ -40,7 +40,7 @@ class CaseList(object):
         response = requests.post(url, params, headers=self.headers, verify=False)
         if is_case_valid(response):
             self.case_number += 1
-            return response
+            return {'county': self.county, 'case': case, 'response': response}
         else:
             print(f'Invalid case:{case}')
             raise StopIteration
