@@ -1,10 +1,22 @@
-import oscn_search as oscn
 import sys
+import time
+from oscn import *
 
-cases = oscn.cases(county='adair', year="2018")
+counties = ['tulsa']
+years = ['2018', '2017']
 
-# import warnings
-# warnings.filterwarnings("ignore")
 
-for case in cases:
-    sys.stdout.write('.')
+start = time.clock()
+
+for county in counties:
+    for year in years:
+        sys.stdout.write(f'{county} {year}')
+        case_iter = oscn.request.CaseList(county=county, year=year)
+        count = 0
+        for case in case_iter:
+            time.sleep(.10)
+            data = oscn.parse.Case(county, case['number'], case['response'].text)
+            import ipdb; ipdb.set_trace()
+
+            sys.stdout.write('.')
+            sys.stdout.flush()
