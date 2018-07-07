@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 fp = open("examples/multi_count.html")
 soup = BeautifulSoup(fp, 'html.parser')
 
-count_details = re.compile(r'Count as Filed:[.\n\s]*([A-Z]+)\,.(.+)\,[\n\s\w\:\D]*Date of Offense\:.([\d\/]*)',re.M)
+count_details = re.compile(r'Count as Filed:[.\n\s]*([A-Z]+)\,.(.+)\,[\n\s\w\:\D]*Date of Offense\:.([\d\/]*)', re.M)
 
 counts = soup.find_all('td', 'CountDescription')
 

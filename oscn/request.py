@@ -4,6 +4,9 @@ import settings
 url = settings.OSCN_URL
 county = settings.COUNTY
 
+import warnings
+warnings.filterwarnings("ignore")
+
 
 def is_case_valid(resp):
     if resp.status_code != 200:
@@ -42,5 +45,4 @@ class CaseList(object):
             self.case_number += 1
             return {'county': self.county, 'case': case, 'response': response}
         else:
-            print(f'Invalid case:{case}')
             raise StopIteration
