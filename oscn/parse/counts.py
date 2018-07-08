@@ -11,7 +11,7 @@ def counts(oscn_page):
             count_details = re.compile(r'Count as Filed:[.\n\s]*([A-Z]+)\,.(.+)\,[\n\s\w\:\D]*Date of Offense\:.([\d\/]*)', re.M)
             find_desc = count_details.search(count.text)
             if find_desc.group(2):
-                count_list.append({'description': find_desc.group(2)})
+                count_list.append({'description': find_desc.group(2).strip()})
     else:
         count_start = soup.find('h2', 'section counts')
         next_sibling = count_start.find_next_sibling('p')
