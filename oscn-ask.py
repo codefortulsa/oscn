@@ -1,10 +1,10 @@
 import sys
 import time
 import oscn.request
-import oscn.parse
+from oscn.parse import counts
 
 
-counties = ['tulsa']
+counties = ['cimarron']
 years = ['2018']
 
 for county in counties:
@@ -14,8 +14,7 @@ for county in counties:
         count = 0
         for case in case_iter:
             time.sleep(.10)
-            data = oscn.parse.Case(county, case['case'], case['response'].text)
-            counts = data.counts()
+            counts = oscn.parse.counts(case['response'].text)
             import ipdb; ipdb.set_trace()
             sys.stdout.write('.')
             sys.stdout.flush()
