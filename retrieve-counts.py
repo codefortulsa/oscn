@@ -16,9 +16,10 @@ writer.writerow(["year", "county", "case", "description"])
 for county in counties:
     for year in years:
         sys.stdout.write(f'{county} {year}')
-        case_iter = oscn.request.CaseList(county=county, year=year)
+        cases = oscn.request.CaseList(county=county, year=year)
         count = 0
-        for case in case_iter:
+        for case in cases:
+            import ipdb; ipdb.set_trace()
             time.sleep(.10)
             counts = oscn.parse.counts(case['response'].text)
             for count in counts:
