@@ -1,0 +1,25 @@
+from bs4 import BeautifulSoup
+
+
+def parties(oscn_page):
+    parties_list = []
+    names = []
+    soup = BeautifulSoup(oscn_page, 'html.parser')
+    start = soup.find('h2', 'section party')
+    party_p = start.find_next_sibling('p')
+    party_links = party_p.find_all('a')
+
+    for link in party_links:
+        names.append(link.text)
+        party_p.a.extract()
+
+    party_type = party_p.text.split(',')
+    party_type.pop(0)
+    types = [r.strip() for r in party_type]
+
+    def Party(name,type):
+        return {'name': name, 'type': type}
+
+    result = map(Party, names, types)
+
+    return [r for r in result]
