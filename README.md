@@ -24,3 +24,10 @@ using BeautifulSoup
 ### oscn.parse
 
 - counts: Returns of list of counts found in a case
+
+## Install
+
+1. Create a Python 3.7 virtual env
+1. `git clone git@github.com:codefortulsa/oscn-query.git`
+1. `cd oscn-query`
+1. `pip install -r requirements.txt`
