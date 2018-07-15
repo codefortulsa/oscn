@@ -11,8 +11,9 @@ examples > Source HTML files for testing
 scripts > Python scripts showing use of the oscn package
 - retrieve-counts.py: saves a list of all counts for a list of counties and years
 - find-counts.py: saves a list of counts passing a test for a list of counties and years
-- soup_test.py: a stub for testing parsing attempts
-using BeautifulSoup
+- soup_test.py: a stub for testing parsing attempts using BeautifulSoup
+- parse_test.py: a stub for developing using saved examples
+
 
 ## OSCN package
 

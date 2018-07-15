@@ -1,2 +1,2 @@
 
-from .cases import CaseList
+from .cases import CaseList, Case

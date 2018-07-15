@@ -13,9 +13,7 @@ import ipdb; ipdb.set_trace()
 
 cases = CaseList(type='CF', county='cimarron', year='2018')
 
-
 for case in cases:
-    # import ipdb; ipdb.set_trace()
     find = oscn.parse.judge(case['response'].text)
     number = case['case']
     print(f'case: {number} found: {find}')
