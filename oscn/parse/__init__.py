@@ -4,3 +4,4 @@
 
 from .counts import counts
 from .parties import parties
+from .judge import judge

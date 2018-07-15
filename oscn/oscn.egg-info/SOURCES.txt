@@ -1,0 +1,12 @@
+oscn.egg-info/PKG-INFO
+oscn.egg-info/SOURCES.txt
+oscn.egg-info/dependency_links.txt
+oscn.egg-info/not-zip-safe
+oscn.egg-info/top_level.txt
+parse/__init__.py
+parse/counts.py
+parse/judge.py
+parse/parties.py
+request/__init__.py
+request/cases.py
+request/settings.py

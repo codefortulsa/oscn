@@ -1,10 +1,10 @@
 from bs4 import BeautifulSoup
 
 
-def parties(oscn_page):
+def parties(oscn_html):
     parties_list = []
     names = []
-    soup = BeautifulSoup(oscn_page, 'html.parser')
+    soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section party')
     party_p = start.find_next_sibling('p')
     party_links = party_p.find_all('a')
