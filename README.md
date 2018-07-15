@@ -22,12 +22,16 @@ using BeautifulSoup
 - CaseList: Returns an iterator for retrieving cases for a county and year.
 
 ### oscn.parse
+Parsers accept the html of an OSCN case page and return python objects.
 
-- counts: Returns of list of counts found in a case
+- counts: returns of list of counts found in a case
+- judge: returns a string of the judges name
+- parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
 
 ## Install
 
-1. Create a Python 3.7 virtual env
+1. Create a Python 3.6 virtual env
 1. `git clone git@github.com:codefortulsa/oscn-query.git`
 1. `cd oscn-query`
 1. `pip install -r requirements.txt`
+1. `pip install -e oscn`
