@@ -9,4 +9,3 @@ parse/judge.py
 parse/parties.py
 request/__init__.py
 request/cases.py
-request/settings.py

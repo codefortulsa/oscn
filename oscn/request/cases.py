@@ -2,7 +2,7 @@ import requests
 import settings
 import warnings
 
-url = settings.OSCN_URL
+oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
 
 
@@ -19,13 +19,19 @@ class OSCNrequest(object):
         self.year = year
         self.number = number
 
+    @property
     def case_number(self):
         return f'{self.type}-{self.year}-{self.number}'
 
+    @property
     def url(self):
-        return f'{url}?db={self.county}&number={self.case_number()}'
+        return f'{oscn_url}?db={self.county}&number={self.case_number}'
 
-    def valid_response(self, resp):
+    @property
+    def html(self):
+        return self.response.text
+
+    def _valid_response(self, resp):
         if resp.status_code != 200:
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
@@ -33,11 +39,14 @@ class OSCNrequest(object):
                 return False
         return True
 
-    def request(self):
-        params = {'db': self.county, 'number': self.case_number()}
-        response = requests.post(url, params, headers=self.headers, verify=False)
-        if self.valid_response(response):
-            return {'county': self.county, 'case': params['number'], 'response': response, 'source': self.url()}
+    def _request(self):
+        params = {'db': self.county, 'number': self.case_number}
+        response = (
+            requests.post(oscn_url, params, headers=self.headers, verify=False)
+            )
+        if self._valid_response(response):
+            self.response = response
+            return self
         else:
             return None
 
@@ -45,7 +54,8 @@ class OSCNrequest(object):
 class Case(OSCNrequest):
 
     def __init__(self, **kwargs):
-        super(Case, self).__init__(**kwargs)
+        super().__init__(**kwargs)
+        self._request()
 
 
 
@@ -56,10 +66,10 @@ class CaseList(OSCNrequest):
         return self
 
     def __next__(self):
-        next_case = self.request()
+        next_case = self._request()
         if next_case:
             for msg in settings.UNUSED_CASE_MESSAGES:
-                if msg in next_case['response'].text:
+                if msg in next_case.response.text:
                     self.number += 1
                     return self.__next__()
 
