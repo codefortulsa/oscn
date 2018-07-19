@@ -2,6 +2,8 @@ import requests
 import settings
 import warnings
 
+from oscn.parse import judge, parties, counts
+
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
 
@@ -24,11 +26,11 @@ class OSCNrequest(object):
         return f'{self.type}-{self.year}-{self.number}'
 
     @property
-    def url(self):
+    def source(self):
         return f'{oscn_url}?db={self.county}&number={self.case_number}'
 
     @property
-    def html(self):
+    def text(self):
         return self.response.text
 
     def _valid_response(self, resp):
@@ -50,14 +52,21 @@ class OSCNrequest(object):
         else:
             return None
 
+parsers = [judge, counts, parties]
+
+
+def self_parser(f):
+    return property(lambda self: f(self.response.text))
+
+for p in parsers:
+    setattr(OSCNrequest, p.__name__, self_parser(p))
+
 
 class Case(OSCNrequest):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._request()
-
-
 
 
 class CaseList(OSCNrequest):
