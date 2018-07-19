@@ -2,7 +2,7 @@ import requests
 import settings
 import warnings
 
-from oscn.parse import judge, parties, counts
+from oscn.parse import judge, parties, counts, docket
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -52,7 +52,7 @@ class OSCNrequest(object):
         else:
             return None
 
-parsers = [judge, counts, parties]
+parsers = [judge, counts, parties, docket]
 
 
 def self_parser(f):
