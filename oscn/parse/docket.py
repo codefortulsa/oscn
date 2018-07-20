@@ -1,15 +1,14 @@
-import re
 from bs4 import BeautifulSoup
 
-count_re = r'Count as Filed:[^A-Z]*([A-Z|\d]*),\s(.*)'
+def text_results(ResultSet):
+    text_list =[]
+    for el in ResultSet:
+        text_list.append(el.text.strip())
+    return text_list
 
-
-        # <th>Date</th>
-        # <th>Code</th>
-        # <th>Description</th>
-        # <th>Count</th>
-        # <th>Party</th>
-        # <th>Amount</th>
+class DocketEvent(object):
+    def __init__(self):
+        pass
 
 
 def docket(oscn_html):
@@ -17,23 +16,23 @@ def docket(oscn_html):
     soup = BeautifulSoup(oscn_html, 'html.parser')
     docket_table = soup.find('table', 'docketlist')
     thead = docket_table.find('thead').find_all('th')
-    headings=[]
-    for h in thead:
-        headings.append(h.text)
-
     rows = docket_table.find('tbody').find_all('tr')
-
-    def Event(v,h):
-        pair = {}
-        pair[h]=v
-        return pair
+    headings = text_results(thead)
 
     for row in rows:
-        values =[]
         cells=row.find_all('td')
-        for cell in cells:
-            values.append(cell.text)
-        pairs = map(Event, values, headings)
-        events.append([p for p in pairs])
+        values = text_results(cells)
+        event = DocketEvent()
+
+        for idx, value in enumerate(values):
+            setattr(event, headings[idx], value)
+        events.append(event)
+        # clean up blank dates
+        current_date = events[0].Date
+        for e in events:
+            if e.Date:
+                current_date = e.Date
+            else:
+                e.Date = current_date
 
     return events
