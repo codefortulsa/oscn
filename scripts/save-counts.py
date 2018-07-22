@@ -2,7 +2,7 @@ import sys
 import time
 import csv
 
-from .oscn import oscn
+import oscn
 
 counties = ['washington', 'cimarron', 'beckham']
 years = ['2017','2018']
@@ -10,6 +10,7 @@ years = ['2017','2018']
 
 for county in counties:
     csv_file = open(f'data/{county}-counts.csv', "w")
+    # if this breaks, you may need to mkdir data
     writer = csv.writer(csv_file, delimiter=',')
     writer.writerow(["year", "county", "case", "judge", "description","source"])
 
