@@ -2,8 +2,7 @@ import sys
 import time
 import csv
 
-import oscn.request
-from oscn.parse import counts
+import oscn
 
 
 counties = ['adair', 'washington']
@@ -28,13 +27,13 @@ for county in counties:
         count = 0
         for case in case_iter:
             time.sleep(.10)
-            sys.stdout.write(case['case'])
+            sys.stdout.write(case.case_number)
             sys.stdout.flush()
 
-            counts = oscn.parse.counts(case['response'].text)
+            counts = oscn.parse.counts(case.response.text)
             for count in counts:
                 if count_test(count['description']):
-                    writer.writerow([year, county, case['case'], count['description']])
+                    writer.writerow([year, county, case.case_number, count['description']])
                     sys.stdout.write('*')
                 else:
                     sys.stdout.write('.')

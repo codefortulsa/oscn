@@ -34,5 +34,9 @@ Parsers accept the html of an OSCN case page and return python objects.
 1. Create a Python 3.6 virtual env
 1. `git clone git@github.com:codefortulsa/oscn-query.git`
 1. `cd oscn-query`
-1. `pip install -r requirements.txt`
+1. `pip install -r oscn/requirements.txt`
 1. `pip install -e oscn`
+
+## Run test scripts
+
+Currently to run the test scripts, you have to copy them into the project root. Solutions to eliminate this step are wanted.
