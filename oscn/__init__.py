@@ -1,2 +1,2 @@
-import request
-import parse
+from . import request
+from . import parse

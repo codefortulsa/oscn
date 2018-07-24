@@ -1,5 +1,6 @@
 import re
 
+__name__ = 'judge'
 
 def judge(oscn_html):
     judge_re = r'Judge:\s*([\w\s\,]*)'

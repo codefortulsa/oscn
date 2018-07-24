@@ -1,5 +1,8 @@
 from bs4 import BeautifulSoup
 
+__name__ = 'docket'
+
+
 def text_results(ResultSet):
     text_list =[]
     for el in ResultSet:

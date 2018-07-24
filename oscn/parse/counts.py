@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 
 count_re = r'Count as Filed:[^A-Z]*([A-Z|\d]*),\s(.*)'
 
+__name__ = 'counts'
+
 def counts(oscn_html):
     count_list = []
     soup = BeautifulSoup(oscn_html, 'html.parser')

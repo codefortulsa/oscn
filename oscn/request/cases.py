@@ -1,8 +1,12 @@
 import requests
-import settings
 import warnings
 
-from oscn.parse import judge, parties, counts, docket
+from . import settings
+
+from oscn.parse.judge import judge
+from oscn.parse.counts import counts
+from oscn.parse.parties import parties
+from oscn.parse.docket import docket
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -53,7 +57,6 @@ class OSCNrequest(object):
             return None
 
 parsers = [judge, counts, parties, docket]
-
 
 def self_parser(f):
     return property(lambda self: f(self.response.text))

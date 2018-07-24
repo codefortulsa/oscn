@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 
+__name__ = 'parties'
 
 def parties(oscn_html):
     parties_list = []
