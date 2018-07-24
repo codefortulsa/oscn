@@ -3,10 +3,7 @@ import warnings
 
 from . import settings
 
-from oscn.parse.judge import judge
-from oscn.parse.counts import counts
-from oscn.parse.parties import parties
-from oscn.parse.docket import docket
+from oscn.parse import judge, parties, counts, docket
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -84,8 +81,6 @@ class CaseList(OSCNrequest):
                 if msg in next_case.response.text:
                     self.number += 1
                     return self.__next__()
-
-        if next_case:
             self.number += 1
             return next_case
         else:
