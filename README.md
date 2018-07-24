@@ -31,7 +31,7 @@ Parsers accept the html of an OSCN case page and return python objects.
 - parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
 - docket: returns a list of rows in a docket
 
-## Install
+## Development Install
 
 1. Create and activate a Python 3.6 virtual env
 1. `git clone git@github.com:codefortulsa/oscn.git`
@@ -39,6 +39,11 @@ Parsers accept the html of an OSCN case page and return python objects.
 1. `pip install -e .`
 
 ## Usage
+
+Install with `pip install oscn`
+
+Script example:
+
 `import oscn`
 
 Request a single case:
