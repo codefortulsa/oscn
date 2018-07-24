@@ -29,7 +29,7 @@ Parsers accept the html of an OSCN case page and return python objects.
 - counts: returns of list of counts found in a case
 - judge: returns a string of the judge's name
 - parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
--docket: returns a list of rows in a docket
+- docket: returns a list of rows in a docket
 
 ## Install
 
