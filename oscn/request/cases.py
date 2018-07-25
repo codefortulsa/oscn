@@ -1,6 +1,7 @@
 import requests
-import settings
 import warnings
+
+from . import settings
 
 from oscn.parse import judge, parties, counts, docket
 
@@ -79,8 +80,6 @@ class CaseList(OSCNrequest):
                 if msg in next_case.response.text:
                     self.number += 1
                     return self.__next__()
-
-        if next_case:
             self.number += 1
             return next_case
         else:
