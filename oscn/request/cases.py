@@ -53,15 +53,26 @@ class OSCNrequest(object):
         else:
             return None
 
+# This next section adds properties to the OSCNrequest as a shortcuts
+# for parsing.  This allows access to parse results such as:
+# name = OSCNrequest.judge
+# or
+# counts = OSCNrequest.counts
 
-parsers = [judge, counts, parties, docket]
+# These parsing functions were imported from the parse module above.
+case_parsers = [judge, counts, parties, docket]
 
-def self_parser(f):
-    return property(lambda self: f(self.response.text))
+# this function accepts a function and returns a property
+# the lambda is the 'fget' function of the property
+#  which returns the result of the parse_function using
+#  the response.text of the object instance
+def make_property(parse_function):
+    return property(lambda self: parse_function(self.response.text))
 
-for p in parsers:
-    setattr(OSCNrequest, p.__name__, self_parser(p))
-
+for parser in case_parsers:
+    # This adds an attribute to OSCNrequest with the name of the parser
+    # and a new property created using the parser function
+    setattr(OSCNrequest, parser.__name__, make_property(parser))
 
 class Case(OSCNrequest):
 
