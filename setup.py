@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 
 setup(  name='oscn',
-        version='0.0.0.3',
+        version='0.0.0.4',
         description='Oklahoma Supreme Court Network page parsing utilities',
         long_description=long_description,
         long_description_content_type="text/markdown",
