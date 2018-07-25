@@ -83,17 +83,20 @@ class Case(OSCNrequest):
 
 class CaseList(OSCNrequest):
 
+    def __init__(self, **kwargs):
+        super().__init__(number=0, **kwargs)
+
     def __iter__(self):
         return self
 
     def __next__(self):
+        self.number += 1
         next_case = self._request()
         if next_case:
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in next_case.response.text:
                     self.number += 1
                     return self.__next__()
-            self.number += 1
             return next_case
         else:
             raise StopIteration
