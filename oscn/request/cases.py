@@ -53,6 +53,7 @@ class OSCNrequest(object):
         else:
             return None
 
+
 parsers = [judge, counts, parties, docket]
 
 def self_parser(f):
