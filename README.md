@@ -4,7 +4,7 @@ This is a collection of python utilities to scrape case information from the [Ok
 
 ## Contents
 
-oscn > This is python package to provide an api for retrieving and parsing case records.
+oscn > Python package source to provide an api for retrieving and parsing case records.
 
 examples > Source HTML files for testing
 
@@ -50,7 +50,7 @@ Request a single case:
 
 `oscn.request.Case(county='tulsa', year='2018', number=84)`
 
-or request a list of case to iterate:
+or request a list of cases to iterate:
 
 `oscn.request.CaseList(county='adair', year='2016')`
 
