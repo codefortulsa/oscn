@@ -8,11 +8,6 @@ from oscn.parse import judge, parties, counts, docket
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
 
-parsers = [judge, counts, parties, docket]
-
-def self_parser(f):
-    return property(lambda self: f(self.response.text))
-
 
 class OSCNrequest(object):
     headers = {
@@ -26,8 +21,6 @@ class OSCNrequest(object):
         self.county = county
         self.year = year
         self.number = number
-        for p in parsers:
-            setattr(OSCNrequest, p.__name__, self_parser(p))
 
     @property
     def case_number(self):
@@ -59,6 +52,15 @@ class OSCNrequest(object):
             return self
         else:
             return None
+
+
+parsers = [judge, counts, parties, docket]
+
+def self_parser(f):
+    return property(lambda self: f(self.response.text))
+
+for p in parsers:
+    setattr(OSCNrequest, p.__name__, self_parser(p))
 
 
 class Case(OSCNrequest):
