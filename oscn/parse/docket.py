@@ -1,11 +1,5 @@
 from bs4 import BeautifulSoup
-
-
-def text_results(ResultSet):
-    text_list =[]
-    for el in ResultSet:
-        text_list.append(el.text.strip())
-    return text_list
+from ._helpers import text_values, add_properties
 
 class DocketEvent(object):
     def __init__(self):
@@ -18,16 +12,15 @@ def docket(oscn_html):
     docket_table = soup.find('table', 'docketlist')
     thead = docket_table.find('thead').find_all('th')
     rows = docket_table.find('tbody').find_all('tr')
-    headings = text_results(thead)
+    headings = text_values(thead)
 
     for row in rows:
         cells=row.find_all('td')
-        values = text_results(cells)
+        values = text_values(cells)
         event = DocketEvent()
-
-        for idx, value in enumerate(values):
-            setattr(event, headings[idx], value)
+        add_properties(event, headings, values)
         events.append(event)
+
         # clean up blank dates
         current_date = events[0].Date
         for e in events:

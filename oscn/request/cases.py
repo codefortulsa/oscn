@@ -3,7 +3,7 @@ import warnings
 
 from . import settings
 
-from oscn.parse import judge, parties, counts, docket
+from oscn.parse import judge, parties, counts, events, docket
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -53,14 +53,14 @@ class OSCNrequest(object):
         else:
             return None
 
-# This next section adds properties to the OSCNrequest as a shortcuts
+# This next section adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
 # name = OSCNrequest.judge
 # or
 # counts = OSCNrequest.counts
 
 # These parsing functions were imported from the parse module above.
-case_parsers = [judge, counts, parties, docket]
+case_parsers = [judge, counts, parties, events, docket]
 
 # this function accepts a function and returns a property
 # the lambda is the 'fget' function of the property
