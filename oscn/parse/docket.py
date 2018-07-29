@@ -30,3 +30,5 @@ def docket(oscn_html):
                 e.Date = current_date
 
     return events
+
+setattr(docket,'target',['OSCNrequest'])

@@ -17,9 +17,11 @@ def parties(oscn_html):
     party_type.pop(0)
     types = [r.strip() for r in party_type]
 
-    def Party(name,type):
-        return {'name': name, 'type': type}
+    Party = lambda name,type: {'name': name, 'type': type}
 
     result = map(Party, names, types)
 
     return [r for r in result]
+
+# add this attribute to allow it to be added to request objects
+setattr(parties,'target',['OSCNrequest'])

@@ -9,3 +9,5 @@ def judge(oscn_html):
         return judge_search.group(1)
     else:
         return None
+
+setattr(judge,'target',['OSCNrequest'])

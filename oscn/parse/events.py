@@ -5,7 +5,6 @@ class Event(object):
     def __init__(self):
         pass
 
-
 def events(oscn_html):
     events = []
     soup = BeautifulSoup(oscn_html, 'html.parser')
@@ -23,3 +22,5 @@ def events(oscn_html):
         events.append(event)
 
     return events
+
+setattr(events,'target',['OSCNrequest'])
