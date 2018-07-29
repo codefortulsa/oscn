@@ -1,7 +1,7 @@
 import re
 
 def filed(oscn_html):
-    pattern = r'Filed:\s*([\w\s\,]*)'
+    pattern = r'Filed:\s*([\/\d]*)'
     find = re.compile(pattern, re.M)
     search = find.search(oscn_html)
     if search.group:
@@ -13,7 +13,7 @@ setattr(filed,'target',['OSCNrequest'])
 
 
 def closed(oscn_html):
-    pattern = r'Closed:\s*([\w\s\,]*)'
+    pattern = r'Closed:\s*([\/\d]*)'
     find = re.compile(pattern, re.M)
     search = find.search(oscn_html)
     try:
