@@ -20,7 +20,7 @@ scripts > Python scripts showing use of the oscn package
 
 ### oscn
 
-- courts: Returns a list of courts.  
+- counties: Returns a list of counties. 
 
 
 ### oscn.request

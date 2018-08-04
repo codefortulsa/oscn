@@ -1,5 +1,5 @@
 from . import request
 from . import parse
-from . import courts
+from . import _meta
 
-courts = courts.courts()
+counties = _meta.courts()
