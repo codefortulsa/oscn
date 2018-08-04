@@ -18,6 +18,11 @@ scripts > Python scripts showing use of the oscn package
 
 ## OSCN package
 
+### oscn
+
+- courts: Returns a list of courts.  
+
+
 ### oscn.request
 
 - Case: Returns a single case.
