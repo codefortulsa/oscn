@@ -48,12 +48,16 @@ class OSCNrequest(object):
             requests.post(oscn_url, params, headers=self.headers, verify=False)
             )
         if self._valid_response(response):
+            for msg in settings.UNUSED_CASE_MESSAGES:
+                if msg in response.text:
+                    self.number += 1
+                    self._request()
             self.response = response
             return self
         else:
             return None
 
-# This next section adds properties to the OSCNrequest as a shortcut
+# This next line adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
 # name = OSCNrequest.judge
 # or
@@ -70,25 +74,41 @@ class Case(OSCNrequest):
 
 class CaseList(OSCNrequest):
 
+    def _convert_str_arg(self, name, args):
+        if name in args:
+            if type(args[name]) is str:
+                # convert str to one element list
+                args[name] = [args[name]]
+
+    def _gen_requests(self):
+        for county in self.counties:
+            self.county = county
+            for year in self.years:
+                self.year = year
+                self.number = self.start
+                while True:
+                    self.number += 1
+                    if self.stop and self.number > self.stop:
+                        break
+                    next_case = self._request()
+                    if next_case:
+                        yield next_case
+                    else:
+                        break
+        raise StopIteration
+
     def __init__(self, start=0, stop=False, **kwargs):
-        number = start if start==0 else start-1
-        self.start = start
+        self.start = start if start == 0 else start-1
         self.stop = stop
-        super().__init__(number=number, **kwargs)
+        self._convert_str_arg('county', kwargs)
+        self._convert_str_arg('year', kwargs)
+        self.counties = kwargs['county']
+        self.years = kwargs['year']
+        self.all_cases = self._gen_requests()
+        super().__init__(number=self.start, **kwargs)
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        self.number += 1
-        if self.stop and self.number > self.stop:
-            raise StopIteration
-        next_case = self._request()
-        if next_case:
-            for msg in settings.UNUSED_CASE_MESSAGES:
-                if msg in next_case.response.text:
-                    self.number += 1
-                    return self.__next__()
-            return next_case
-        else:
-            raise StopIteration
+        return next(self.all_cases)
