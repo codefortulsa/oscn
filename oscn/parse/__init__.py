@@ -21,11 +21,21 @@ try:
 except NameError:
     pass
 
+def make_safe_parser(f):
+    def safe_parser(self):
+        try:
+            return f(self.response.text)
+        except:
+            return None
+    return safe_parser
+
 def make_property(parse_function):
-    return property(lambda self: parse_function(self.response.text))
+    # return property(lambda self: parse_function(self.response.text))
+    return property(make_safe_parser(parse_function))
 
 # this function accepts a class and searches for
-# parsers to be added to it
+# parsers to be added to
+
 def append_parsers(obj):
     for fn in parse_functions:
         if obj.__name__ in fn.target:
