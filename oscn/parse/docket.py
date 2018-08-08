@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
 from ._helpers import text_values, add_properties
+from ._helpers import PrettyPrint
 
-class DocketEvent(object):
+class DocketEvent(PrettyPrint):
     def __init__(self):
         pass
 
