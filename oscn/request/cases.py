@@ -42,7 +42,7 @@ class OSCNrequest(object):
                 return False
         return True
 
-    def _request(self):
+    def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
         params = {'db': self.county, 'number': self.case_number}
         response = (
             requests.post(oscn_url, params, headers=self.headers, verify=False)
@@ -51,7 +51,10 @@ class OSCNrequest(object):
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in response.text:
                     self.number += 1
-                    self._request()
+                    if attempts_left > 0:
+                        return self._request(attempts_left=attempts_left-1)
+                    else:
+                        return None
             self.response = response
             return self
         else:
