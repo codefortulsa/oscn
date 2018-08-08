@@ -1,3 +1,4 @@
+import logging
 import requests
 import warnings
 
@@ -7,6 +8,7 @@ from oscn.parse import append_parsers
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
+logger = logging.getLogger('oscn')
 
 
 class OSCNrequest(object):
@@ -39,6 +41,7 @@ class OSCNrequest(object):
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
             if msg in resp.text:
+                logger.warning("Case %s is invalid", self.case_number)
                 return False
         return True
 
@@ -52,9 +55,11 @@ class OSCNrequest(object):
                 if msg in response.text:
                     self.number += 1
                     if attempts_left > 0:
+                        logger.warning("Case %s might be last, trying %d more", self.case_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
                         return None
+            logger.info("Case %s fetched", self.case_number)
             self.response = response
             return self
         else:
