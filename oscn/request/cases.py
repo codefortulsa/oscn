@@ -41,7 +41,7 @@ class OSCNrequest(object):
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
             if msg in resp.text:
-                logger.warning("Case %s is invalid", self.case_number)
+                logger.info("Case %s is invalid", self.case_number)
                 return False
         return True
 
@@ -55,7 +55,7 @@ class OSCNrequest(object):
                 if msg in response.text:
                     self.number += 1
                     if attempts_left > 0:
-                        logger.warning("Case %s might be last, trying %d more", self.case_number, attempts_left)
+                        logger.info("Case %s might be last, trying %d more", self.case_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
                         return None
