@@ -1,3 +1,4 @@
+import logging
 import requests
 import warnings
 
@@ -7,6 +8,7 @@ from oscn.parse import append_parsers
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
+logger = logging.getLogger('oscn')
 
 
 class OSCNrequest(object):
@@ -39,10 +41,11 @@ class OSCNrequest(object):
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
             if msg in resp.text:
+                logger.info("Case %s is invalid", self.case_number)
                 return False
         return True
 
-    def _request(self):
+    def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
         params = {'db': self.county, 'number': self.case_number}
         response = (
             requests.post(oscn_url, params, headers=self.headers, verify=False)
@@ -51,7 +54,12 @@ class OSCNrequest(object):
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in response.text:
                     self.number += 1
-                    self._request()
+                    if attempts_left > 0:
+                        logger.info("Case %s might be last, trying %d more", self.case_number, attempts_left)
+                        return self._request(attempts_left=attempts_left-1)
+                    else:
+                        return None
+            logger.info("Case %s fetched", self.case_number)
             self.response = response
             return self
         else:
