@@ -10,8 +10,9 @@ def attorneys(oscn_html):
         attorney_table = sibling
         rows = attorney_table.find('tbody').find_all('tr')
         for row in rows:
-                attorney = row.td.get_text()
-                attorney_list.append(attorney)
+            attorney = row.td.contents[0]
+            attorney = ' '.join(attorney.split())
+            attorney_list.append(attorney)
 
     return attorney_list
 

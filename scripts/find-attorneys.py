@@ -4,7 +4,7 @@ import csv
 
 import oscn
 
-counties = ['tulsa', 'cimarron']
+counties = ['tulsa', 'cimarron', 'adair', 'delaware']
 years = ['2010']
 
 
@@ -15,14 +15,13 @@ for county in counties:
 
     for year in years:
         sys.stdout.write(f'{county} {year}')
-        case_iter = oscn.request.CaseList(county=county, year=year, start=2168, stop= 2173)
+        case_iter = oscn.request.CaseList(county=county, year=year, stop=25)
         for case in case_iter:
             sys.stdout.write(case.case_number)
             sys.stdout.flush()
             writer.writerow([year, county, case.case_number])
-            for attorney in case.attorneys:
-                writer.writerow([attorney])
-                sys.stdout.write('.')
-                sys.stdout.flush()
+            writer.writerow(case.attorneys)
+            sys.stdout.write('.')
+            sys.stdout.flush()
 
     csv_file.close()
