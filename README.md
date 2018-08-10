@@ -66,3 +66,8 @@ or request a list of cases to iterate:
 ## Run test scripts
 
 - `python scripts/{file.py}`
+
+## Deployment steps
+
+1. `python3 setup.py sdist bdist_wheel`
+1. `twine upload dist/*`
