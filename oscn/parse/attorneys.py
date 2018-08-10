@@ -5,9 +5,9 @@ def attorneys(oscn_html):
     attorney_list = []
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section attorneys')
-    sibling = start.next_sibling.next_sibling
-    if sibling.name == "table":
-        attorney_table = sibling
+    attorney_table = None
+    attorney_table = start.find_next_sibling('table')
+    if attorney_table:
         rows = attorney_table.find('tbody').find_all('tr')
         for row in rows:
             attorney = row.td.contents[0]
