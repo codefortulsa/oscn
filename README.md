@@ -20,7 +20,7 @@ scripts > Python scripts showing use of the oscn package
 
 ### oscn
 
-- counties: Returns a list of counties. 
+- counties: Returns a list of counties.
 
 
 ### oscn.request
@@ -37,6 +37,8 @@ Parsers accept the html of an OSCN case page and return python objects.
 - parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
 - docket: returns a list of rows in a docket
 - events: returns a list of rows in the event table
+- attorneys: returns a list of strings found in the attorney table
+
 
 ## Development Install
 
