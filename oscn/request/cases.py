@@ -139,3 +139,4 @@ class CaseList(OSCNrequest):
         is_prop = lambda kw: kw in attrs
         for kw in filter(is_prop, kwargs):
             self.filters.append({'name': kw, 'test': kwargs[kw]})
+        return self
