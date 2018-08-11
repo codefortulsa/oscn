@@ -5,6 +5,7 @@ from types import FunctionType
 
 # The following code searches for parse functions to allow them to be
 # added to objects as properties using the append_parsers function
+# it also imports them so they are available from `oscn.parse`
 
 parse_functions = []
 
@@ -21,21 +22,19 @@ try:
 except NameError:
     pass
 
-def make_safe_parser(f):
+def make_safe_parser(fn):
     def safe_parser(self):
         try:
-            return f(self.response.text)
+            return fn(self.response.text)
         except:
             return None
     return safe_parser
 
 def make_property(parse_function):
-    # return property(lambda self: parse_function(self.response.text))
     return property(make_safe_parser(parse_function))
 
 # this function accepts a class and searches for
 # parsers to be added to
-
 def append_parsers(obj):
     for fn in parse_functions:
         if obj.__name__ in fn.target:

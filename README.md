@@ -28,6 +28,9 @@ scripts > Python scripts showing use of the oscn package
 - Case: Returns a single case.
 - CaseList: Returns an iterator for retrieving cases for a county and year.
 
+ CaseLists can be filtered using .find().  See scripts/example.py for details 
+
+
 ### oscn.parse
 Parsers accept the html of an OSCN case page and return python objects.
 - filed: returns a string of the filing date (e.g. 12/25/2017)
