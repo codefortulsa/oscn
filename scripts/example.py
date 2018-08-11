@@ -16,7 +16,7 @@ years = ['2016','2017']
 cases = oscn.request.CaseList(county=counties, year=years, start=5, stop=7)
 
 for case in cases:
-    print(f'count: {case.county} number: {case.case_number}')
+    print(f'county: {case.county} number: {case.case_number}')
 
 
 

@@ -1,3 +1,5 @@
+from types import FunctionType
+
 import logging
 import requests
 import warnings
@@ -90,14 +92,16 @@ class CaseList(OSCNrequest):
                 # convert str to one element list
                 args[name] = [args[name]]
 
-    def pass_filter(self):
+    def _passes_filters(self):
+        # no filters? you pass!
         if self.filters == []:
             return True
-        for fltr in self.filters:
-            test_value = getattr(self, fltr['name'])
-            if fltr['test'](test_value):
-                return True
-        return False
+
+        filter_funcs = [case_filter['test'] for case_filter in self.filters]
+        case_values = [getattr(self, case_filter['attr_name']) for case_filter in self.filters]
+        does_it_pass = lambda fn,val : fn(val)
+        test_results = map(does_it_pass, filter_funcs, case_values)
+        return all(test_results)
 
     def _gen_requests(self):
         for county in self.counties:
@@ -111,7 +115,7 @@ class CaseList(OSCNrequest):
                         break
                     next_case = self._request()
                     if next_case:
-                        if self.pass_filter():
+                        if self._passes_filters():
                             yield next_case
                     else:
                         break
@@ -138,5 +142,9 @@ class CaseList(OSCNrequest):
         attrs = dir(self)
         is_prop = lambda kw: kw in attrs
         for kw in filter(is_prop, kwargs):
-            self.filters.append({'name': kw, 'test': kwargs[kw]})
+            if isinstance(kwargs[kw], FunctionType):
+                attr_test = kwargs[kw]
+            elif isinstance(kwargs[kw], str):
+                attr_test = lambda val: kwargs[kw] in val
+            self.filters.append({'attr_name': kw, 'test': attr_test})
         return self
