@@ -83,13 +83,13 @@ class Case(OSCNrequest):
 class CaseList(OSCNrequest):
     filters = []
 
-    def _passes_filters(self):
+    def _passes_filters(self, case_to_test):
         # no filters? you pass!
         if self.filters == []:
             return True
 
         filter_funcs = [case_filter['test'] for case_filter in self.filters]
-        case_values = [getattr(self, case_filter['attr_name'])
+        case_values = [getattr(case_to_test, case_filter['attr_name'])
                        for case_filter in self.filters]
         does_it_pass = lambda fn, val: fn(val)
         test_results = map(does_it_pass, filter_funcs, case_values)
@@ -97,19 +97,19 @@ class CaseList(OSCNrequest):
 
     def _gen_requests(self):
         for case_type in self.types:
-            self.type = case_type
             for county in self.counties:
-                self.county = county
                 for year in self.years:
-                    self.year = year
                     self.number = self.start
                     while True:
                         self.number += 1
                         if self.stop and self.number > self.stop:
                             break
-                        next_case = self._request()
+                        next_case = Case(number=self.number,
+                                         type=case_type,
+                                         county=county,
+                                         year=year)._request()
                         if next_case:
-                            if self._passes_filters():
+                            if self._passes_filters(next_case):
                                 yield next_case
                         else:
                             break
