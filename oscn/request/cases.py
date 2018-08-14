@@ -14,11 +14,7 @@ logger = logging.getLogger('oscn')
 
 
 class OSCNrequest(object):
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'en-US,en;q=0.9'
-        }
+    headers = settings.OSCN_REQUEST_HEADER
 
     def __init__(self, type='CF', county='tulsa', year='2018', number=1):
         self.type = type
