@@ -6,7 +6,7 @@ import warnings
 
 from . import settings
 
-from oscn.parse import append_parsers
+from ..parse import append_parsers
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -53,7 +53,8 @@ class OSCNrequest(object):
                 if msg in response.text:
                     self.number += 1
                     if attempts_left > 0:
-                        logger.info("Case %s might be last, trying %d more", self.case_number, attempts_left)
+                        logger.info("Case %s might be last, trying %d more",
+                                    self.case_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
                         return None
@@ -101,8 +102,9 @@ class CaseList(OSCNrequest):
             return True
 
         filter_funcs = [case_filter['test'] for case_filter in self.filters]
-        case_values = [getattr(self, case_filter['attr_name']) for case_filter in self.filters]
-        does_it_pass = lambda fn,val : fn(val)
+        case_values = [getattr(self, case_filter['attr_name'])
+                       for case_filter in self.filters]
+        does_it_pass = lambda fn, val: fn(val)
         test_results = map(does_it_pass, filter_funcs, case_values)
         return all(test_results)
 
