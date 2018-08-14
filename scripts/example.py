@@ -1,5 +1,6 @@
 import oscn
 
+
 # single case request
 case = oscn.request.Case(county='washington', year='2018', number=6)
 print(f'judge: {case.judge}')
@@ -10,9 +11,10 @@ print(f'parties: {case.parties}')
 cases = oscn.request.CaseList(county='tulsa', year='2017')
 
 
-#multiple counties and multiple years
+# multiple types, multiple counties, or multiple years
+types = ['CM', 'CF']
 counties = ['tulsa', 'adair', 'bryan']
-years = ['2016','2017']
+years = ['2016', '2017']
 cases = oscn.request.CaseList(county=counties, year=years, start=5, stop=7)
 
 for case in cases:

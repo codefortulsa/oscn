@@ -85,12 +85,19 @@ class Case(OSCNrequest):
 
 class CaseList(OSCNrequest):
     filters = []
+    list_args = [('type', 'types'), ('county', 'counties'), ('year', 'years')]
 
-    def _convert_str_arg(self, name, args):
-        if name in args:
-            if type(args[name]) is str:
-                # convert str to one element list
-                args[name] = [args[name]]
+    def _convert_str_args(self, args):
+        for pair in self.list_args:
+            single_name = pair[0]
+            if single_name in args:
+                if type(args[single_name]) is str:
+                    # convert str to one element list
+                    args[single_name] = [args[single_name]]
+                # add the list to this object
+                plural_name = pair[1]
+                setattr(self, plural_name, args[single_name])
+
 
     def _passes_filters(self):
         # no filters? you pass!
@@ -104,30 +111,37 @@ class CaseList(OSCNrequest):
         return all(test_results)
 
     def _gen_requests(self):
-        for county in self.counties:
-            self.county = county
-            for year in self.years:
-                self.year = year
-                self.number = self.start
-                while True:
-                    self.number += 1
-                    if self.stop and self.number > self.stop:
-                        break
-                    next_case = self._request()
-                    if next_case:
-                        if self._passes_filters():
-                            yield next_case
-                    else:
-                        break
+        for case_type in self.types:
+            self.type = case_type
+            for county in self.counties:
+                self.county = county
+                for year in self.years:
+                    self.year = year
+                    self.number = self.start
+                    while True:
+                        self.number += 1
+                        if self.stop and self.number > self.stop:
+                            break
+                        next_case = self._request()
+                        if next_case:
+                            if self._passes_filters():
+                                yield next_case
+                        else:
+                            break
         raise StopIteration
 
-    def __init__(self, start=0, stop=False, **kwargs):
+    def __init__(self,
+                 types=['CF', 'CM'],
+                 counties=['tulsa', 'oklahoma'],
+                 years=['2018', '2017'],
+                 start=0, stop=False, **kwargs):
+
         self.start = start if start == 0 else start-1
         self.stop = stop
-        self._convert_str_arg('county', kwargs)
-        self._convert_str_arg('year', kwargs)
-        self.counties = kwargs['county']
-        self.years = kwargs['year']
+        self.types = types
+        self.counties = counties
+        self.years = years
+        self._convert_str_args(kwargs)
         self.all_cases = self._gen_requests()
         super().__init__(number=self.start, **kwargs)
 
