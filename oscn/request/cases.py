@@ -82,19 +82,6 @@ class Case(OSCNrequest):
 
 class CaseList(OSCNrequest):
     filters = []
-    list_args = [('type', 'types'), ('county', 'counties'), ('year', 'years')]
-
-    def _convert_str_args(self, args):
-        for pair in self.list_args:
-            single_name = pair[0]
-            if single_name in args:
-                if type(args[single_name]) is str:
-                    # convert str to one element list
-                    args[single_name] = [args[single_name]]
-                # add the list to this object
-                plural_name = pair[1]
-                setattr(self, plural_name, args[single_name])
-
 
     def _passes_filters(self):
         # no filters? you pass!
@@ -136,12 +123,16 @@ class CaseList(OSCNrequest):
 
         self.start = start if start == 0 else start-1
         self.stop = stop
-        self.types = types
-        self.counties = counties
-        self.years = years
-        self._convert_str_args(kwargs)
-        self.all_cases = self._gen_requests()
         super().__init__(number=self.start, **kwargs)
+
+        # make a str into a single element list otherwise do nothing
+        mk_list = lambda val: [val] if type(val) is str else val
+
+        self.types = mk_list(kwargs['county']) if 'type' in kwargs else types
+        self.counties = (
+            mk_list(kwargs['county']) if 'county' in kwargs else counties)
+        self.years = mk_list(kwargs['year']) if 'year' in kwargs else years
+        self.all_cases = self._gen_requests()
 
     def __iter__(self):
         return self
