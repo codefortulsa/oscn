@@ -107,7 +107,7 @@ class CaseList(OSCNrequest):
                         next_case = Case(number=self.number,
                                          type=case_type,
                                          county=county,
-                                         year=year)._request()
+                                         year=year)
                         if next_case:
                             if self._passes_filters(next_case):
                                 yield next_case
