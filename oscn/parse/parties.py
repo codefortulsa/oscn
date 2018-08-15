@@ -24,4 +24,4 @@ def parties(oscn_html):
     return [r for r in result]
 
 # add this attribute to allow it to be added to request objects
-setattr(parties,'target',['OSCNrequest'])
+setattr(parties,'target',['Case'])

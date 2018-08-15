@@ -9,7 +9,7 @@ def filed(oscn_html):
     else:
         return None
 
-setattr(filed,'target',['OSCNrequest'])
+setattr(filed,'target',['Case'])
 
 
 def closed(oscn_html):
@@ -23,4 +23,4 @@ def closed(oscn_html):
     except AttributeError:
         return None
 
-setattr(closed,'target',['OSCNrequest'])
+setattr(closed,'target',['Case'])

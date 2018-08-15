@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 logger = logging.getLogger('oscn')
 
 
-class OSCNrequest(object):
+class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
 
     def __init__(self, type='CF', county='tulsa', year='2018', number=1):
@@ -21,6 +21,7 @@ class OSCNrequest(object):
         self.county = county
         self.year = year
         self.number = number
+        self._request()
 
     @property
     def case_number(self):
@@ -66,21 +67,14 @@ class OSCNrequest(object):
 
 # This next line adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
-# name = OSCNrequest.judge
+# name = Case.judge
 # or
-# counts = OSCNrequest.counts
+# counts = Case.counts
 
-append_parsers(OSCNrequest)
-
-
-class Case(OSCNrequest):
-
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self._request()
+append_parsers(Case)
 
 
-class CaseList(OSCNrequest):
+class CaseList(object):
     filters = []
 
     def _passes_filters(self, case_to_test):
@@ -88,11 +82,25 @@ class CaseList(OSCNrequest):
         if self.filters == []:
             return True
 
-        filter_funcs = [case_filter['test'] for case_filter in self.filters]
+        # make a list of filters that match properties on case_to_test
+        case_attrs = dir(case_to_test)
+        is_prop = lambda fl: fl['attr_name'] in case_attrs
+        test_filters = [f for f in filter(is_prop, self.filters)]
+
+        # no filters found? you pass!
+        if test_filters == []:
+            return True
+
+        # make a list of functions and a list of values
+        filter_funcs = [case_filter['test'] for case_filter in test_filters]
         case_values = [getattr(case_to_test, case_filter['attr_name'])
-                       for case_filter in self.filters]
+                       for case_filter in test_filters]
+
+        # run the tests
         does_it_pass = lambda fn, val: fn(val)
         test_results = map(does_it_pass, filter_funcs, case_values)
+
+        # see if they are all true
         return all(test_results)
 
     def _gen_requests(self):
@@ -123,15 +131,22 @@ class CaseList(OSCNrequest):
 
         self.start = start if start == 0 else start-1
         self.stop = stop
-        super().__init__(number=self.start, **kwargs)
 
-        # make a str into a single element list otherwise do nothing
+        # this next section allows passing single arguments, such as
+        # type = 'CM' or county = 'tulsa' or year = '2018'
+        # it also allows passing a list with these argumens, such as
+        # year=['2018','2017']
+
+
+        # make a str into a single element list otherwise return the value
+        # use the default value if type, county, or year aren't passed
         mk_list = lambda val: [val] if type(val) is str else val
-
-        self.types = mk_list(kwargs['county']) if 'type' in kwargs else types
+        self.types = mk_list(kwargs['type']) if 'type' in kwargs else types
         self.counties = (
             mk_list(kwargs['county']) if 'county' in kwargs else counties)
         self.years = mk_list(kwargs['year']) if 'year' in kwargs else years
+
+        # create the generator for this list
         self.all_cases = self._gen_requests()
 
     def __iter__(self):
@@ -141,10 +156,7 @@ class CaseList(OSCNrequest):
         return next(self.all_cases)
 
     def find(self, **kwargs):
-        # see if any kwargs match self attr
-        attrs = dir(self)
-        is_prop = lambda kw: kw in attrs
-        for kw in filter(is_prop, kwargs):
+        for kw in kwargs:
             if isinstance(kwargs[kw], FunctionType):
                 attr_test = kwargs[kw]
             elif isinstance(kwargs[kw], str):

@@ -23,4 +23,4 @@ def events(oscn_html):
 
     return events
 
-setattr(events,'target',['OSCNrequest'])
+setattr(events,'target',['Case'])

@@ -31,4 +31,4 @@ def docket(oscn_html):
 
     return events
 
-setattr(docket,'target',['OSCNrequest'])
+setattr(docket,'target',['Case'])
