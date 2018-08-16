@@ -74,6 +74,19 @@ class Case(object):
 append_parsers(Case)
 
 
+class CaseFilter(object):
+
+    def __init__(self, target, test):
+        # target is the property of a case to be tested
+        self.target = target
+        # test is a function used to evaluate the target values
+        if isinstance(test, FunctionType):
+            self.test = test
+        # turn a str into a function to find the str in the target value
+        elif isinstance(test, str):
+            self.test = lambda val: test in val
+
+
 class CaseList(object):
     filters = []
 
@@ -83,8 +96,8 @@ class CaseList(object):
             return True
 
         # make a list of filters that match properties on case_to_test
-        case_attrs = dir(case_to_test)
-        is_prop = lambda fl: fl['attr_name'] in case_attrs
+        case_props = dir(case_to_test)
+        is_prop = lambda f: f.target in case_props
         test_filters = [f for f in filter(is_prop, self.filters)]
 
         # no filters found? you pass!
@@ -92,9 +105,8 @@ class CaseList(object):
             return True
 
         # make a list of functions and a list of values
-        filter_funcs = [case_filter['test'] for case_filter in test_filters]
-        case_values = [getattr(case_to_test, case_filter['attr_name'])
-                       for case_filter in test_filters]
+        filter_funcs = [f.test for f in test_filters]
+        case_values = [getattr(case_to_test, f.target) for f in test_filters]
 
         # run the tests
         does_it_pass = lambda fn, val: fn(val)
@@ -157,9 +169,5 @@ class CaseList(object):
 
     def find(self, **kwargs):
         for kw in kwargs:
-            if isinstance(kwargs[kw], FunctionType):
-                attr_test = kwargs[kw]
-            elif isinstance(kwargs[kw], str):
-                attr_test = lambda val: kwargs[kw] in val
-            self.filters.append({'attr_name': kw, 'test': attr_test})
+            self.filters.append(CaseFilter(kw, kwargs[kw]))
         return self
