@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 
+from ._helpers import clean_string
 
 def parties(oscn_html):
     parties_list = []
@@ -10,12 +11,13 @@ def parties(oscn_html):
     party_links = party_p.find_all('a')
 
     for link in party_links:
-        names.append(link.text)
+        names.append(clean_string(link.text))
         party_p.a.extract()
 
     party_type = party_p.text.split(',')
     party_type.pop(0)
-    types = [r.strip() for r in party_type]
+
+    types = [clean_string(r) for r in party_type]
 
     Party = lambda name,type: {'name': name, 'type': type}
 
