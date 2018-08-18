@@ -12,9 +12,11 @@ oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
 logger = logging.getLogger('oscn')
 
+logger.setLevel(logging.INFO)
 
 class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
+    response = False
 
     def __init__(self, type='CF', county='tulsa', year='2018', number=1):
         self.type = type
@@ -58,12 +60,9 @@ class Case(object):
                                     self.case_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
-                        return None
+                        return
             logger.info("Case %s fetched", self.case_number)
             self.response = response
-            return self
-        else:
-            return None
 
 # This next line adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
@@ -128,7 +127,8 @@ class CaseList(object):
                                          type=case_type,
                                          county=county,
                                          year=year)
-                        if next_case:
+                        self.number = next_case.number
+                        if next_case.response:
                             if self._passes_filters(next_case):
                                 yield next_case
                         else:
