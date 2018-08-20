@@ -10,6 +10,7 @@ OSCN_REQUEST_HEADER = {
 
 INVALID_CASE_MESSAGES = [
     "Case Number is Invalid",
+    "SKIPPED IN ERROR",
     ]
 UNUSED_CASE_MESSAGES = [
     "Something went wrong",
