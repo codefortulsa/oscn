@@ -120,14 +120,13 @@ class CaseList(object):
                 for year in self.years:
                     self.number = self.start
                     while True:
-                        self.number += 1
                         if self.stop and self.number > self.stop:
                             break
                         next_case = Case(number=self.number,
                                          type=case_type,
                                          county=county,
                                          year=year)
-                        self.number = next_case.number
+                        self.number = next_case.number+1
                         if next_case.response:
                             if self._passes_filters(next_case):
                                 yield next_case
@@ -139,9 +138,9 @@ class CaseList(object):
                  types=['CF', 'CM'],
                  counties=['tulsa', 'oklahoma'],
                  years=['2018', '2017'],
-                 start=0, stop=False, **kwargs):
+                 start=1, stop=False, **kwargs):
 
-        self.start = start if start == 0 else start-1
+        self.start = start
         self.stop = stop
 
         # this next section allows passing single arguments, such as
