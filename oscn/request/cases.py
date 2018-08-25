@@ -18,20 +18,26 @@ class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def __init__(self, type='CF', county='tulsa', year='2018', number=1):
+    def __init__(self, type='CF', county='tulsa', year='2018',
+                 number=1, **kwargs):
         self.type = type
         self.county = county
         self.year = year
         self.number = number
+        self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
         self._request()
 
     @property
     def case_number(self):
-        return f'{self.type}-{self.year}-{self.number}'
+        if self.cmid:
+            return f'cmid:{self.cmid}'
+        else:
+            return f'{self.type}-{self.year}-{self.number}'
 
     @property
     def source(self):
-        return f'{oscn_url}?db={self.county}&number={self.case_number}'
+        request = self.response.request
+        return f'{request.url}?{request.body}'
 
     @property
     def text(self):
@@ -47,7 +53,12 @@ class Case(object):
         return True
 
     def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
-        params = {'db': self.county, 'number': self.case_number}
+
+        if self.cmid:
+            params = {'db': self.county, 'cmid': self.cmid}
+        else:
+            params = {'db': self.county, 'number': self.case_number}
+
         response = (
             requests.post(oscn_url, params, headers=self.headers, verify=False)
             )
@@ -128,8 +139,15 @@ class CaseList(object):
                                          year=year)
                         self.number = next_case.number+1
                         if next_case.response:
-                            if self._passes_filters(next_case):
-                                yield next_case
+                            if next_case.cmids:
+                                for cmid in next_case.cmids:
+                                    cmid_case = Case(county=county, cmid=cmid)
+                                    if cmid_case.response:
+                                        if self._passes_filters(cmid_case):
+                                            yield cmid_case
+                            else:
+                                if self._passes_filters(next_case):
+                                        yield next_case
                         else:
                             break
         raise StopIteration
@@ -150,12 +168,13 @@ class CaseList(object):
 
 
         # make a str into a single element list otherwise return the value
+        str_to_list = lambda val: [val] if type(val) is str else val
+
         # use the default value if type, county, or year aren't passed
-        mk_list = lambda val: [val] if type(val) is str else val
-        self.types = mk_list(kwargs['type']) if 'type' in kwargs else types
+        self.types = str_to_list(kwargs['type']) if 'type' in kwargs else types
         self.counties = (
-            mk_list(kwargs['county']) if 'county' in kwargs else counties)
-        self.years = mk_list(kwargs['year']) if 'year' in kwargs else years
+            str_to_list(kwargs['county']) if 'county' in kwargs else counties)
+        self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
 
         # create the generator for this list
         self.all_cases = self._gen_requests()
