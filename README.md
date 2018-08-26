@@ -1,6 +1,6 @@
-# OSCN Query utilities
+# OSCN utilities
 
-This is a collection of python utilities to scrape case information from the [Oklahoma Supreme Court Network](https://www.oscn.net/dockets/).
+A python library for scraping case information from the [Oklahoma State Courts Network](https://www.oscn.net/dockets/).
 
 ## Contents
 
@@ -28,7 +28,7 @@ scripts > Python scripts showing use of the oscn package
 - Case: Returns a single case.
 - CaseList: Returns an iterator for retrieving cases for a county and year.
 
- CaseLists can be filtered using .find().  See scripts/example.py for details 
+ CaseLists can be filtered using .find().  See scripts/example.py for details
 
 
 ### oscn.parse

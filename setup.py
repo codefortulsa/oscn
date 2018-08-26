@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+Statefrom setuptools import setup, find_packages
 
 
 with open("README.md", "r") as fh:
@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(  name='oscn',
         version='0.0.0.23',
-        description='Oklahoma Supreme Court Network page parsing utilities',
+        description='Oklahoma State Courts Network page parsing utilities',
         long_description=long_description,
         long_description_content_type="text/markdown",
         url='https://github.com/codefortulsa/oscn',
