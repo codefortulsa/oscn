@@ -7,6 +7,9 @@ print(f'judge: {case.judge}')
 print(f'filed: {case.filed}')
 print(f'parties: {case.parties}')
 
+for min in case.docket:
+    print(min)
+
 # all cases for a one county and year
 cases = oscn.request.CaseList(county='tulsa', year='2017')
 
@@ -25,7 +28,6 @@ for case in cases:
 cases=oscn.request.CaseList(type='CF', year='2017',county='love', start=305)
 
 [print(c.case_number) for c in cases]
-
 
 # example using find on CaseList
 

@@ -11,16 +11,19 @@ parse_functions = []
 
 try:
     for py_file in listdir(__path__[0]):
-        parse_module = import_module(f'.{splitext(py_file)[0]}', package=__package__)
+        parse_module = (
+            import_module(f'.{splitext(py_file)[0]}', package=__package__)
+            )
         for name in dir(parse_module):
             attr = getattr(parse_module, name)
             if isinstance(attr, FunctionType):
-                if hasattr(attr,'target'):
+                if hasattr(attr, 'target'):
                     # replaces 'from .counts import counts'
                     locals()[name] = attr
                     parse_functions.append(attr)
 except NameError:
     pass
+
 
 def make_safe_parser(fn):
     def safe_parser(self):
@@ -30,8 +33,10 @@ def make_safe_parser(fn):
             return None
     return safe_parser
 
+
 def make_property(parse_function):
     return property(make_safe_parser(parse_function))
+
 
 # this function accepts a class and searches for
 # parsers to be added to
