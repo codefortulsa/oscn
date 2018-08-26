@@ -2,8 +2,8 @@ from bs4 import BeautifulSoup
 
 from ._helpers import clean_string
 
+
 def parties(oscn_html):
-    parties_list = []
     names = []
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section party')
@@ -19,11 +19,11 @@ def parties(oscn_html):
 
     types = [clean_string(r) for r in party_type]
 
-    Party = lambda name,type: {'name': name, 'type': type}
+    Party = lambda name, type: {'name': name, 'type': type}
 
     result = map(Party, names, types)
 
     return [r for r in result]
 
 # add this attribute to allow it to be added to request objects
-setattr(parties,'target',['Case'])
+setattr(parties, 'target', ['Case'])

@@ -21,9 +21,10 @@ def counts(oscn_html):
             while next_sibling.name != 'h2':
                 if next_sibling.name == 'p':
                     next_sibling.strong.extract()
-                    count_list.append({'description': next_sibling.text.strip()})
+                    count_list.append(
+                        {'description': next_sibling.text.strip()})
                 next_sibling = next_sibling.next_sibling
 
     return count_list
 
-setattr(counts,'target',['Case'])
+setattr(counts, 'target', ['Case'])

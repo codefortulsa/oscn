@@ -1,9 +1,11 @@
 from bs4 import BeautifulSoup
 from ._helpers import text_values, add_properties
 
+
 class Event(object):
     def __init__(self):
         pass
+
 
 def events(oscn_html):
     events = []
@@ -15,7 +17,7 @@ def events(oscn_html):
     headings = text_values(thead)
 
     for row in rows:
-        cells=row.find_all('td')
+        cells = row.find_all('td')
         values = text_values(cells)
         event = Event()
         add_properties(event, headings, values)
@@ -23,4 +25,4 @@ def events(oscn_html):
 
     return events
 
-setattr(events,'target',['Case'])
+setattr(events, 'target', ['Case'])

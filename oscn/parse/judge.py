@@ -10,4 +10,4 @@ def judge(oscn_html):
     else:
         return None
 
-setattr(judge,'target',['Case'])
+setattr(judge, 'target', ['Case'])

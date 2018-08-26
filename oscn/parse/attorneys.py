@@ -17,4 +17,4 @@ def attorneys(oscn_html):
     return attorney_list
 
 # add this attribute to allow it to be added to request objects
-setattr(attorneys,'target',['Case'])
+setattr(attorneys, 'target', ['Case'])
