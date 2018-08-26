@@ -59,21 +59,25 @@ class Case(object):
         else:
             params = {'db': self.county, 'number': self.case_number}
 
-        response = (
+        self.response = (
             requests.post(oscn_url, params, headers=self.headers, verify=False)
             )
-        if self._valid_response(response):
+
+        if self._valid_response(self.response):
+            self.valid = True
             for msg in settings.UNUSED_CASE_MESSAGES:
-                if msg in response.text:
+                if msg in self.response.text:
                     self.number += 1
                     if attempts_left > 0:
                         logger.info("Case %s might be last, trying %d more",
                                     self.case_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
+                        self.valid = False
                         return
             logger.info("Case %s fetched", self.case_number)
-            self.response = response
+        else:
+            self.valid = False
 
 # This next line adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
@@ -138,7 +142,7 @@ class CaseList(object):
                                          county=county,
                                          year=year)
                         self.number = next_case.number+1
-                        if next_case.response:
+                        if next_case.valid:
                             if next_case.cmids:
                                 for cmid in next_case.cmids:
                                     cmid_case = Case(county=county, cmid=cmid)
