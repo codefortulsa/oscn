@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 
 def make_pattern_finder(pattern):
@@ -7,7 +8,8 @@ def make_pattern_finder(pattern):
     def find_pattern(oscn_html):
         search = find.search(oscn_html)
         try:
-            return search.group(1)
+            date_str = search.group(1)
+            return datetime.strptime(date_str, '%m/%d/%Y')
         except AttributeError:
             return None
 

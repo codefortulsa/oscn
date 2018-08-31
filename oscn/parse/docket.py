@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
-from ._helpers import text_values, add_properties
+from ._helpers import text_values, add_properties, OSCN_Row
 
 
-class DocketMinute(object):
+class DocketMinute(OSCN_Row):
     def __init__(self, properties=[], values=[]):
         self.publish = properties
         add_properties(self, properties, values)

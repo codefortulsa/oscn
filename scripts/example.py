@@ -1,6 +1,5 @@
 import oscn
 
-
 # single case request
 case = oscn.request.Case(county='washington', year='2018', number=6)
 print(f'judge: {case.judge}')

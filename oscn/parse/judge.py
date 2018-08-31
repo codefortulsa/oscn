@@ -1,5 +1,7 @@
 import re
 
+from . import settings.REMOVE_TITLES
+
 
 def judge(oscn_html):
     judge_re = r'Judge:\s*([\w\s\,]*)'
