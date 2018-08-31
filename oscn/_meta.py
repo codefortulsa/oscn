@@ -3,7 +3,7 @@ import functools
 
 from bs4 import BeautifulSoup
 
-from .request import settings
+from . import settings
 
 @functools.lru_cache()
 def courts():

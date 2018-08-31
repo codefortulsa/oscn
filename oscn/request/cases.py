@@ -4,7 +4,7 @@ import logging
 import requests
 import warnings
 
-from . import settings
+from .. import settings
 
 from ..parse import append_parsers
 

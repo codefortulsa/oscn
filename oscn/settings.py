@@ -6,7 +6,7 @@ OSCN_REQUEST_HEADER = {
         'Accept-Language': 'en-US,en;q=0.9'
         }
 
-
+REMOVE_TITLES = ['HONORABLE']
 
 INVALID_CASE_MESSAGES = [
     "Case Number is Invalid",
