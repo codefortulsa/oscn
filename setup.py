@@ -6,8 +6,8 @@ with open("README.md", "r") as fh:
 
 
 setup(  name='oscn',
-        version='0.0.0.24',
-        description='Oklahoma State Courts Network page parsing utilities',
+        version='0.0.0.25',
+        description='Oklahoma State Courts Network case parsing utilities',
         long_description=long_description,
         long_description_content_type="text/markdown",
         url='https://github.com/codefortulsa/oscn',
