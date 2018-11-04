@@ -9,6 +9,7 @@ from requests.exceptions import ConnectionError
 from .. import settings
 
 from ..parse import append_parsers
+from ..find import append_finders
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -91,6 +92,7 @@ class Case(object):
 # or
 # counts = Case.counts
 append_parsers(Case)
+append_finders(Case)
 
 
 class CaseFilter(object):
