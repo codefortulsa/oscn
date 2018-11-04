@@ -1,7 +1,7 @@
 import oscn
 
 # single case request
-case = oscn.request.Case(county='washington', year='2018', number=6)
+case = oscn.request.Case(county='mayes', year='2018', number=11)
 print(f'judge: {case.judge}')
 print(f'filed: {case.filed}')
 print(f'parties: {case.parties}')

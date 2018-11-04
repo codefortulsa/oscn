@@ -4,6 +4,8 @@ import logging
 import requests
 import warnings
 
+from requests.exceptions import ConnectionError
+
 from .. import settings
 
 from ..parse import append_parsers
@@ -13,6 +15,7 @@ warnings.filterwarnings("ignore")
 logger = logging.getLogger('oscn')
 
 logger.setLevel(logging.INFO)
+
 
 class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
@@ -59,9 +62,12 @@ class Case(object):
         else:
             params = {'db': self.county, 'number': self.case_number}
 
-        self.response = (
-            requests.post(oscn_url, params, headers=self.headers, verify=False)
+        try:
+            self.response = (
+              requests.post(oscn_url, params, headers=self.headers, verify=False)
             )
+        except ConnectionError:
+            return self._request(attempts_left=attempts_left-1)
 
         if self._valid_response(self.response):
             self.valid = True
@@ -84,7 +90,6 @@ class Case(object):
 # name = Case.judge
 # or
 # counts = Case.counts
-
 append_parsers(Case)
 
 

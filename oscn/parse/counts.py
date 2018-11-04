@@ -2,7 +2,7 @@ import re
 from bs4 import BeautifulSoup
 
 count_re = r'Count as Filed:[^A-Z]*([A-Z|\d]*),\s(.*)'
-
+count_details = re.compile(count_re, re.M)
 
 def counts(oscn_html):
     count_list = []
@@ -10,7 +10,6 @@ def counts(oscn_html):
     counts = soup.find_all('td', 'CountDescription')
     if counts:
         for count in counts:
-            count_details = re.compile(count_re, re.M)
             find_desc = count_details.search(count.text)
             if find_desc.group:
                 count_list.append({'description': find_desc.group(2).strip()})
