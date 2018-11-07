@@ -1,16 +1,23 @@
 import re
 
-find_plea = re.compile(r'plea', re.M | re.I)
-
+has_plea = re.compile(r'plea', re.M | re.I)
+has_sentance = re.compile(r'sentence', re.M | re.I)
 
 def pleas(case):
-    minutes_with_pleas = []
     try:
-        for min in case.docket:
-            if find_plea.search(min['description']):
-                minutes_with_pleas.append(min)
-        return minutes_with_pleas
+        find_pleas = lambda min: has_plea.search(min['description'])
+        return list(filter(find_pleas, case.docket))
     except:
         return []
 
 setattr(pleas, 'target', ['Case'])
+
+
+def sentences(case):
+    try:
+        find_sentence = lambda min: has_sentance.search(min['description'])
+        return list(filter(find_sentence, case.docket))
+    except:
+        return []
+
+setattr(sentences, 'target', ['Case'])

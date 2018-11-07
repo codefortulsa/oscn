@@ -8,10 +8,9 @@ def make_pattern_finder(pattern):
     def find_pattern(oscn_html):
         search = find.search(oscn_html)
         try:
-            date_str = search.group(1)
-            return datetime.strptime(date_str, '%m/%d/%Y')
+            return search.group(1)
         except AttributeError:
-            return None
+            return ''
 
     return find_pattern
 
@@ -22,3 +21,7 @@ setattr(find_filed, 'target', ['Case'])
 find_closed = make_pattern_finder(r'Closed:\s*([\/\d]*)')
 find_closed.__name__ = 'closed'
 setattr(find_closed, 'target', ['Case'])
+
+find_offense = make_pattern_finder(r'Date.of.Offense:\s*([\/\d]*)')
+find_offense.__name__ = 'offense'
+setattr(find_offense, 'target', ['Case'])

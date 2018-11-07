@@ -43,8 +43,10 @@ Parsers accept the html of an OSCN case page and return python objects.
 - attorneys: returns a list of strings found in the attorney table
 
 ### oscn.find
-These functions use parse results to determine addition properties.
+These functions use parse results to determine additional properties.
 - pleas: returns a list of docket minutes containing pleas
+- sentence: returns a list of docket minutes containing sentences
+
 
 ## Development Install
 
