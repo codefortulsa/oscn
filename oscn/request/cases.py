@@ -39,6 +39,10 @@ class Case(object):
             return f'{self.type}-{self.year}-{self.number}'
 
     @property
+    def case_index(self):
+        return f'{self.county}-{self.case_number}'
+
+    @property
     def source(self):
         request = self.response.request
         return f'{request.url}?{request.body}'
