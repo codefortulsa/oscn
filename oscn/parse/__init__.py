@@ -32,7 +32,7 @@ def make_safe_parser(fn):
         try:
             return fn(self.response.text)
         except:
-            return None
+            return fn._default_value if fn._default_value else False
     return safe_parser
 
 

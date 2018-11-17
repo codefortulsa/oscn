@@ -16,6 +16,7 @@ UNUSED_CASE_MESSAGES = [
     "Something went wrong",
     'THIS CASE NUMBER WAS NOT USED',
     "is formatted incorrectly or is not found within",
+    ">No Record.</td>"
     ]
 
 # How many empty cases in a row to decide we're at the end of the case list?

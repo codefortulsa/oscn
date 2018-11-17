@@ -7,7 +7,6 @@ def docket(oscn_html):
     docket_table = soup.find('table', 'docketlist')
     thead = docket_table.find('thead').find_all('th')
     rows = docket_table.find('tbody').find_all('tr')
-
     minutes = []
     # make a lower case list of column headers
     columns = [hdr for hdr in map(lambda str:str.lower(), text_values(thead))]
@@ -27,3 +26,4 @@ def docket(oscn_html):
     return [dt_chk(min) for min in minutes]
 
 setattr(docket, 'target', ['Case'])
+setattr(docket, '_default_value', [])
