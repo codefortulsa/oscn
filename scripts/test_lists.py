@@ -6,10 +6,10 @@ import oscn
 #
 # parties = case.parties
 
-types = ['CM', 'CV', 'CF', 'PB', 'FD']
+types = ['CV', 'PB', 'FD']
 
 
 cases = oscn.request.CaseList(types=types, county='tulsa', year='2017', start=50, stop=55)
 for case in cases:
-    print(case.case_number)
-    print(case.parties)
+    issues = oscn.parse.issues(case.text)
+    print(issues)
