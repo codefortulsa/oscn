@@ -2,7 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ._helpers import lists2dict, clean_string
+from ._helpers import find_values
 
 
 def issues(oscn_html):
@@ -14,17 +14,27 @@ def issues(oscn_html):
     if issue_table:
         rows = issue_table.find_all('tr')
         for row in rows:
-            key_words = ['Filed Date', 'Filed By', 'Issue']
-            values = []
-            for word in key_words:
-                word_element = row.find(string=re.compile(f'{word}:'))
-                if word_element:
-                    word_value = word_element.split(':')[1]
-                else:
-                    word_value = ''
-                values.append(clean_string(word_value))
+            # find the issue details
+            key_names = ['Filed Date', 'Filed By', 'Issue']
+            issue_dict = find_values(row, key_names)
+            # look for disposition
+            issue_table = start.find_next_sibling('table')
+            disp_table = (
+                issue_table
+                .find_next('th', 'dispositionInformation')
+                .find_parent('table')
+            )
+            if disp_table:
+                disp_keys = ['Defendant', 'Respondent', 'Disposed']
+                for row in disp_table.tbody.find_all('tr'):
+                    # remove formatting from td
+                    for td in row.find_all('td'):
+                        td.string = (' '.join(td.strings))
+                    disp_dict = find_values(row, disp_keys)
+                    # add disposition to the issue dict
+                    issue_dict['disposition'] = disp_dict
+            issue_list.append(issue_dict)
 
-            issue_list.append(lists2dict(key_words, values))
     return issue_list
 
 

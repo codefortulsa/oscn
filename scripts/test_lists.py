@@ -9,7 +9,7 @@ import oscn
 types = ['CV', 'PB', 'FD']
 
 
-cases = oscn.request.CaseList(types=types, county='tulsa', year='2017', start=50, stop=55)
+cases = oscn.request.CaseList(types=types, county='tulsa', year='2017', start=700, stop=710)
 for case in cases:
     issues = oscn.parse.issues(case.text)
     print(issues)

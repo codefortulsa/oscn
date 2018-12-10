@@ -8,6 +8,7 @@ def docket(oscn_html):
     thead = docket_table.find('thead').find_all('th')
     rows = docket_table.find('tbody').find_all('tr')
     minutes = []
+
     # make a lower case list of column headers
     columns = [hdr for hdr in map(lambda str:str.lower(), text_values(thead))]
 
