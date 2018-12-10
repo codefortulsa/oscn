@@ -1,5 +1,3 @@
-import re
-
 from bs4 import BeautifulSoup
 
 from ._helpers import find_values
