@@ -6,3 +6,4 @@ data/
 /*.egg-info
 /dist
 /build
+/examples

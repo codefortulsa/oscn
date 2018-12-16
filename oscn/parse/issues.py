@@ -23,14 +23,17 @@ def issues(oscn_html):
                 .find_parent('table')
             )
             if disp_table:
+                dispositions = []
                 disp_keys = ['Defendant', 'Respondent', 'Disposed']
                 for row in disp_table.tbody.find_all('tr'):
-                    # remove formatting from td
+                    # remove formatting elements from td
                     for td in row.find_all('td'):
                         td.string = (' '.join(td.strings))
                     disp_dict = find_values(row, disp_keys)
-                    # add disposition to the issue dict
-                    issue_dict['disposition'] = disp_dict
+                    dispositions.append(disp_dict)
+
+                # add disposition to the issue dict
+                issue_dict['dispositions'] = dispositions
             issue_list.append(issue_dict)
 
     return issue_list
