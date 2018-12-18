@@ -7,8 +7,13 @@ def issues(oscn_html):
     issue_list = []
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section issues')
+
     issue_table = None
     issue_table = start.find_next_sibling('table')
+    # if there is no table you may have the docket table
+    if 'docketlist' in issue_table.attrs['class']:
+        return issue_list
+
     if issue_table:
         rows = issue_table.find_all('tr')
         for row in rows:
