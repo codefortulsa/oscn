@@ -1,27 +1,25 @@
+import re
+
 from bs4 import BeautifulSoup
 
 from ._helpers import find_values
-
 
 def issues(oscn_html):
     issue_list = []
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section issues')
-
     issue_table = None
     issue_table = start.find_next_sibling('table')
-    # if there is no table you may have the docket table
-    if 'docketlist' in issue_table.attrs['class']:
-        return issue_list
-
-    if issue_table:
+    key_names = ['Filed Date', 'Filed By', 'Issue']
+    contains_issue = issue_table.find(string=re.compile(f'{key_names[0]}:'))
+    if issue_table and contains_issue:
+        # test table for issue details
         rows = issue_table.find_all('tr')
         for row in rows:
             # find the issue details
-            key_names = ['Filed Date', 'Filed By', 'Issue']
             issue_dict = find_values(row, key_names)
             # look for disposition
-            issue_table = start.find_next_sibling('table')
+            issue_table =start.find_next_sibling('table')
             disp_table = (
                 issue_table
                 .find_next('th', 'dispositionInformation')
