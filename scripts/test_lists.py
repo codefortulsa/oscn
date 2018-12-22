@@ -1,6 +1,6 @@
 import oscn
 
-case = oscn.request.Case(county='tulsa', year='2017', type='FD', number=387)
+case = oscn.request.Case(county='tulsa', year='2017', type='CV', number=300)
 
 i = case.issues
 
