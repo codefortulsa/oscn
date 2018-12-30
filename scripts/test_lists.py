@@ -1,21 +1,23 @@
 import oscn
 
-case = oscn.request.Case(county='tulsa', year='2017', type='CV', number=300)
+# CM-2018-299
 
-i = case.issues
+case = oscn.request.Case(county='oklahoma', year='2018', type='CM', number=299)
+
+counts = case.counts
 
 
 import ipdb; ipdb.set_trace()
-#
+
 # parties = case.parties
 
-years = ['2017', '2018']
-counties = ['tulsa', 'oklahoma']
-types = ['CV', 'PB', 'FD']
+years = ['2017','2018']
+counties = ['delaware','adair','love']
+types = ['CF','CM']
 
-import ipdb; ipdb.set_trace()
 
-cases = oscn.request.CaseList(types=types, county='tulsa', year='2017', start=700, stop=710)
+cases = oscn.request.CaseList(types=types, county=counties, year=years, start=250, stop=300)
 for case in cases:
-    issues = oscn.parse.issues(case.text)
-    print(issues)
+    counts = oscn.parse.counts(case.text)
+    print(f'case: {case.source}')
+    print(counts)
