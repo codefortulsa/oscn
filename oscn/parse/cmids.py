@@ -18,3 +18,4 @@ def cmids(oscn_html):
     return cmids
 
 setattr(cmids, 'target', ['Case'])
+setattr(cmids, '_default_value', [])

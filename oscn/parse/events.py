@@ -26,3 +26,4 @@ def events(oscn_html):
     return events
 
 setattr(events, 'target', ['Case'])
+setattr(events, '_default_value', [])

@@ -42,3 +42,4 @@ def parties(oscn_html):
 
 # add this attribute to allow it to be added to request objects
 setattr(parties, 'target', ['Case'])
+setattr(parties, '_default_value', [])

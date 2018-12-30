@@ -27,3 +27,4 @@ def counts(oscn_html):
     return count_list
 
 setattr(counts, 'target', ['Case'])
+setattr(counts, '_default_value', [])
