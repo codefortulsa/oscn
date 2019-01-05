@@ -22,8 +22,8 @@ class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def __init__(self, type='CF', county='tulsa', year='2018',
-                 number=1, **kwargs):
+    def __init__(
+            self, type='CF', county='tulsa', year='2018', number=1, **kwargs):
         self.type = type
         self.county = county
         self.year = year
@@ -69,7 +69,9 @@ class Case(object):
 
         try:
             self.response = (
-              requests.post(oscn_url, params, headers=self.headers, verify=False)
+                requests.post(
+                    oscn_url, params, headers=self.headers, verify=False
+                )
             )
         except ConnectionError:
             return self._request(attempts_left=attempts_left-1)
@@ -89,6 +91,7 @@ class Case(object):
             logger.info("Case %s fetched", self.case_number)
         else:
             self.valid = False
+
 
 # This next line adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
@@ -180,7 +183,6 @@ class CaseList(object):
         # type = 'CM' or county = 'tulsa' or year = '2018'
         # it also allows passing a list with these argumens, such as
         # year=['2018','2017']
-
 
         # make a str into a single element list otherwise return the value
         str_to_list = lambda val: [val] if type(val) is str else val
