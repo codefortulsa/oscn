@@ -28,11 +28,13 @@ except NameError:
 
 
 def make_safe_parser(fn):
+    on_error = fn._default_value if hasattr(fn, '_default_value') else False
+
     def safe_parser(self):
         try:
             return fn(self.response.text)
         except:
-            return fn._default_value if fn._default_value else False
+            return on_error
     return safe_parser
 
 
