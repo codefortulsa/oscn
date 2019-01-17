@@ -23,7 +23,7 @@ class Case(object):
     response = False
 
     def __init__(
-            self, type='CF', county='tulsa', year='2018', number=1, **kwargs):
+            self, type='CF', county='tulsa', year='2019', number=1, **kwargs):
         self.type = type
         self.county = county
         self.year = year

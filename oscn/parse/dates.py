@@ -10,7 +10,7 @@ def make_pattern_finder(pattern):
         try:
             return search.group(1)
         except AttributeError:
-            return ''
+            return '01/01/1970'
 
     return find_pattern
 
