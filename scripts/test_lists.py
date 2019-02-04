@@ -4,10 +4,13 @@ import oscn
 
 case = oscn.request.Case(county='oklahoma', year='2018', type='CM', number=299)
 
+case.save('data')
+
+case = oscn.request.Case(
+    county='oklahoma', year='2018', type='CM', number=299, directory= 'data')
+
+
 counts = case.counts
-
-
-import ipdb; ipdb.set_trace()
 
 # parties = case.parties
 

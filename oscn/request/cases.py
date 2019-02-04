@@ -1,3 +1,8 @@
+
+import os
+import gzip
+import json
+
 from types import FunctionType
 
 import logging
@@ -17,7 +22,6 @@ logger = logging.getLogger('oscn')
 
 logger.setLevel(logging.INFO)
 
-
 class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
@@ -29,7 +33,10 @@ class Case(object):
         self.year = year
         self.number = number
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
-        self._request()
+        if 'directory' in kwargs:
+            self._open(kwargs['directory'])
+        else:
+            self._request()
 
     @property
     def case_number(self):
@@ -43,13 +50,41 @@ class Case(object):
         return f'{self.county}-{self.case_number}'
 
     @property
-    def source(self):
-        request = self.response.request
-        return f'{request.url}?{request.body}'
+    def case_path(self):
+        return f'{self.county}/{self.year}/{self.type}/{self.number}'
 
-    @property
-    def text(self):
-        return self.response.text
+    def save(self, directory=''):
+        case_data = {
+            'source': self.source,
+            'county': self.county,
+            'type': self.type,
+            'year': self.year,
+            'number': self.number,
+            'text': self.text,
+        }
+        file_name = f'{directory}/{self.case_path}/{self.number}.json'
+
+        if not os.path.exists(os.path.dirname(file_name)):
+            try:
+                os.makedirs(os.path.dirname(file_name))
+            except OSError as exc: # Guard against race condition
+                if exc.errno != errno.EEXIST:
+                    raise
+
+        with gzip.GzipFile(file_name, 'w') as open_file:
+            open_file.write(json.dumps(case_data).encode('utf-8'))
+
+    def _open(self, directory=''):
+        file_name = f'{directory}/{self.case_path}/{self.number}.json'
+        with gzip.GzipFile(file_name, 'r') as open_file:
+            saved_data = json.loads(open_file.read().decode('utf-8'))
+            self.source = saved_data['source']
+            self.county = saved_data['county']
+            self.type = saved_data['type']
+            self.year = saved_data['year']
+            self.number = saved_data['number']
+            self.text = saved_data['text']
+
 
     def _valid_response(self, resp):
         if resp.status_code != 200:
@@ -78,6 +113,8 @@ class Case(object):
 
         if self._valid_response(self.response):
             self.valid = True
+            self.source = f'{response.url}?{response.request.body}'
+            self.text = self.response.text
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in self.response.text:
                     self.number += 1
