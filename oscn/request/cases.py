@@ -1,5 +1,5 @@
 
-import os
+import os, errno
 import gzip
 import json
 
@@ -33,8 +33,10 @@ class Case(object):
         self.year = year
         self.number = number
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
-        if 'directory' in kwargs:
-            self._open(kwargs['directory'])
+        self.directory = kwargs['directory'] if 'directory' in kwargs else ''
+
+        if self.directory:
+            self._open(self.directory)
         else:
             self._request()
 
@@ -50,8 +52,8 @@ class Case(object):
         return f'{self.county}-{self.case_number}'
 
     @property
-    def case_path(self):
-        return f'{self.county}/{self.year}/{self.type}/{self.number}'
+    def path(self):
+        return f'{self.directory}/{self.county}/{self.year}/{self.type}/'
 
     def save(self, directory=''):
         case_data = {
@@ -62,8 +64,7 @@ class Case(object):
             'number': self.number,
             'text': self.text,
         }
-        file_name = f'{directory}/{self.case_path}/{self.number}.json'
-
+        file_name = f'{directory}/{self.path}/{self.number}.json'
         if not os.path.exists(os.path.dirname(file_name)):
             try:
                 os.makedirs(os.path.dirname(file_name))
@@ -75,22 +76,25 @@ class Case(object):
             open_file.write(json.dumps(case_data).encode('utf-8'))
 
     def _open(self, directory=''):
-        file_name = f'{directory}/{self.case_path}/{self.number}.json'
-        with gzip.GzipFile(file_name, 'r') as open_file:
-            saved_data = json.loads(open_file.read().decode('utf-8'))
-            self.source = saved_data['source']
-            self.county = saved_data['county']
-            self.type = saved_data['type']
-            self.year = saved_data['year']
-            self.number = saved_data['number']
-            self.text = saved_data['text']
+        file_name = f'{self.path}/{self.number}.json'
+        try:
+            with gzip.GzipFile(file_name, 'r') as open_file:
+                saved_data = json.loads(open_file.read().decode('utf-8'))
+                self.source = saved_data['source']
+                self.county = saved_data['county']
+                self.type = saved_data['type']
+                self.year = saved_data['year']
+                self.number = saved_data['number']
+                self.text = saved_data['text']
+            self.valid = True
+        except FileNotFoundError:
+            self.valid = False
 
-
-    def _valid_response(self, resp):
-        if resp.status_code != 200:
+    def _valid_response(self, response):
+        if not response.ok:
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
-            if msg in resp.text:
+            if msg in response.text:
                 logger.info("Case %s is invalid", self.case_number)
                 return False
         return True
@@ -103,7 +107,7 @@ class Case(object):
             params = {'db': self.county, 'number': self.case_number}
 
         try:
-            self.response = (
+            response = (
                 requests.post(
                     oscn_url, params, headers=self.headers, verify=False
                 )
@@ -111,12 +115,12 @@ class Case(object):
         except ConnectionError:
             return self._request(attempts_left=attempts_left-1)
 
-        if self._valid_response(self.response):
+        if self._valid_response(response):
             self.valid = True
             self.source = f'{response.url}?{response.request.body}'
-            self.text = self.response.text
+            self.text = response.text
             for msg in settings.UNUSED_CASE_MESSAGES:
-                if msg in self.response.text:
+                if msg in response.text:
                     self.number += 1
                     if attempts_left > 0:
                         logger.info("Case %s might be last, trying %d more",
@@ -180,7 +184,7 @@ class CaseList(object):
         # see if they are all true
         return all(test_results)
 
-    def _gen_requests(self):
+    def _request_generator(self):
         for case_type in self.types:
             for county in self.counties:
                 for year in self.years:
@@ -207,6 +211,37 @@ class CaseList(object):
                             break
         raise StopIteration
 
+    def _file_generator(self, directory):
+        for case_type in self.types:
+            for county in self.counties:
+                for year in self.years:
+                    self.number = self.start
+                    first_case = Case(number=self.number,
+                                        type=case_type,
+                                        county=county,
+                                        year=year,
+                                        directory=directory)
+                    if first_case.valid:
+                        yield first_case
+                    max_cases= len(os.listdir(first_case.path))
+                    self.number = first_case.number+1
+                    while self.number <= max_cases:
+                        if self.stop and self.number > self.stop:
+                            break
+                        next_case = Case(number=self.number,
+                                            type=case_type,
+                                            county=county,
+                                            year=year,
+                                            directory=directory)
+                        count_cases= len(os.listdir(next_case.path))
+                        self.number = next_case.number+1
+                        if next_case.valid:
+                            if self._passes_filters(next_case):
+                                    yield next_case
+                        else:
+                            max_cases += 1
+        raise StopIteration
+
     def __init__(self,
                  types=['CF', 'CM'],
                  counties=['tulsa', 'oklahoma'],
@@ -231,7 +266,10 @@ class CaseList(object):
         self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
 
         # create the generator for this list
-        self.all_cases = self._gen_requests()
+        if 'directory' in kwargs:
+            self.all_cases = self._file_generator(kwargs['directory'])
+        else:
+            self.all_cases = self._request_generator()
 
     def __iter__(self):
         return self
