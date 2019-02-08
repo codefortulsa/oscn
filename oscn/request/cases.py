@@ -222,7 +222,8 @@ class CaseList(object):
                                         year=year,
                                         directory=directory)
                     if first_case.valid:
-                        yield first_case
+                        if self._passes_filters(first_case):
+                                yield first_case
                     max_cases= len(os.listdir(first_case.path))
                     self.number = first_case.number+1
                     while self.number <= max_cases:
