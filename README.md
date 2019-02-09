@@ -23,7 +23,8 @@ scripts > Python scripts showing use of the oscn package
 
 ### oscn.request
 
-- Case: Returns a single case.
+- Case: Returns a single case.  Case can be saved as files using Case.save() and retrieved using Case.open().
+
 - CaseList: Returns an iterator for retrieving cases for a county and year.
 
  CaseLists can be filtered using .find().  See scripts/example.py for details
@@ -33,8 +34,8 @@ scripts > Python scripts showing use of the oscn package
 Parsers accept the html of an OSCN case page and return python objects.
 - filed: returns a string of the filing date (e.g. 12/25/2017)
 - closed: returns a string of the date the case was closed.  Return None if not closed.
-- counts: returns of list of count dicts found in a case.  Values include 'description'
-of the counta and 'disposed' if available.
+- counts: returns of list of count dicts found in a case.  Keys include 'description'
+of the count. If available 'violation' and 'disposed' are added.
 - judge: returns a string of the judge's name
 - parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
 - docket: returns a list of rows in a docket
