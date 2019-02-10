@@ -16,7 +16,7 @@ def is_pro_se(case):
 
 for case in cases:
     if is_pro_se(case):
-        print(case.case_number)
+        print(case.oscn_number)
     
     # filed = datetime.strptime(case.filed, '%d/%m/%Y')
     # print(filed.date())

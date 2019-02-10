@@ -14,7 +14,6 @@ from requests.exceptions import ConnectionError
 from .. import settings
 
 from ..parse import append_parsers
-from ..find import append_finders
 
 oscn_url = settings.OSCN_URL
 warnings.filterwarnings("ignore")
@@ -41,21 +40,26 @@ class Case(object):
             self._request()
 
     @property
-    def case_number(self):
+    def oscn_number(self):
         if self.cmid:
             return f'cmid:{self.cmid}'
         else:
             return f'{self.type}-{self.year}-{self.number}'
 
     @property
-    def case_index(self):
-        return f'{self.county}-{self.case_number}'
+    def index(self):
+        return f'{self.county}-{self.oscn_number}'
 
     @property
     def path(self):
-        return f'{self.directory}/{self.county}/{self.year}/{self.type}/'
+        return f'{self.directory}/{self.county}/{self.year}/{self.type}'
+
+    @property
+    def file_name(self):
+        return f'{self.path}/{self.number}.json'
 
     def save(self, directory=''):
+        self.directory=directory
         case_data = {
             'source': self.source,
             'county': self.county,
@@ -64,21 +68,19 @@ class Case(object):
             'number': self.number,
             'text': self.text,
         }
-        file_name = f'{directory}/{self.path}/{self.number}.json'
-        if not os.path.exists(os.path.dirname(file_name)):
+        if not os.path.exists(os.path.dirname(self.file_name)):
             try:
-                os.makedirs(os.path.dirname(file_name))
+                os.makedirs(os.path.dirname(self.file_name))
             except OSError as exc: # Guard against race condition
                 if exc.errno != errno.EEXIST:
                     raise
-
-        with gzip.GzipFile(file_name, 'w') as open_file:
+        # import ipdb; ipdb.set_trace()
+        with gzip.GzipFile(self.file_name, 'w') as open_file:
             open_file.write(json.dumps(case_data).encode('utf-8'))
 
     def _open(self, directory=''):
-        file_name = f'{self.path}/{self.number}.json'
         try:
-            with gzip.GzipFile(file_name, 'r') as open_file:
+            with gzip.GzipFile(self.file_name, 'r') as open_file:
                 saved_data = json.loads(open_file.read().decode('utf-8'))
                 self.source = saved_data['source']
                 self.county = saved_data['county']
@@ -95,7 +97,7 @@ class Case(object):
             return False
         for msg in settings.INVALID_CASE_MESSAGES:
             if msg in response.text:
-                logger.info("Case %s is invalid", self.case_number)
+                logger.info("Case %s is invalid", self.oscn_number)
                 return False
         return True
 
@@ -104,7 +106,7 @@ class Case(object):
         if self.cmid:
             params = {'db': self.county, 'cmid': self.cmid}
         else:
-            params = {'db': self.county, 'number': self.case_number}
+            params = {'db': self.county, 'number': self.oscn_number}
 
         try:
             response = (
@@ -124,12 +126,12 @@ class Case(object):
                     self.number += 1
                     if attempts_left > 0:
                         logger.info("Case %s might be last, trying %d more",
-                                    self.case_number, attempts_left)
+                                    self.oscn_number, attempts_left)
                         return self._request(attempts_left=attempts_left-1)
                     else:
                         self.valid = False
                         return
-            logger.info("Case %s fetched", self.case_number)
+            logger.info("Case %s fetched", self.oscn_number)
         else:
             self.valid = False
 
@@ -140,7 +142,6 @@ class Case(object):
 # or
 # counts = Case.counts
 append_parsers(Case)
-append_finders(Case)
 
 
 class CaseFilter(object):
@@ -216,16 +217,15 @@ class CaseList(object):
             for county in self.counties:
                 for year in self.years:
                     self.number = self.start
-                    first_case = Case(number=self.number,
-                                        type=case_type,
+                    first_case = Case(  type=case_type,
                                         county=county,
                                         year=year,
                                         directory=directory)
-                    if first_case.valid:
-                        if self._passes_filters(first_case):
-                                yield first_case
-                    max_cases= len(os.listdir(first_case.path))
-                    self.number = first_case.number+1
+                    try:
+                        max_cases= len(os.listdir(first_case.path))
+                    except FileNotFoundError:
+                        max_cases=0
+
                     while self.number <= max_cases:
                         if self.stop and self.number > self.stop:
                             break

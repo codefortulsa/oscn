@@ -20,13 +20,13 @@ years = ['2016', '2017']
 cases = oscn.request.CaseList(county=counties, year=years, start=5, stop=7)
 
 for case in cases:
-    print(f'county: {case.county} number: {case.case_number}')
+    print(f'county: {case.county} number: {case.oscn_number}')
 
 # find the end of a CaseList
 
 cases=oscn.request.CaseList(type='CF', year='2017',county='love', start=305)
 
-[print(c.case_number) for c in cases]
+[print(c.oscn_number) for c in cases]
 
 # example using find on CaseList
 
@@ -45,5 +45,5 @@ cases.find(counts=count_test)
 
 # this will print any cases with OBSTRUCT in the counts
 for case in cases:
-    print(f'case: {case.case_number}')
+    print(f'case: {case.oscn_number}')
     print(f'source: {case.source}')

@@ -17,9 +17,9 @@ for county in counties:
         sys.stdout.write(f'{county} {year}')
         case_iter = oscn.request.CaseList(county=county, year=year, stop=25)
         for case in case_iter:
-            sys.stdout.write(case.case_number)
+            sys.stdout.write(case.oscn_number)
             sys.stdout.flush()
-            writer.writerow([year, county, case.case_number])
+            writer.writerow([year, county, case.oscn_number])
             writer.writerow(case.attorneys)
             sys.stdout.write('.')
             sys.stdout.flush()

@@ -24,11 +24,11 @@ cases = oscn.request.CaseList(county=counties, year=years)
 
 for case in cases:
     count = 0
-    sys.stdout.write(case.case_number)
+    sys.stdout.write(case.oscn_number)
     sys.stdout.flush()
     for count in case.counts:
         if count_test(count['description']):
-            writer.writerow([case.year, case.county, case.case_number, count['description']])
+            writer.writerow([case.year, case.county, case.oscn_number, count['description']])
             sys.stdout.write('*')
         else:
             sys.stdout.write('.')
