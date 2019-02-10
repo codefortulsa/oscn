@@ -15,7 +15,7 @@ from .. import settings
 
 from ..parse import append_parsers
 
-oscn_url = settings.OSCN_URL
+oscn_url = settings.OSCN_CASE_URL
 warnings.filterwarnings("ignore")
 logger = logging.getLogger('oscn')
 
