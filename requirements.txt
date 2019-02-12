@@ -18,6 +18,7 @@ decorator==4.3.0
 dill==0.2.8.2
 docutils==0.14
 elasticsearch==6.3.1
+elasticsearch-dsl==6.3.1
 en-core-web-sm==2.0.0
 entrypoints==0.2.3
 flake8==3.6.0
@@ -55,7 +56,7 @@ nltk==3.3
 notebook==5.7.2
 numexpr==2.6.8
 numpy==1.15.0
--e git+git@github.com:codefortulsa/oscn.git@d16d4eb5ea966115dc8ad765a81c132163bb5629#egg=oscn
+-e git+git@github.com:codefortulsa/oscn.git@182a8548f3a15be773395bdb7552f6e3d9e7087e#egg=oscn
 pandas==0.23.4
 pandocfilters==1.4.2
 parso==0.3.0

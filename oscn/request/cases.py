@@ -6,10 +6,14 @@ import json
 from types import FunctionType
 
 import logging
-import requests
 import warnings
 
+import requests
 from requests.exceptions import ConnectionError
+
+import boto3
+import botocore
+s3 = boto3.resource('s3')
 
 from .. import settings
 
@@ -33,9 +37,11 @@ class Case(object):
         self.number = number
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
         self.directory = kwargs['directory'] if 'directory' in kwargs else ''
-
+        self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
         if self.directory:
-            self._open(self.directory)
+            self._open_file()
+        elif self.bucket:
+            self._open_s3_object()
         else:
             self._request()
 
@@ -56,10 +62,13 @@ class Case(object):
 
     @property
     def file_name(self):
-        return f'{self.path}/{self.number}.json'
+        return f'{self.path}/{self.number}.case'
 
-    def save(self, directory=''):
-        self.directory=directory
+    @property
+    def s3_key(self):
+        return f'{self.county}/{self.year}/{self.type}/{self.number}.case'
+
+    def save(self, **kwargs):
         case_data = {
             'source': self.source,
             'county': self.county,
@@ -68,17 +77,31 @@ class Case(object):
             'number': self.number,
             'text': self.text,
         }
-        if not os.path.exists(os.path.dirname(self.file_name)):
-            try:
-                os.makedirs(os.path.dirname(self.file_name))
-            except OSError as exc: # Guard against race condition
-                if exc.errno != errno.EEXIST:
-                    raise
-        # import ipdb; ipdb.set_trace()
-        with gzip.GzipFile(self.file_name, 'w') as open_file:
-            open_file.write(json.dumps(case_data).encode('utf-8'))
+        file_data = gzip.compress(bytes(json.dumps(case_data),'utf-8'))
 
-    def _open(self, directory=''):
+        self.directory = kwargs['directory'] if 'directory' in kwargs else ''
+        self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
+        if self.directory:
+            if not os.path.exists(os.path.dirname(self.file_name)):
+                try:
+                    os.makedirs(os.path.dirname(self.file_name))
+                except OSError as exc: # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+            with open(self.file_name, 'wb') as open_file:
+                open_file.write(file_data)
+
+        elif self.bucket:
+            try:
+                s3.meta.client.head_bucket(Bucket=self.bucket)
+            except botocore.exceptions.ClientError as e:
+                error_code = e.response['Error']['Code']
+                if error_code == '404':
+                    s3.create_bucket(Bucket=self.bucket)
+            s3.Bucket(self.bucket).put_object(Key=self.s3_key, Body=file_data)
+
+
+    def _open_file(self):
         try:
             with gzip.GzipFile(self.file_name, 'r') as open_file:
                 saved_data = json.loads(open_file.read().decode('utf-8'))
@@ -92,6 +115,24 @@ class Case(object):
         except FileNotFoundError:
             self.valid = False
 
+    def _open_s3_object(self):
+        try:
+            s3.Object(self.bucket, self.s3_key).get()
+            import ipdb; ipdb.set_trace()
+            s3_object = boto3.client.get_object(Bucket=self.bucket, Key=self.s3_key)
+            saved_data = json.loads(s3_object['Body'].read()).decode('utf-8')
+            self.source = saved_data['source']
+            self.county = saved_data['county']
+            self.type = saved_data['type']
+            self.year = saved_data['year']
+            self.number = saved_data['number']
+            self.text = saved_data['text']
+            self.valid = True
+        except botocore.exceptions.ClientError as e:
+                error_code = e.response['Error']['Code']
+                if error_code == '404':
+                    self.valid = False
+
     def _valid_response(self, response):
         if not response.ok:
             return False
@@ -102,7 +143,6 @@ class Case(object):
         return True
 
     def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
-
         if self.cmid:
             params = {'db': self.county, 'cmid': self.cmid}
         else:
@@ -185,62 +225,76 @@ class CaseList(object):
         # see if they are all true
         return all(test_results)
 
-    def _request_generator(self):
+    def _argument_generator(self):
         for case_type in self.types:
+            self.type_stop = False
             for county in self.counties:
                 for year in self.years:
                     self.number = self.start
-                    while True:
+                    while not self.type_stop:
+                        print((case_type, county, year, self.number))
+                        yield (case_type, county, year, self.number)
+                        self.number += 1
                         if self.stop and self.number > self.stop:
                             break
-                        next_case = Case(number=self.number,
-                                         type=case_type,
-                                         county=county,
-                                         year=year)
-                        self.number = next_case.number+1
-                        if next_case.valid:
-                            if next_case.cmids:
-                                for cmid in next_case.cmids:
-                                    cmid_case = Case(county=county, cmid=cmid)
-                                    if cmid_case.response:
-                                        if self._passes_filters(cmid_case):
-                                            yield cmid_case
-                            else:
-                                if self._passes_filters(next_case):
-                                        yield next_case
-                        else:
-                            break
+                    self.type_stop = False
+        raise StopIteration
+
+    def _request_generator(self):
+        for args in self._argument_generator():
+            (case_type, county, year, number) = args
+            case = Case(number=number,
+                             type=case_type,
+                             county=county,
+                             year=year)
+            if case.valid:
+                if case.cmids:
+                    for cmid in case.cmids:
+                        cmid_case = Case(county=county, cmid=cmid)
+                        if cmid_case.response:
+                            if self._passes_filters(cmid_case):
+                                yield cmid_case
+                else:
+                    if self._passes_filters(case):
+                        yield case
+                    else:
+                        break
+            else:
+                break
         raise StopIteration
 
     def _file_generator(self, directory):
-        for case_type in self.types:
-            for county in self.counties:
-                for year in self.years:
-                    self.number = self.start
-                    first_case = Case(  type=case_type,
-                                        county=county,
-                                        year=year,
-                                        directory=directory)
-                    try:
-                        max_cases= len(os.listdir(first_case.path))
-                    except FileNotFoundError:
-                        max_cases=0
+        open_attempts = 10
+        for args in self._argument_generator():
+            (case_type, county, year, number) = args
+            case = Case(number=number,
+                        type=case_type,
+                        county=county,
+                        year=year,
+                        directory=directory)
+            if case.valid:
+                open_attempts = 10
+                if self._passes_filters(case):
+                        yield case
+            else:
+                if open_attempts > 0:
+                    open_attempts -= 1
+                else:
+                    self.type_stop = True
 
-                    while self.number <= max_cases:
-                        if self.stop and self.number > self.stop:
-                            break
-                        next_case = Case(number=self.number,
-                                            type=case_type,
-                                            county=county,
-                                            year=year,
-                                            directory=directory)
-                        count_cases= len(os.listdir(next_case.path))
-                        self.number = next_case.number+1
-                        if next_case.valid:
-                            if self._passes_filters(next_case):
-                                    yield next_case
-                        else:
-                            max_cases += 1
+    def _s3_generator(self, bucket):
+        for args in self._argument_generator():
+            open_attempts = 10
+            (case_type, county, year, number) = args
+            next_case = Case(number=self.number,
+                                type=case_type,
+                                county=county,
+                                year=year,
+                                bucket=bucket)
+            self.number = next_case.number+1
+            if next_case.valid:
+                if self._passes_filters(next_case):
+                        yield next_case
         raise StopIteration
 
     def __init__(self,
@@ -254,7 +308,7 @@ class CaseList(object):
 
         # this next section allows passing single arguments, such as
         # type = 'CM' or county = 'tulsa' or year = '2018'
-        # it also allows passing a list with these argumens, such as
+        # it also allows passing a list with these arguments, such as
         # year=['2018','2017']
 
         # make a str into a single element list otherwise return the value
@@ -269,6 +323,8 @@ class CaseList(object):
         # create the generator for this list
         if 'directory' in kwargs:
             self.all_cases = self._file_generator(kwargs['directory'])
+        elif 'bucket' in kwargs:
+            self.all_cases = self._s3_generator(kwargs['bucket'])
         else:
             self.all_cases = self._request_generator()
 
