@@ -1,5 +1,6 @@
 
 import os, errno
+from io import BytesIO
 import gzip
 import json
 
@@ -14,6 +15,7 @@ from requests.exceptions import ConnectionError
 import boto3
 import botocore
 s3 = boto3.resource('s3')
+s3_client = boto3.client('s3')
 
 from .. import settings
 
@@ -117,10 +119,10 @@ class Case(object):
 
     def _open_s3_object(self):
         try:
-            s3.Object(self.bucket, self.s3_key).get()
-            import ipdb; ipdb.set_trace()
-            s3_object = boto3.client.get_object(Bucket=self.bucket, Key=self.s3_key)
-            saved_data = json.loads(s3_object['Body'].read()).decode('utf-8')
+            s3_object = s3_client.get_object(Bucket=self.bucket, Key=self.s3_key)
+            bytestream = BytesIO(s3_object['Body'].read())
+            unzipped_stream = gzip.GzipFile(None, 'rb', fileobj=bytestream).read().decode('utf-8')
+            saved_data = json.loads(unzipped_stream)
             self.source = saved_data['source']
             self.county = saved_data['county']
             self.type = saved_data['type']
@@ -130,7 +132,7 @@ class Case(object):
             self.valid = True
         except botocore.exceptions.ClientError as e:
                 error_code = e.response['Error']['Code']
-                if error_code == '404':
+                if error_code == 'NoSuchKey':
                     self.valid = False
 
     def _valid_response(self, response):
@@ -155,23 +157,16 @@ class Case(object):
                 )
             )
         except ConnectionError:
-            return self._request(attempts_left=attempts_left-1)
-
+            if attempts_left > 0:
+                return self._request(attempts_left=attempts_left-1)
         if self._valid_response(response):
             self.valid = True
             self.source = f'{response.url}?{response.request.body}'
             self.text = response.text
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in response.text:
-                    self.number += 1
-                    if attempts_left > 0:
-                        logger.info("Case %s might be last, trying %d more",
-                                    self.oscn_number, attempts_left)
-                        return self._request(attempts_left=attempts_left-1)
-                    else:
-                        self.valid = False
-                        return
-            logger.info("Case %s fetched", self.oscn_number)
+                    self.valid = False
+                    return
         else:
             self.valid = False
 
@@ -225,47 +220,52 @@ class CaseList(object):
         # see if they are all true
         return all(test_results)
 
-    def _argument_generator(self):
-        for case_type in self.types:
-            self.type_stop = False
-            for county in self.counties:
-                for year in self.years:
-                    self.number = self.start
-                    while not self.type_stop:
-                        print((case_type, county, year, self.number))
-                        yield (case_type, county, year, self.number)
-                        self.number += 1
-                        if self.stop and self.number > self.stop:
+    def _argument_generator(self, start, stop):
+        case_numbers = range(start, stop+1)
+        for county in self.counties:
+            for year in self.years:
+                for case_type in self.types:
+                    self.exit_type = False
+                    for num in case_numbers:
+                        print((case_type, county, year, num))
+                        yield (case_type, county, year, num)
+                        if self.exit_type:
                             break
-                    self.type_stop = False
+                    if self.exit_type:
+                        break
         raise StopIteration
 
     def _request_generator(self):
-        for args in self._argument_generator():
+        request_attempts=10
+        for args in self.case_arguments:
             (case_type, county, year, number) = args
-            case = Case(number=number,
-                             type=case_type,
-                             county=county,
-                             year=year)
+            case = Case(number=number, type=case_type, county=county, year=year)
             if case.valid:
                 if case.cmids:
+                    print('cmids found')
                     for cmid in case.cmids:
                         cmid_case = Case(county=county, cmid=cmid)
                         if cmid_case.response:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
                 else:
+                    request_attempts=10
                     if self._passes_filters(case):
                         yield case
                     else:
                         break
             else:
-                break
+                if request_attempts > 0:
+                    request_attempts -= 1
+                else:
+                    print('requests done')
+                    self.exit_type = True
+
         raise StopIteration
 
     def _file_generator(self, directory):
         open_attempts = 10
-        for args in self._argument_generator():
+        for args in self.case_arguments:
             (case_type, county, year, number) = args
             case = Case(number=number,
                         type=case_type,
@@ -280,28 +280,34 @@ class CaseList(object):
                 if open_attempts > 0:
                     open_attempts -= 1
                 else:
-                    self.type_stop = True
+                    self.exit_type = True
 
     def _s3_generator(self, bucket):
-        for args in self._argument_generator():
-            open_attempts = 10
+        open_attempts = 10
+        for args in self.case_arguments:
             (case_type, county, year, number) = args
-            next_case = Case(number=self.number,
+            case = Case(number=self.number,
                                 type=case_type,
                                 county=county,
                                 year=year,
                                 bucket=bucket)
-            self.number = next_case.number+1
-            if next_case.valid:
-                if self._passes_filters(next_case):
-                        yield next_case
+            if case.valid:
+                open_attempts = 10
+                if self._passes_filters(case):
+                        yield case
+            else:
+                if open_attempts > 0:
+                    open_attempts -= 1
+                else:
+                    self.exit_type = True
+
         raise StopIteration
 
     def __init__(self,
                  types=['CF', 'CM'],
                  counties=['tulsa', 'oklahoma'],
                  years=['2018', '2017'],
-                 start=1, stop=False, **kwargs):
+                 start=1, stop=20000, **kwargs):
 
         self.start = start
         self.stop = stop
@@ -319,6 +325,9 @@ class CaseList(object):
         self.counties = (
             str_to_list(kwargs['county']) if 'county' in kwargs else counties)
         self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
+
+        # create all arguments
+        self.case_arguments = self._argument_generator(start, stop)
 
         # create the generator for this list
         if 'directory' in kwargs:
