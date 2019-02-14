@@ -2,18 +2,22 @@ import oscn
 
 # CM-2018-299
 
-counties=['delaware','tulsa','oklahoma']
+counties=['delaware','adair']
 types=['CF','CM']
-
-# cases = oscn.request.CaseList(counties=counties, year='2018', types=types,stop=5)
-#
-# for c in cases:
-#     print(c.index)
-#     c.save(directory='data')
+years=['2013','2012']
 
 
-cases = oscn.request.CaseList(counties=counties, year='2018', type=types,
-                                directory='data')
+cases = oscn.request.CaseList(counties=counties, year=years, type=types,stop=3)
 for case in cases:
-    # import ipdb; ipdb.set_trace()
     print(case.index)
+    case.save(bucket='oscn-case-data')
+    case.save(directory='data')
+
+
+cases = oscn.request.CaseList(counties=counties, year=years, type=types,bucket='oscn-case-data')
+for case in cases:
+    print(case.parties)
+
+cases = oscn.request.CaseList(counties=counties, year=years, type=types,directory='data')
+for case in cases:
+    print(case.events)

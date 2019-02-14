@@ -98,10 +98,11 @@ class Case(object):
                 s3.meta.client.head_bucket(Bucket=self.bucket)
             except botocore.exceptions.ClientError as e:
                 error_code = e.response['Error']['Code']
-                if error_code == '404':
+                if error_code == '404' or error_code == '403':
                     s3.create_bucket(Bucket=self.bucket)
+                else:
+                    raise e
             s3.Bucket(self.bucket).put_object(Key=self.s3_key, Body=file_data)
-
 
     def _open_file(self):
         try:
@@ -227,12 +228,9 @@ class CaseList(object):
                 for case_type in self.types:
                     self.exit_type = False
                     for num in case_numbers:
-                        print((case_type, county, year, num))
                         yield (case_type, county, year, num)
                         if self.exit_type:
                             break
-                    if self.exit_type:
-                        break
         raise StopIteration
 
     def _request_generator(self):
@@ -242,7 +240,6 @@ class CaseList(object):
             case = Case(number=number, type=case_type, county=county, year=year)
             if case.valid:
                 if case.cmids:
-                    print('cmids found')
                     for cmid in case.cmids:
                         cmid_case = Case(county=county, cmid=cmid)
                         if cmid_case.response:
@@ -252,15 +249,11 @@ class CaseList(object):
                     request_attempts=10
                     if self._passes_filters(case):
                         yield case
-                    else:
-                        break
             else:
                 if request_attempts > 0:
                     request_attempts -= 1
                 else:
-                    print('requests done')
                     self.exit_type = True
-
         raise StopIteration
 
     def _file_generator(self, directory):
@@ -281,16 +274,17 @@ class CaseList(object):
                     open_attempts -= 1
                 else:
                     self.exit_type = True
+        raise StopIteration
 
     def _s3_generator(self, bucket):
         open_attempts = 10
         for args in self.case_arguments:
             (case_type, county, year, number) = args
-            case = Case(number=self.number,
-                                type=case_type,
-                                county=county,
-                                year=year,
-                                bucket=bucket)
+            case = Case(number=number,
+                        type=case_type,
+                        county=county,
+                        year=year,
+                        bucket=bucket)
             if case.valid:
                 open_attempts = 10
                 if self._passes_filters(case):
