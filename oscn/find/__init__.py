@@ -1,1 +1,1 @@
-from .search_party import party
+# from .search_party import index

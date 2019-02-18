@@ -31,8 +31,9 @@ class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def __init__(
-            self, type='CF', county='tulsa', year='2019', number=1, **kwargs):
+    def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, **kwargs):
+        if index:
+            county, type, year, number = index.split('-')
         self.type = type
         self.county = county
         self.year = year
@@ -135,6 +136,8 @@ class Case(object):
                 error_code = e.response['Error']['Code']
                 if error_code == 'NoSuchKey':
                     self.valid = False
+                else:
+                    raise e
 
     def _valid_response(self, response):
         if not response.ok:

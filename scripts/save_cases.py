@@ -14,10 +14,10 @@ for case in cases:
     case.save(directory='data')
 
 
-cases = oscn.request.CaseList(counties=counties, year=years, type=types,bucket='oscn-case-data')
-for case in cases:
-    print(case.parties)
-
-cases = oscn.request.CaseList(counties=counties, year=years, type=types,directory='data')
-for case in cases:
-    print(case.events)
+# cases = oscn.request.CaseList(counties=counties, year=years, type=types,bucket='oscn-case-data')
+# for case in cases:
+#     print(case.parties)
+#
+# cases = oscn.request.CaseList(counties=counties, year=years, type=types,directory='data')
+# for case in cases:
+#     print(case.events)
