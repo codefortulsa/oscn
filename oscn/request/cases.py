@@ -224,23 +224,22 @@ class CaseList(object):
         # see if they are all true
         return all(test_results)
 
-    def _argument_generator(self, start, stop):
+    def _index_generator(self, start, stop):
         case_numbers = range(start, stop+1)
         for county in self.counties:
             for year in self.years:
                 for case_type in self.types:
                     self.exit_type = False
                     for num in case_numbers:
-                        yield (case_type, county, year, num)
+                        yield (f'{county}-{case_type}-{year}-{num}')
                         if self.exit_type:
                             break
         raise StopIteration
 
     def _request_generator(self):
         request_attempts=10
-        for args in self.case_arguments:
-            (case_type, county, year, number) = args
-            case = Case(number=number, type=case_type, county=county, year=year)
+        for index in self.case_indexes:
+            case = Case(index)
             if case.valid:
                 if case.cmids:
                     for cmid in case.cmids:
@@ -261,13 +260,8 @@ class CaseList(object):
 
     def _file_generator(self, directory):
         open_attempts = 10
-        for args in self.case_arguments:
-            (case_type, county, year, number) = args
-            case = Case(number=number,
-                        type=case_type,
-                        county=county,
-                        year=year,
-                        directory=directory)
+        for index in self.case_indexes:
+            case = Case(index=index, directory=directory)
             if case.valid:
                 open_attempts = 10
                 if self._passes_filters(case):
@@ -281,13 +275,8 @@ class CaseList(object):
 
     def _s3_generator(self, bucket):
         open_attempts = 10
-        for args in self.case_arguments:
-            (case_type, county, year, number) = args
-            case = Case(number=number,
-                        type=case_type,
-                        county=county,
-                        year=year,
-                        bucket=bucket)
+        for index in self.case_indexes:
+            case = Case(index=index, bucket=bucket)
             if case.valid:
                 open_attempts = 10
                 if self._passes_filters(case):
@@ -297,7 +286,6 @@ class CaseList(object):
                     open_attempts -= 1
                 else:
                     self.exit_type = True
-
         raise StopIteration
 
     def __init__(self,
@@ -324,7 +312,7 @@ class CaseList(object):
         self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
 
         # create all arguments
-        self.case_arguments = self._argument_generator(start, stop)
+        self.case_indexes = self._index_generator(start, stop)
 
         # create the generator for this list
         if 'directory' in kwargs:
