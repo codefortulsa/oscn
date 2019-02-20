@@ -13,7 +13,7 @@ def parties(oscn_html):
         names = [link.text for link in party_links]
         # party_p.strings look like "name,type,name,type"
         # [1::2] starts at the 2nd position and gets every other string
-        types = [t for t in party_p.strings][1::2]
+        types = [t[1::] for t in [s for s in party_p.strings][1::2]]
     else:
         names = []
         types = []
