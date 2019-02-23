@@ -2,25 +2,29 @@ import oscn
 
 # CM-2018-299
 
-case = oscn.request.Case(county='oklahoma', year='2018', type='CM', number=299)
-case.save(directory='data')
-
-case = oscn.request.Case(
-    county='oklahoma', year='2018', type='CM', number=299, directory= 'data')
-
-
-counts = case.counts
-
 # parties = case.parties
 
+# carter-CM-2019-14 has cmid references
+
 years = ['2019']
-counties = ['delaware','adair','love']
+counties = ['carter']
 # counties = ['tulsa']
 types = ['CM']
 
 
-cases = oscn.request.CaseList(types=types, county=counties, year=years, start=7, stop=12)
+cases = oscn.request.CaseList(  types=types, county=counties,
+                                year=years, start=13, stop=16)
 for case in cases:
-    counts = oscn.parse.counts(case.text)
-    print(f'case: {case.source}')
-    # print(counts)
+    case.save(bucket='oscn-case-data')
+    case.save(directory='data')
+    print(f'case: {case.index}')
+
+
+cases = oscn.request.CaseList(  types=types, county=counties,
+                                year=years, start=13, stop=16,
+                                directory='data')
+
+print(f'---')
+
+for case in cases:
+    print(f'case: {case.index}')

@@ -37,7 +37,7 @@ class Case(object):
         self.type = type
         self.county = county
         self.year = year
-        self.number = number
+        self.number = int(number)
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
         self.directory = kwargs['directory'] if 'directory' in kwargs else ''
         self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
@@ -47,6 +47,13 @@ class Case(object):
             self._open_s3_object()
         else:
             self._request()
+
+    def _re_init(self, saved_data):
+        self.source = saved_data['source']
+        self.text = saved_data['text']
+        self.county, self.type, self.year, self.number = (
+            saved_data['index'].split('-')
+        )
 
     @property
     def oscn_number(self):
@@ -65,7 +72,8 @@ class Case(object):
 
     @property
     def file_name(self):
-        return f'{self.path}/{self.number}.case'
+        file_number = self.cmid if self.cmid else self.number
+        return f'{self.path}/{file_number}.case'
 
     @property
     def s3_key(self):
@@ -74,10 +82,7 @@ class Case(object):
     def save(self, **kwargs):
         case_data = {
             'source': self.source,
-            'county': self.county,
-            'type': self.type,
-            'year': self.year,
-            'number': self.number,
+            'index' : self.index,
             'text': self.text,
         }
         file_data = gzip.compress(bytes(json.dumps(case_data),'utf-8'))
@@ -109,12 +114,7 @@ class Case(object):
         try:
             with gzip.GzipFile(self.file_name, 'r') as open_file:
                 saved_data = json.loads(open_file.read().decode('utf-8'))
-                self.source = saved_data['source']
-                self.county = saved_data['county']
-                self.type = saved_data['type']
-                self.year = saved_data['year']
-                self.number = saved_data['number']
-                self.text = saved_data['text']
+                self._re_init(saved_data)
             self.valid = True
         except FileNotFoundError:
             self.valid = False
@@ -125,12 +125,7 @@ class Case(object):
             bytestream = BytesIO(s3_object['Body'].read())
             unzipped_stream = gzip.GzipFile(None, 'rb', fileobj=bytestream).read().decode('utf-8')
             saved_data = json.loads(unzipped_stream)
-            self.source = saved_data['source']
-            self.county = saved_data['county']
-            self.type = saved_data['type']
-            self.year = saved_data['year']
-            self.number = saved_data['number']
-            self.text = saved_data['text']
+            self._re_init(saved_data)
             self.valid = True
         except botocore.exceptions.ClientError as e:
                 error_code = e.response['Error']['Code']
@@ -236,15 +231,22 @@ class CaseList(object):
                             break
         raise StopIteration
 
-    def _request_generator(self):
+    def _request_generator(self, request_type, store_name=False):
         request_attempts=10
         for index in self.case_indexes:
-            case = Case(index)
+            if request_type=='http':
+                case = Case(index)
+            elif request_type=='bucket':
+                case = Case(index, bucket=store_name)
+            elif request_type=='directory':
+                case = Case(index, directory=store_name)
+
             if case.valid:
                 if case.cmids:
+                    yield case
                     for cmid in case.cmids:
-                        cmid_case = Case(county=county, cmid=cmid)
-                        if cmid_case.response:
+                        cmid_case = Case(county=case.county, cmid=cmid)
+                        if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
                 else:
@@ -254,36 +256,6 @@ class CaseList(object):
             else:
                 if request_attempts > 0:
                     request_attempts -= 1
-                else:
-                    self.exit_type = True
-        raise StopIteration
-
-    def _file_generator(self, directory):
-        open_attempts = 10
-        for index in self.case_indexes:
-            case = Case(index=index, directory=directory)
-            if case.valid:
-                open_attempts = 10
-                if self._passes_filters(case):
-                        yield case
-            else:
-                if open_attempts > 0:
-                    open_attempts -= 1
-                else:
-                    self.exit_type = True
-        raise StopIteration
-
-    def _s3_generator(self, bucket):
-        open_attempts = 10
-        for index in self.case_indexes:
-            case = Case(index=index, bucket=bucket)
-            if case.valid:
-                open_attempts = 10
-                if self._passes_filters(case):
-                        yield case
-            else:
-                if open_attempts > 0:
-                    open_attempts -= 1
                 else:
                     self.exit_type = True
         raise StopIteration
@@ -311,16 +283,17 @@ class CaseList(object):
             str_to_list(kwargs['county']) if 'county' in kwargs else counties)
         self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
 
-        # create all arguments
+        # create all indexes needed for this list
         self.case_indexes = self._index_generator(start, stop)
 
         # create the generator for this list
         if 'directory' in kwargs:
-            self.all_cases = self._file_generator(kwargs['directory'])
+            self.all_cases = self._request_generator('directory',
+                                                    kwargs['directory'])
         elif 'bucket' in kwargs:
-            self.all_cases = self._s3_generator(kwargs['bucket'])
+            self.all_cases = self._request_generator('bucket',kwargs['bucket'])
         else:
-            self.all_cases = self._request_generator()
+            self.all_cases = self._request_generator('http')
 
     def __iter__(self):
         return self
