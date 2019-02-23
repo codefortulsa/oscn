@@ -35,10 +35,16 @@ class Case(object):
         if index:
             county, type, year, number = index.split('-')
         self.type = type
+        self.cmid = number if type == 'cmid' else False
+        # key word argument cmid overides index set
+        self.cmid = kwargs['cmid'] if 'cmid' in kwargs else self.cmid
+
         self.county = county
         self.year = year
         self.number = int(number)
+
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
+
         self.directory = kwargs['directory'] if 'directory' in kwargs else ''
         self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
         if self.directory:
@@ -58,7 +64,7 @@ class Case(object):
     @property
     def oscn_number(self):
         if self.cmid:
-            return f'cmid:{self.cmid}'
+            return f'cmid-{self.year}-{self.cmid}'
         else:
             return f'{self.type}-{self.year}-{self.number}'
 
@@ -68,7 +74,7 @@ class Case(object):
 
     @property
     def path(self):
-        return f'{self.directory}/{self.county}/{self.year}/{self.type}'
+        return f'{self.directory}/{self.county}/{self.type}/{self.year}'
 
     @property
     def file_name(self):
@@ -77,7 +83,8 @@ class Case(object):
 
     @property
     def s3_key(self):
-        return f'{self.county}/{self.year}/{self.type}/{self.number}.case'
+        file_number = self.cmid if self.cmid else self.number
+        return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
 
     def save(self, **kwargs):
         case_data = {
@@ -222,12 +229,12 @@ class CaseList(object):
     def _index_generator(self, start, stop):
         case_numbers = range(start, stop+1)
         for county in self.counties:
-            for year in self.years:
-                for case_type in self.types:
-                    self.exit_type = False
+            for case_type in self.types:
+                for year in self.years:
+                    self.exit_year = False
                     for num in case_numbers:
                         yield (f'{county}-{case_type}-{year}-{num}')
-                        if self.exit_type:
+                        if self.exit_year:
                             break
         raise StopIteration
 
@@ -257,7 +264,7 @@ class CaseList(object):
                 if request_attempts > 0:
                     request_attempts -= 1
                 else:
-                    self.exit_type = True
+                    self.exit_year = True
         raise StopIteration
 
     def __init__(self,
