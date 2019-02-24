@@ -7,7 +7,7 @@ A python library for scraping case information from the [Oklahoma State Courts N
 oscn > Python package source to provide an api for retrieving and parsing case records.
 
 scripts > Python scripts showing use of the oscn package
-- example.py: demostrates use of the request Case and Caselist
+- example.py: demonstrates use of the request Case and Caselist
 - retrieve-counts.py: saves a list of all counts for a list of counties and years
 - find-counts.py: saves a list of counts passing a test for a list of counties and years
 - soup_test.py: a stub for testing parsing attempts using BeautifulSoup
@@ -44,10 +44,7 @@ of the count. If available 'violation' and 'disposed' are added.
 - issues: returns a list of dicts with issue information.  Includes a 'dispositions' key with a list of dicts with disposition details.
 
 ### oscn.find (experimental)
-These functions use parse results to determine additional properties.
-- pleas: returns a list of docket minutes containing pleas
-- sentence: returns a list of docket minutes containing sentences
-
+Calls to the OSCN search application.
 
 ## Development Install
 
