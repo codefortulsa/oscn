@@ -250,7 +250,8 @@ class CaseList(object):
 
             if case.valid:
                 if case.cmids:
-                    yield case
+                    if self._passes_filters(case):
+                        yield case
                     for cmid in case.cmids:
                         cmid_case = Case(county=case.county, cmid=cmid)
                         if cmid_case.valid:
