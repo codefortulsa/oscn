@@ -249,18 +249,15 @@ class CaseList(object):
                 case = Case(index, directory=store_name)
 
             if case.valid:
+                request_attempts=10
+                if self._passes_filters(case):
+                    yield case
                 if case.cmids:
-                    if self._passes_filters(case):
-                        yield case
                     for cmid in case.cmids:
                         cmid_case = Case(county=case.county, cmid=cmid)
                         if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
-                else:
-                    request_attempts=10
-                    if self._passes_filters(case):
-                        yield case
             else:
                 if request_attempts > 0:
                     request_attempts -= 1
