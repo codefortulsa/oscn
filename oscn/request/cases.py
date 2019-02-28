@@ -33,7 +33,10 @@ class Case(object):
 
     def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, **kwargs):
         if index:
-            county, type, year, number = index.split('-')
+            if 'IN' in index:
+                county, type, number = index.split('-')
+            else:
+                county, type, year, number = index.split('-')
         self.type = type
         self.cmid = number if type == 'cmid' else False
         # key word argument cmid overides index set
