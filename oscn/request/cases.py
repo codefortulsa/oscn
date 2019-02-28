@@ -199,8 +199,6 @@ class CaseFilter(object):
 
 
 class CaseList(object):
-    filters = []
-
     def _passes_filters(self, case_to_test):
         # no filters? you pass!
         if self.filters == []:
@@ -273,6 +271,7 @@ class CaseList(object):
 
         self.start = start
         self.stop = stop
+        self.filters = []
 
         # this next section allows passing single arguments, such as
         # type = 'CM' or county = 'tulsa' or year = '2018'
