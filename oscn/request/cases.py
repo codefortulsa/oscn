@@ -57,14 +57,21 @@ class Case(object):
     def _re_init(self, saved_data):
         self.source = saved_data['source']
         self.text = saved_data['text']
-        self.county, self.type, self.year, self.number = (
-            saved_data['index'].split('-')
-        )
+        if 'IN' in saved_data['index']:
+            self.county, self.type, self.number = (
+                saved_data['index'].split('-')
+            )
+        else:
+            self.county, self.type, self.year, self.number = (
+                saved_data['index'].split('-')
+            )
 
     @property
     def oscn_number(self):
         if self.cmid:
             return f'cmid-{self.year}-{self.cmid}'
+        elif self.type == 'IN':
+            return f'{self.type}-{self.number}'
         else:
             return f'{self.type}-{self.year}-{self.number}'
 
@@ -74,6 +81,8 @@ class Case(object):
 
     @property
     def path(self):
+        if self.type == 'IN':
+            return f'{self.directory}/{self.county}/{self.type}'
         return f'{self.directory}/{self.county}/{self.type}/{self.year}'
 
     @property
@@ -84,6 +93,8 @@ class Case(object):
     @property
     def s3_key(self):
         file_number = self.cmid if self.cmid else self.number
+        if self.type == 'IN':
+            return f'{self.county}/{self.type}/{file_number}.case'
         return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
 
     def save(self, **kwargs):
