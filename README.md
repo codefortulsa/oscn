@@ -19,6 +19,7 @@ scripts > Python scripts showing use of the oscn package
 ### oscn
 
 - counties: Returns a list of counties.
+- courts: Same as counties but more a accurate description.
 
 
 ### oscn.request
@@ -37,10 +38,10 @@ Parsers accept the html of an OSCN case page and return python objects.
 - counts: returns of list of count dicts found in a case.  Keys include 'description'
 of the count. If available 'violation' and 'disposed' are added.
 - judge: returns a string of the judge's name
-- parties: returns a list of objects that look like this: {'name': 'Some Name', 'type': 'Description'}
+- parties: returns a list of dicts with these keys: name, type
 - docket: returns a list of rows in a docket
 - events: returns a list of rows in the event table
-- attorneys: returns a list of strings found in the attorney table
+- attorneys: returns a list of dicts with these keys: name, address, and representing
 - issues: returns a list of dicts with issue information.  Includes a 'dispositions' key with a list of dicts with disposition details.
 
 ### oscn.find (experimental)
