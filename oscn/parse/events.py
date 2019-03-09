@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
-from ._helpers import text_values, column_titles, lists2dict
-
+from ._helpers import text_values, column_titles, lists2dict, clean_string
 
 
 def events(oscn_html):
@@ -13,8 +12,11 @@ def events(oscn_html):
     rows = events_table.find('tbody').find_all('tr')
     for row in rows:
         cells = row.find_all('td')
+        event_font = cells[0].font.extract()
+        event_date = clean_string(event_font.text)
         values = text_values(cells)
         event = lists2dict(event_keys, values)
+        event['date'] = event_date
         events.append(event)
     return events
 

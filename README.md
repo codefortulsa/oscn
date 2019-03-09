@@ -40,7 +40,7 @@ of the count. If available 'violation' and 'disposed' are added.
 - judge: returns a string of the judge's name
 - parties: returns a list of dicts with these keys: name, type
 - docket: returns a list of rows in a docket
-- events: returns a list of rows in the event table
+- events: returns a list of dicts with these keys: event, party, docket, reporter, date
 - attorneys: returns a list of dicts with these keys: name, address, and representing
 - issues: returns a list of dicts with issue information.  Includes a 'dispositions' key with a list of dicts with disposition details.
 
