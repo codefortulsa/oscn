@@ -51,7 +51,6 @@ class Case(object):
         self.text = kwargs['text'] if 'text' in kwargs else False
 
         if 'text' in kwargs:
-            import ipdb; ipdb.set_trace()
             re_init_data = {'source':self.source,
                             'index':self.index,
                             'text':self.text}
