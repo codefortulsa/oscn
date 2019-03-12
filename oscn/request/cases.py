@@ -33,8 +33,8 @@ class Case(object):
 
     def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, **kwargs):
         if index:
-            if 'IN' in index:
-                county, type, number = index.split('-')
+            if 'appellate' in index:
+                county, number = index.split('-')
             else:
                 county, type, year, number = index.split('-')
         self.type = type
@@ -60,8 +60,8 @@ class Case(object):
     def _re_init(self, saved_data):
         self.source = saved_data['source']
         self.text = saved_data['text']
-        if 'IN' in saved_data['index']:
-            self.county, self.type, self.number = (
+        if 'appellate' in saved_data['index']:
+            self.county, self.number = (
                 saved_data['index'].split('-')
             )
         else:
@@ -73,8 +73,8 @@ class Case(object):
     def oscn_number(self):
         if self.cmid:
             return f'cmid-{self.year}-{self.cmid}'
-        elif self.type == 'IN':
-            return f'{self.type}-{self.number}'
+        elif self.county == 'appellate':
+            return f'{self.number}'
         else:
             return f'{self.type}-{self.year}-{self.number}'
 
@@ -84,8 +84,8 @@ class Case(object):
 
     @property
     def path(self):
-        if self.type == 'IN':
-            return f'{self.directory}/{self.county}/{self.type}'
+        if self.county == 'appellate':
+            return f'{self.directory}/{self.county}'
         return f'{self.directory}/{self.county}/{self.type}/{self.year}'
 
     @property
@@ -96,8 +96,8 @@ class Case(object):
     @property
     def s3_key(self):
         file_number = self.cmid if self.cmid else self.number
-        if self.type == 'IN':
-            return f'{self.county}/{self.type}/{file_number}.case'
+        if self.type == 'appellate':
+            return f'{self.county}/{file_number}.case'
         return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
 
     def save(self, **kwargs):

@@ -12,11 +12,12 @@ def events(oscn_html):
     rows = events_table.find('tbody').find_all('tr')
     for row in rows:
         cells = row.find_all('td')
-        event_font = cells[0].font.extract()
-        event_date = clean_string(event_font.text)
         values = text_values(cells)
         event = lists2dict(event_keys, values)
+        event_font = cells[0].font.extract()
+        event_date = clean_string(event_font.text)
         event['date'] = event_date
+        event['description'] = clean_string(cells[0].text)
         events.append(event)
     return events
 

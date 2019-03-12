@@ -1,7 +1,7 @@
 import oscn
 
 
-cases = ['tulsa-CV-2018-01048',
+cases = ['tulsa-CF-2018-01048',
 'tulsa-CJ-2016-3196',
 'tulsa-CJ-2018-4616',
 'tulsa-CV-2019-0012',
