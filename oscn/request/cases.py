@@ -47,15 +47,24 @@ class Case(object):
         self.number = int(number)
 
         self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
+        self.source = kwargs['source'] if 'source' in kwargs else False
+        self.text = kwargs['text'] if 'text' in kwargs else False
 
-        self.directory = kwargs['directory'] if 'directory' in kwargs else ''
-        self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
-        if self.directory:
-            self._open_file()
-        elif self.bucket:
-            self._open_s3_object()
+        if 'text' in kwargs:
+            import ipdb; ipdb.set_trace()
+            re_init_data = {'source':self.source,
+                            'index':self.index,
+                            'text':self.text}
+            self._re_init(re_init_data)
         else:
-            self._request()
+            self.directory = kwargs['directory'] if 'directory' in kwargs else ''
+            self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
+            if self.directory:
+                self._open_file()
+            elif self.bucket:
+                self._open_s3_object()
+            else:
+                self._request()
 
     def _re_init(self, saved_data):
         self.source = saved_data['source']
