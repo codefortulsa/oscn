@@ -1,21 +1,28 @@
 import oscn
 
 # CM-2018-299
-counties=['delaware','tulsa','adair']
+counties=['carter','tulsa','adair']
 
 
 # Create a test function
 count_text = 'CHILD ENDANGERMENT'
+
 def count_test(counts):
     for count in counts:
         if count_text in count['description']:
             return True
     return False
 
+def log_source(source):
+    print(source)
+    return True
+
 cases = oscn.request.CaseList(
-            counties=counties, year='2018',
-            type='CF',directory='data').find(
-                text=count_text)
+            counties=counties,
+            years='2019',
+            types='CM',
+            # bucket='oscn-cases'
+            ).find(source=log_source, text=count_text)
 
 for c in cases:
     print('------------------------------------')

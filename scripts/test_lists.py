@@ -6,26 +6,32 @@ import oscn
 
 # carter-CM-2019-14 has cmid references
 
-years = ['2019','2018']
-counties = ['carter','adair']
-# counties = ['tulsa']
-types = ['CM','CF']
 
-
-cases = oscn.request.CaseList(  types=types, county=counties,
-                                year=years, start=13, stop=16)
-for case in cases:
-    # case.save(bucket='oscn-test-data')
-    case.save(directory='data')
-    print(f'case: {case.index}')
-
-
-cases = oscn.request.CaseList(  types=types, county=counties,
-                                year=years, start=13, stop=16,
-                                directory='data')
-                                # bucket='oscn-test-data')
+cases = oscn.request.CaseList(  types=types, counties=['carter'],
+                                years=['2019'], start=13, stop=16)
 
 print(f'---')
+
+for case in cases:
+    print(f'case: {case.index}')
+    case.save(directory='data')
+
+print(f'---')
+
+cases = oscn.request.CaseList(  types=types, counties=['carter'],
+                                years=['2019'], start=13, stop=16,
+                                directory='data')
+
+
+for case in cases:
+    print(f'case: {case.index}')
+    case.save(bucket='oscn-test-data')
+
+print(f'---')
+
+cases = oscn.request.CaseList(  types=types, counties=['carter'],
+                                years=['2019'], start=13, stop=16,
+                                bucket='oscn-test-data')
 
 for case in cases:
     print(f'case: {case.index}')

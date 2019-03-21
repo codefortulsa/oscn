@@ -31,22 +31,37 @@ class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, **kwargs):
+    def _init_by_index(self, case_index):
+        index_parts = case_index.split('-')
+
+        if len(index_parts)==4:
+            self.county, self.type, self.year, self.number = index_parts
+            self.cmid = False
+        elif len(index_parts)==3:
+            self.county, self.type, self.number = index_parts
+            self.cmid = self.number
+            self.type = 'cmid'
+        elif len(index_parts)==2:
+            self.county, self.number = index_parts
+            self.type = 'IN'
+            self.cmid = False
+
+    def _re_init(self, saved_data):
+        self.source = saved_data['source']
+        self.text = saved_data['text']
+        self._init_by_index(saved_data['index'])
+
+    def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, cmid=False, **kwargs):
         if index:
-            if 'appellate' in index:
-                county, number = index.split('-')
-            else:
-                county, type, year, number = index.split('-')
-        self.type = type
-        self.cmid = number if type == 'cmid' else False
-        # key word argument cmid overides index set
-        self.cmid = kwargs['cmid'] if 'cmid' in kwargs else self.cmid
+            self._init_by_index(index)
+        else:
+            self.type = type
+            self.county = county
+            self.year = year
+            self.number = int(number)
+            self.cmid = cmid
 
-        self.county = county
-        self.year = year
-        self.number = int(number)
-
-        self.cmid = kwargs['cmid'] if 'cmid' in kwargs else False
+        self.cmid = self.number if self.type == 'cmid' else self.cmid
         self.source = kwargs['source'] if 'source' in kwargs else False
         self.text = kwargs['text'] if 'text' in kwargs else False
 
@@ -65,22 +80,10 @@ class Case(object):
             else:
                 self._request()
 
-    def _re_init(self, saved_data):
-        self.source = saved_data['source']
-        self.text = saved_data['text']
-        if 'appellate' in saved_data['index']:
-            self.county, self.number = (
-                saved_data['index'].split('-')
-            )
-        else:
-            self.county, self.type, self.year, self.number = (
-                saved_data['index'].split('-')
-            )
-
     @property
     def oscn_number(self):
         if self.cmid:
-            return f'cmid-{self.year}-{self.cmid}'
+            return f'cmid-{self.cmid}'
         elif self.county == 'appellate':
             return f'{self.number}'
         else:
@@ -94,7 +97,10 @@ class Case(object):
     def path(self):
         if self.county == 'appellate':
             return f'{self.directory}/{self.county}'
-        return f'{self.directory}/{self.county}/{self.type}/{self.year}'
+        if self.type == 'cmid':
+            return f'{self.directory}/{self.county}/{self.type}'
+        else:
+            return f'{self.directory}/{self.county}/{self.type}/{self.year}'
 
     @property
     def file_name(self):
@@ -104,9 +110,13 @@ class Case(object):
     @property
     def s3_key(self):
         file_number = self.cmid if self.cmid else self.number
-        if self.type == 'appellate':
+        if self.county == 'appellate':
             return f'{self.county}/{file_number}.case'
-        return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
+        if self.type == 'cmid':
+            return f'{self.county}/{self.type}/{file_number}.case'
+        else:
+            return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
+
 
     def save(self, **kwargs):
         case_data = {
@@ -128,7 +138,7 @@ class Case(object):
             with open(self.file_name, 'wb') as open_file:
                 open_file.write(file_data)
 
-        elif self.bucket:
+        if self.bucket:
             try:
                 s3.meta.client.head_bucket(Bucket=self.bucket)
             except botocore.exceptions.ClientError as e:
@@ -173,10 +183,11 @@ class Case(object):
         return True
 
     def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
+        params = {'db': self.county}
         if self.cmid:
-            params = {'db': self.county, 'cmid': self.cmid}
+            params['cmid'] = self.cmid
         else:
-            params = {'db': self.county, 'number': self.oscn_number}
+            params['number'] = self.oscn_number
 
         try:
             response = (
@@ -246,6 +257,12 @@ class CaseList(object):
         # see if they are all true
         return all(test_results)
 
+    def _make_case_requester(self, **kwargs):
+        def case_request(index=False):
+            kwargs['index']=index
+            return Case(**kwargs)
+        return case_request
+
     def _index_generator(self, start, stop):
         case_numbers = range(start, stop+1)
         for county in self.counties:
@@ -258,23 +275,17 @@ class CaseList(object):
                             break
         raise StopIteration
 
-    def _request_generator(self, request_type, store_name=False):
+    def _request_generator(self):
         request_attempts=10
         for index in self.case_indexes:
-            if request_type=='http':
-                case = Case(index)
-            elif request_type=='bucket':
-                case = Case(index, bucket=store_name)
-            elif request_type=='directory':
-                case = Case(index, directory=store_name)
-
+            case = self._request_case(index)
             if case.valid:
                 request_attempts=10
                 if self._passes_filters(case):
                     yield case
                 if case.cmids:
                     for cmid in case.cmids:
-                        cmid_case = Case(county=case.county, cmid=cmid)
+                        cmid_case = self._request_case(f'{case.county}-cmid-{cmid}')
                         if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
@@ -295,31 +306,24 @@ class CaseList(object):
         self.stop = stop
         self.filters = []
 
-        # this next section allows passing single arguments, such as
-        # type = 'CM' or county = 'tulsa' or year = '2018'
-        # it also allows passing a list with these arguments, such as
-        # year=['2018','2017']
-
+        # Allow passing a string to list keywords
         # make a str into a single element list otherwise return the value
         str_to_list = lambda val: [val] if type(val) is str else val
-
-        # use the default value if type, county, or year aren't passed
-        self.types = str_to_list(kwargs['type']) if 'type' in kwargs else types
-        self.counties = (
-            str_to_list(kwargs['county']) if 'county' in kwargs else counties)
-        self.years = str_to_list(kwargs['year']) if 'year' in kwargs else years
-
+        self.types = str_to_list(types)
+        self.counties = str_to_list(counties)
+        self.years = str_to_list(years)
         # create all indexes needed for this list
         self.case_indexes = self._index_generator(start, stop)
 
-        # create the generator for this list
+        # create case request based on storage option
         if 'directory' in kwargs:
-            self.all_cases = self._request_generator('directory',
-                                                    kwargs['directory'])
+            self._request_case = self._make_case_requester(directory=kwargs['directory'])
         elif 'bucket' in kwargs:
-            self.all_cases = self._request_generator('bucket',kwargs['bucket'])
+            self._request_case = self._make_case_requester(bucket=kwargs['bucket'])
         else:
-            self.all_cases = self._request_generator('http')
+            self._request_case = self._make_case_requester()
+
+        self.all_cases = self._request_generator()
 
     def __iter__(self):
         return self

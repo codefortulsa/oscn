@@ -13,8 +13,10 @@ case=oscn.request.Case(number=116264,county='appellate')
 
 case.save(directory='data')
 
+case.save(bucket='oscn-test-data')
+
 # case=oscn.request.Case(type='IN',number=115205,county='appellate', bucket='oscn-test-data')
 
-case=oscn.request.Case(number=116264,county='appellate', directory='data')
+case=oscn.request.Case(index='appellate-116264', directory='data')
 
 print(case.source)
