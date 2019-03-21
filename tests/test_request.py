@@ -15,17 +15,43 @@ def test_live_request_properties():
     assert case1.s3_key == 'adair/CM/2019/6.case'
     assert case1.file_name == '/adair/CM/2019/6.case'
 
+def test_init_number():
+    case1 = oscn.request.Case(county='adair', type='CM',year='2019', number=6)
+    assert type(case1.number) == int
+    assert case1.number == 6
+    case2 = oscn.request.Case(county='adair', type='CM',year='2019', number='6')
+    assert type(case2.number) == int
+    assert case2.number == 6
+    case3 = oscn.request.Case('adair-CM-2019-6')
+    assert type(case3.number) == int
+    assert case3.number == 6
+    case5 = oscn.request.Case('oklahoma-cmid-2018-00001')
+    assert type(case5.number) == int
+    assert case5.number == 1
+
+
 def test_live_request_params_index():
     case1 = oscn.request.Case(county='adair', type='CM',year='2019', number=6)
     case2 = oscn.request.Case('adair-CM-2019-6')
-    assert case1.text == case2.text
-    assert case2.number == 6
+    assert case2.text == case1.text
+    assert case2.county == case1.county
+    assert case2.type == case1.type
+    assert case2.year == case1.year
+    assert case2.number == case1.number
+
 
 def test_live_request_appellate():
     case1 = oscn.request.Case('appellate-116264')
     assert case1.number == 116264
+    assert case1.county == 'appellate'
+    assert case1.type == 'IN'
+    assert type(case1.number) == int
+    assert case1.number == 116264
 
     case2 = oscn.request.Case(county='appellate', number=116264)
     assert case2.number == 116264
-
-    assert case1.source == case2.source
+    assert case2.county == 'appellate'
+    assert case2.type == 'IN'
+    assert case2.number == 116264
+    assert type(case2.number) == int
+    assert case2.source == case1.source

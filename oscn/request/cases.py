@@ -31,47 +31,28 @@ class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def _init_by_index(self, case_index):
-        index_parts = case_index.split('-')
-
-        if len(index_parts)==4:
-            self.county, self.type, self.year, number_str = index_parts
-            self.number = int(number_str)
-            self.cmid = False
-            if self.type == 'cmid':
-                self.cmid = self.number
-                self.type = 'cmid'
-
-        elif len(index_parts)==2:
-            self.county, number_str = index_parts
-            self.number = int(number_str)
-            self.type = 'IN'
-            self.cmid = False
-
-    def _re_init(self, saved_data):
-        self.source = saved_data['source']
-        self.text = saved_data['text']
-        self._init_by_index(saved_data['index'])
-
     def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, cmid=False, **kwargs):
         if index:
-            self._init_by_index(index)
+            index_parts = index.split('-')
+            if len(index_parts)==4:
+                self.county, self.type, self.year, number_str = index_parts
+                self.number = int(number_str)
+            elif len(index_parts)==2:
+                self.county, number_str = index_parts
+                self.number = int(number_str)
+                self.type = 'IN'
         else:
             self.type = type
             self.county = county
             self.year = year
             self.number = int(number)
-            self.cmid = cmid
 
-        self.cmid = self.number if self.type == 'cmid' else self.cmid
+        self.cmid = True if self.type == 'cmid' else False
         self.source = kwargs['source'] if 'source' in kwargs else False
         self.text = kwargs['text'] if 'text' in kwargs else False
 
         if 'text' in kwargs:
-            re_init_data = {'source':self.source,
-                            'index':self.index,
-                            'text':self.text}
-            self._re_init(re_init_data)
+            return self
         else:
             self.directory = kwargs['directory'] if 'directory' in kwargs else ''
             self.bucket = kwargs['bucket'] if 'bucket' in kwargs else ''
@@ -102,18 +83,14 @@ class Case(object):
 
     @property
     def file_name(self):
-        file_number = self.cmid if self.cmid else self.number
-        return f'{self.path}/{file_number}.case'
+        return f'{self.path}/{self.number}.case'
 
     @property
     def s3_key(self):
-        file_number = self.cmid if self.cmid else self.number
         if self.county == 'appellate':
-            return f'{self.county}/{file_number}.case'
-        if self.type == 'cmid':
-            return f'{self.county}/{self.type}/{file_number}.case'
+            return f'{self.county}/{self.number}.case'
         else:
-            return f'{self.county}/{self.type}/{self.year}/{file_number}.case'
+            return f'{self.county}/{self.type}/{self.year}/{self.number}.case'
 
 
     def save(self, **kwargs):
@@ -151,7 +128,7 @@ class Case(object):
         try:
             with gzip.GzipFile(self.file_name, 'r') as open_file:
                 saved_data = json.loads(open_file.read().decode('utf-8'))
-                self._re_init(saved_data)
+                self.__init__(**saved_data)
             self.valid = True
         except FileNotFoundError:
             self.valid = False
@@ -162,7 +139,7 @@ class Case(object):
             bytestream = BytesIO(s3_object['Body'].read())
             unzipped_stream = gzip.GzipFile(None, 'rb', fileobj=bytestream).read().decode('utf-8')
             saved_data = json.loads(unzipped_stream)
-            self._re_init(saved_data)
+            self.__init__(**saved_data)
             self.valid = True
         except botocore.exceptions.ClientError as e:
                 error_code = e.response['Error']['Code']
@@ -183,7 +160,7 @@ class Case(object):
     def _request(self, attempts_left=settings.MAX_EMPTY_CASES):
         params = {'db': self.county}
         if self.cmid:
-            params['cmid'] = self.cmid
+            params['cmid'] = self.number
         else:
             params['number'] = self.oscn_number
 
@@ -265,29 +242,30 @@ class CaseList(object):
             return Case(**kwargs)
         return case_request
 
-    def _index_generator(self, start, stop):
+    def _case_generator(self, start, stop):
         case_numbers = range(start, stop+1)
         for county in self.counties:
             for case_type in self.types:
                 for year in self.years:
                     self.exit_year = False
                     for num in case_numbers:
-                        yield (f'{county}-{case_type}-{year}-{num}')
+                        case_index = f'{county}-{case_type}-{year}-{num}'
+                        yield self._request_case(case_index)
                         if self.exit_year:
                             break
         raise StopIteration
 
     def _request_generator(self):
         request_attempts=10
-        for index in self.case_indexes:
-            case = self._request_case(index)
+        for case in self._case_generator(self.start, self.stop):
             if case.valid:
                 request_attempts=10
                 if self._passes_filters(case):
                     yield case
                 if case.cmids:
                     for cmid in case.cmids:
-                        cmid_case = self._request_case(f'{case.county}-cmid-{case.year}-{cmid}')
+                        cmid_index = f'{case.county}-cmid-{case.year}-{cmid}'
+                        cmid_case = self._request_case(cmid_index)
                         if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
@@ -314,8 +292,6 @@ class CaseList(object):
         self.types = str_to_list(types)
         self.counties = str_to_list(counties)
         self.years = str_to_list(years)
-        # create all indexes needed for this list
-        self.case_indexes = self._index_generator(start, stop)
 
         # create case request based on storage option
         if 'directory' in kwargs:
