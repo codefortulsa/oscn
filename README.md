@@ -72,7 +72,11 @@ or request a list of cases to iterate:
 
 ## Run test scripts
 
-- `python scripts/{file.py}`
+- `pytest tests/`
+
+or with ipdb:
+
+- `py.test -s tests/`
 
 ## Deployment steps
 

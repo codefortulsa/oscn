@@ -192,12 +192,16 @@ class Case(object):
         try:
             response = (
                 requests.post(
-                    oscn_url, params, headers=self.headers, verify=False
+                    oscn_url, params,
+                    headers=self.headers,
+                    verify=False
                 )
             )
         except ConnectionError:
             if attempts_left > 0:
                 return self._request(attempts_left=attempts_left-1)
+            else:
+                raise ConnectionError
         if self._valid_response(response):
             self.valid = True
             self.source = f'{response.url}?{response.request.body}'
