@@ -35,14 +35,16 @@ class Case(object):
         index_parts = case_index.split('-')
 
         if len(index_parts)==4:
-            self.county, self.type, self.year, self.number = index_parts
+            self.county, self.type, self.year, number_str = index_parts
+            self.number = int(number_str)
             self.cmid = False
-        elif len(index_parts)==3:
-            self.county, self.type, self.number = index_parts
-            self.cmid = self.number
-            self.type = 'cmid'
+            if self.type == 'cmid':
+                self.cmid = self.number
+                self.type = 'cmid'
+
         elif len(index_parts)==2:
-            self.county, self.number = index_parts
+            self.county, number_str = index_parts
+            self.number = int(number_str)
             self.type = 'IN'
             self.cmid = False
 
@@ -82,9 +84,7 @@ class Case(object):
 
     @property
     def oscn_number(self):
-        if self.cmid:
-            return f'cmid-{self.cmid}'
-        elif self.county == 'appellate':
+        if self.county == 'appellate':
             return f'{self.number}'
         else:
             return f'{self.type}-{self.year}-{self.number}'
@@ -97,8 +97,6 @@ class Case(object):
     def path(self):
         if self.county == 'appellate':
             return f'{self.directory}/{self.county}'
-        if self.type == 'cmid':
-            return f'{self.directory}/{self.county}/{self.type}'
         else:
             return f'{self.directory}/{self.county}/{self.type}/{self.year}'
 
@@ -289,7 +287,7 @@ class CaseList(object):
                     yield case
                 if case.cmids:
                     for cmid in case.cmids:
-                        cmid_case = self._request_case(f'{case.county}-cmid-{cmid}')
+                        cmid_case = self._request_case(f'{case.county}-cmid-{case.year}-{cmid}')
                         if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
