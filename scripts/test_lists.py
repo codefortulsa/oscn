@@ -6,6 +6,7 @@ import oscn
 
 # carter-CM-2019-14 has cmid references
 
+types = ['CM']
 
 cases = oscn.request.CaseList(  types=types, counties=['carter'],
                                 years=['2019'], start=13, stop=16)

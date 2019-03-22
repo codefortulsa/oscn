@@ -42,17 +42,16 @@ class Case(object):
                 self.number = int(number_str)
                 self.type = 'IN'
         else:
-            self.type = 'IN' if county == 'appellate' else type
             self.county = county
             self.year = year
             self.number = int(number)
+            self.type = 'IN' if county == 'appellate' else type
 
-
-        self.cmid = True if self.type == 'cmid' else False
+        self.cmid = (self.type == 'cmid')
         self.source = kwargs['source'] if 'source' in kwargs else False
-        self.text = kwargs['text'] if 'text' in kwargs else False
 
         if 'text' in kwargs:
+            self.text = kwargs['text']
             return self
         else:
             self.directory = kwargs['directory'] if 'directory' in kwargs else ''

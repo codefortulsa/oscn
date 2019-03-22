@@ -20,10 +20,10 @@ def test_retrieve_cmids():
 
     list1_indexes = []
     for case in list1:
+        # import ipdb; ipdb.set_trace()
         list1_indexes.append(case.index)
         case.save(directory='data')
-# should be:
-# ['carter-CM-2019-13', 'carter-CM-2019-14', 'carter-cmid-639922', 'carter-cmid-639923', 'carter-cmid-645034', 'carter-CM-2019-15', 'carter-CM-2019-16']
+
     assert len(list1_indexes) == 7
 
 

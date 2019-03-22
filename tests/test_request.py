@@ -55,3 +55,19 @@ def test_live_request_appellate():
     assert case2.number == 116264
     assert type(case2.number) == int
     assert case2.source == case1.source
+
+
+def test_live_request_cmid():
+    case1 = oscn.request.Case('carter-cmid-2019-639922')
+    assert case1.number == 639922
+    assert case1.county == 'carter'
+    assert case1.type == 'cmid'
+    assert type(case1.number) == int
+    assert case1.number == 639922
+
+    case2 = oscn.request.Case(county='carter', type='cmid', number=639922)
+    assert case1.number == 639922
+    assert case1.county == 'carter'
+    assert case1.type == 'cmid'
+    assert type(case1.number) == int
+    assert case1.number == 639922
