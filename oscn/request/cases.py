@@ -42,10 +42,11 @@ class Case(object):
                 self.number = int(number_str)
                 self.type = 'IN'
         else:
-            self.type = type
+            self.type = 'IN' if county == 'appellate' else type
             self.county = county
             self.year = year
             self.number = int(number)
+
 
         self.cmid = True if self.type == 'cmid' else False
         self.source = kwargs['source'] if 'source' in kwargs else False
@@ -242,7 +243,7 @@ class CaseList(object):
             return Case(**kwargs)
         return case_request
 
-    def _case_generator(self, start, stop):
+    def _request_generator(self, start, stop):
         case_numbers = range(start, stop+1)
         for county in self.counties:
             for case_type in self.types:
@@ -255,9 +256,9 @@ class CaseList(object):
                             break
         raise StopIteration
 
-    def _request_generator(self):
+    def _case_generator(self):
         request_attempts=10
-        for case in self._case_generator(self.start, self.stop):
+        for case in self._request_generator(self.start, self.stop):
             if case.valid:
                 request_attempts=10
                 if self._passes_filters(case):
@@ -301,7 +302,7 @@ class CaseList(object):
         else:
             self._request_case = self._make_case_requester()
 
-        self.all_cases = self._request_generator()
+        self.all_cases = self._case_generator()
 
     def __iter__(self):
         return self

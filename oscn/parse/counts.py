@@ -33,6 +33,7 @@ def counts(oscn_html):
 
 
             save_count_info = {
+                'party' : count.nobr.text,
                 'offense': count_values['Date of Offense'],
                 'description': count_desc,
                 'disposed': count_values['Disposed'],
