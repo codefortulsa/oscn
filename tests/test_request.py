@@ -7,6 +7,14 @@ def test_live_request_default():
     assert case.type =='CF'
     assert case.year == '2019'
 
+    cty, typ, yr, nm = case.index.split('-')
+    assert case.county == cty
+    assert case.type == typ
+    assert case.year == yr
+    assert case.number == int(nm)
+
+
+
 def test_live_request_properties():
     case1 = oscn.request.Case(county='adair', type='CM',year='2019', number=6)
     assert case1.oscn_number == 'CM-2019-6'
