@@ -197,44 +197,34 @@ class Case(object):
 append_parsers(Case)
 
 
-class CaseFilter(object):
-
-    def __init__(self, target, test):
-        # target is the property of a case to be tested
-        self.target = target
-        # test is a function used to evaluate the target values
-        if isinstance(test, FunctionType):
-            self.test = test
-        # turn a str into a function to find the str in the target value
-        elif isinstance(test, str):
-            self.test = lambda val: test in val
-
-
 class CaseList(object):
-    def _passes_filters(self, case_to_test):
-        # no filters? you pass!
-        if self.filters == []:
-            return True
 
-        # make a list of filters that match properties on case_to_test
-        case_props = dir(case_to_test)
-        is_prop = lambda f: f.target in case_props
-        test_filters = [f for f in filter(is_prop, self.filters)]
+    def __init__(self,
+                 types=['CF', 'CM'],
+                 counties=['tulsa', 'oklahoma'],
+                 years=['2018', '2017'],
+                 start=1, stop=20000, **kwargs):
 
-        # no filters found? you pass!
-        if test_filters == []:
-            return True
+        self.start = start
+        self.stop = stop
+        self.filters = []
 
-        # make a list of functions and a list of values
-        filter_funcs = [f.test for f in test_filters]
-        case_values = [getattr(case_to_test, f.target) for f in test_filters]
+        # Allow passing a string to list keywords
+        # make a str into a single element list otherwise return the value
+        str_to_list = lambda val: [val] if type(val) is str else val
+        self.types = str_to_list(types)
+        self.counties = str_to_list(counties)
+        self.years = str_to_list(years)
 
-        # run the tests
-        does_it_pass = lambda fn, val: fn(val)
-        test_results = map(does_it_pass, filter_funcs, case_values)
+        # create case request based on storage option
+        if 'directory' in kwargs:
+            self._request_case = self._make_case_requester(directory=kwargs['directory'])
+        elif 'bucket' in kwargs:
+            self._request_case = self._make_case_requester(bucket=kwargs['bucket'])
+        else:
+            self._request_case = self._make_case_requester()
 
-        # see if they are all true
-        return all(test_results)
+        self.all_cases = self._case_generator()
 
     def _make_case_requester(self, **kwargs):
         def case_request(index=False):
@@ -276,32 +266,6 @@ class CaseList(object):
                     self.exit_year = True
         raise StopIteration
 
-    def __init__(self,
-                 types=['CF', 'CM'],
-                 counties=['tulsa', 'oklahoma'],
-                 years=['2018', '2017'],
-                 start=1, stop=20000, **kwargs):
-
-        self.start = start
-        self.stop = stop
-        self.filters = []
-
-        # Allow passing a string to list keywords
-        # make a str into a single element list otherwise return the value
-        str_to_list = lambda val: [val] if type(val) is str else val
-        self.types = str_to_list(types)
-        self.counties = str_to_list(counties)
-        self.years = str_to_list(years)
-
-        # create case request based on storage option
-        if 'directory' in kwargs:
-            self._request_case = self._make_case_requester(directory=kwargs['directory'])
-        elif 'bucket' in kwargs:
-            self._request_case = self._make_case_requester(bucket=kwargs['bucket'])
-        else:
-            self._request_case = self._make_case_requester()
-
-        self.all_cases = self._case_generator()
 
     def __iter__(self):
         return self
@@ -309,7 +273,23 @@ class CaseList(object):
     def __next__(self):
         return next(self.all_cases)
 
+    def _passes_filters(self, case_to_test):
+
+        def does_it_pass(filter):
+            target, test_to_run = filter
+            target_value = getattr(case_to_test, target)
+            if isinstance(test_to_run, str):
+                return test_to_run in target_value
+            elif isinstance(test_to_run, FunctionType):
+                return test_to_run(target_value)
+
+        # run the tests
+        test_results = map(does_it_pass, self.filters)
+
+        # see if they are all true
+        return all(test_results)
+
     def find(self, **kwargs):
         for kw in kwargs:
-            self.filters.append(CaseFilter(kw, kwargs[kw]))
+            self.filters.append((kw, kwargs[kw]))
         return self
