@@ -136,8 +136,9 @@ class Case(object):
     def _open_s3_object(self):
         try:
             s3_object = s3_client.get_object(Bucket=self.bucket, Key=self.s3_key)
-            bytestream = BytesIO(s3_object['Body'].read())
-            unzipped_stream = gzip.GzipFile(None, 'rb', fileobj=bytestream).read().decode('utf-8')
+            bytes = BytesIO(s3_object['Body'].read())
+            unzipped_stream = (
+                gzip.GzipFile(None, 'rb', fileobj=bytes).read().decode('utf-8'))
             saved_data = json.loads(unzipped_stream)
             self.__init__(**saved_data)
             self.valid = True
@@ -273,23 +274,19 @@ class CaseList(object):
     def __next__(self):
         return next(self.all_cases)
 
-    def _passes_filters(self, case_to_test):
-
-        def does_it_pass(filter):
-            target, test_to_run = filter
-            target_value = getattr(case_to_test, target)
-            if isinstance(test_to_run, str):
-                return test_to_run in target_value
-            elif isinstance(test_to_run, FunctionType):
-                return test_to_run(target_value)
-
-        # run the tests
-        test_results = map(does_it_pass, self.filters)
-
+    def _passes_filters(self, case):
+        # iter of all the tests
+        run_test = lambda test:test(case)
+        test_results = map(run_test, self.filters)
         # see if they are all true
         return all(test_results)
 
     def find(self, **kwargs):
         for kw in kwargs:
-            self.filters.append((kw, kwargs[kw]))
+            kw_value = kwargs[kw]
+            if isinstance(kw_value, str):
+                case_test = lambda case:kw_value in getattr(case, kw)
+            elif isinstance(kw_value, FunctionType):
+                case_test = lambda case:kw_value(getattr(case, kw))
+            self.filters.append(case_test)
         return self
