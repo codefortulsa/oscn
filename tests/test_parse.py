@@ -25,3 +25,14 @@ def test_live_counts_list():
     cases = oscn.request.CaseList(start=15, stop=17)
     for case in cases:
         assert case.counts[0]['party']
+
+def test_docket():
+    case1 = oscn.request.Case('craig-CJ-2015-66')
+    docket = case1.docket
+    assert isinstance(docket, list)
+    for minute in docket:
+        if minute['links']:
+            for link in minute['links']:
+                assert isinstance(link, str)
+
+        assert isinstance(minute, dict)

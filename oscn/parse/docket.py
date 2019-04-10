@@ -16,6 +16,7 @@ def docket(oscn_html):
         cells = row.find_all('td')
         values = text_values(cells)
         minute = lists2dict(columns, values)
+        minute['links'] = list(lnk.decode() for lnk in row.find_all('a'))
         minutes.append(minute)
 
     # clean up blank dates
