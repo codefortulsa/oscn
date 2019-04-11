@@ -16,16 +16,18 @@ def docket(oscn_html):
         cells = row.find_all('td')
         values = text_values(cells)
         minute = lists2dict(columns, values)
-        minute['links'] = list(lnk.decode() for lnk in row.find_all('a'))
+        minute['html'] = row.decode()
         minutes.append(minute)
 
     # clean up blank dates
-    def dt_chk(min):
-        dt_chk.saved_date = min['date'] if min['date'] else dt_chk.saved_date
-        min['date'] = dt_chk.saved_date
-        return min
+    saved_date = minutes[0]['date']
+    for idx, min in enumerate(minutes):
+        if min['date']:
+            saved_date = min['date']
+        else:
+            min['date'] = saved_date
 
-    return [dt_chk(min) for min in minutes]
+    return minutes
 
 setattr(docket, 'target', ['Case'])
 setattr(docket, '_default_value', [])
