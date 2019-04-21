@@ -33,3 +33,38 @@ def test_docket():
     for minute in docket:
         assert isinstance(minute, dict)
         assert minute['date'] is not ''
+
+
+def test_issues():
+    case1 = oscn.request.Case('tulsa-CV-2019-13')
+    issues = oscn.parse.issues(case1.text)
+
+    assert isinstance(issues, list)
+    for issue in issues:
+        assert isinstance(issue, dict)
+
+
+def test_parties():
+    case1 = oscn.request.Case('tulsa-CJ-2016-143')
+    issues = oscn.parse.issues(case1.text)
+    assert isinstance(issues, list)
+    for issue in issues:
+        assert isinstance(issue, dict)
+        assert isinstance(issue['parties'], list)
+        for party in issue['parties']:
+            assert isinstance(party, dict)
+            assert 'name' in party.keys()
+            assert 'disposed' in party.keys()
+
+def test_issue_list():
+    case_list = oscn.request.CaseList(counties=['tulsa','oklahoma' 'mayes'], types=['CJ', 'PB', 'CV'], stop=20)
+
+    for case in case_list:
+        assert isinstance(case.issues, list)
+        for issue in case.issues:
+            assert isinstance(issue, dict)
+            assert isinstance(issue['parties'], list)
+            for party in issue['parties']:
+                assert isinstance(party, dict)
+                assert 'name' in party.keys()
+                assert 'disposed' in party.keys()

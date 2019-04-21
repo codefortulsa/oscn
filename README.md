@@ -42,7 +42,7 @@ of the count. If available 'violation' and 'disposed' are added.
 - docket: returns a list of rows in a docket
 - events: returns a list of dicts with these keys: event, party, docket, reporter, date, description.  The keys date and description are cleaner versions of the event text.  The event key will be deprecation some day so use date and description if you are starting a project.
 - attorneys: returns a list of dicts with these keys: name, address, and representing
-- issues: returns a list of dicts with issue information.  Includes a 'dispositions' key with a list of dicts with disposition details.
+- issues: returns a list of dicts with issue information. Each issues includes a list of dicts for each party 
 
 ### oscn.find (experimental)
 Calls to the OSCN search application.
@@ -76,7 +76,7 @@ or request a list of cases to iterate:
 
 or with ipdb:
 
-- `py.test -s tests/`
+    - `py.test -s tests/`
 
 ## Deployment steps
 
