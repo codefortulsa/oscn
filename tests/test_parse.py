@@ -56,6 +56,22 @@ def test_parties():
             assert 'name' in party.keys()
             assert 'disposed' in party.keys()
 
+
+def test_attorneys():
+    case1 = oscn.request.Case('tulsa-CJ-2016-143')
+    attorneys1 = oscn.parse.attorneys(case1.text)
+
+    assert isinstance(attorneys1, list)
+    assert len(attorneys1) == 1
+    assert attorneys1[0]['representing'] == 'BANK OF AMERICA NA,'
+
+    case2 = oscn.request.Case('mayes-PO-2015-1')
+    attorneys2 = oscn.parse.attorneys(case2.text)
+
+    assert isinstance(attorneys2, list)
+    assert len(attorneys2) == 0
+
+
 def test_issue_list():
     case_list = oscn.request.CaseList(counties=['tulsa','oklahoma' 'mayes'], types=['CJ', 'PB', 'CV'], stop=20)
 
