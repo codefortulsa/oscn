@@ -13,6 +13,9 @@ def make_party_dict(**kwargs):
     if all(''==v for v in kwargs.values()):
         return False
 
+    party_type = ''
+    party_name = ''
+
     if kwargs['Defendant']:
         party_type = 'defendant'
         party_name = kwargs['Defendant']
@@ -41,7 +44,6 @@ def issues(oscn_html):
 
         issue_dict['parties'] = []
         parties_rows = disp_table.find_all('tr')
-
         for row in parties_rows:
             # remove formatting elements from td
             for td in row.find_all('td'):

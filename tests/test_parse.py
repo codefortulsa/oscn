@@ -36,9 +36,8 @@ def test_docket():
 
 
 def test_issues():
-    case1 = oscn.request.Case('tulsa-CV-2019-13')
+    case1 = oscn.request.Case('oklahoma-PO-2015-10')
     issues = oscn.parse.issues(case1.text)
-
     assert isinstance(issues, list)
     for issue in issues:
         assert isinstance(issue, dict)
