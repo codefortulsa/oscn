@@ -6,9 +6,10 @@ def test_string_params():
     county = 'tulsa'
     type = 'CM'
     year = '2018'
-
-    list1 = oscn.request.CaseList(  types=type, counties=county,
-                                years=year, start=21, stop=25)
+    list1 = oscn.request.CaseList(types=type,
+                                  counties=county,
+                                  years=year,
+                                  start=21, stop=25)
 
     assert list1
     list1_indexes = []
@@ -17,9 +18,8 @@ def test_string_params():
         assert case.county == county
         assert case.type == type
         assert case.year == year
-
+    print('test_string_params')
     assert len(list1_indexes) == 5
-
 
 
 def test_list_params():
@@ -37,9 +37,25 @@ def test_list_params():
         assert case.county in counties
         assert case.type in types
         assert case.year in years
-
+    print('test_list_params')
     assert len(list1_indexes) == 40
 
+def test_list_kwargs():
+
+    list1 = oscn.request.CaseList(  type='CM',
+                                    county='tulsa',
+                                    year='2018',
+                                    start=21, stop=25)
+    assert list1
+
+    list1_indexes = []
+    for case in list1:
+        list1_indexes.append(case.index)
+        assert case.county in 'tulsa'
+        assert case.type in 'CM'
+        assert case.year in '2018'
+    print('test_list_kwargs')
+    assert len(list1_indexes) == 5
 
 def test_retrieve_cmids():
     # saving a list of cases should be retrievable by the same indexes
