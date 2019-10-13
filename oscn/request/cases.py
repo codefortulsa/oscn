@@ -201,21 +201,26 @@ append_parsers(Case)
 class CaseList(object):
 
     def __init__(self,
-                 types=['CF', 'CM'],
-                 counties=['tulsa', 'oklahoma'],
-                 years=['2018', '2017'],
+                 types=[],
+                 counties=[],
+                 years=[],
                  start=1, stop=20000, **kwargs):
 
         self.start = start
         self.stop = stop
         self.filters = []
 
+        # allow kwargs to override certain args
+        self.types = kwargs['type'] if 'type' in kwargs else types
+        self.counties = kwargs['county'] if 'county' in kwargs else counties
+        self.years = kwargs['year'] if 'year' in kwargs else years
+
         # Allow passing a string to list keywords
         # make a str into a single element list otherwise return the value
         str_to_list = lambda val: [val] if type(val) is str else val
-        self.types = str_to_list(types)
-        self.counties = str_to_list(counties)
-        self.years = str_to_list(years)
+        self.types = str_to_list(self.types)
+        self.counties = str_to_list(self.counties)
+        self.years = str_to_list(self.years)
 
         # create case request based on storage option
         if 'directory' in kwargs:
@@ -244,7 +249,7 @@ class CaseList(object):
                         yield self._request_case(case_index)
                         if self.exit_year:
                             break
-        raise StopIteration
+        # raise StopIteration
 
     def _case_generator(self):
         request_attempts=10
@@ -265,7 +270,7 @@ class CaseList(object):
                     request_attempts -= 1
                 else:
                     self.exit_year = True
-        raise StopIteration
+        # raise StopIteration
 
 
     def __iter__(self):
