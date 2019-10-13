@@ -13,12 +13,12 @@ def test_parse_string_response():
 def test_live_counts():
     case1 = oscn.request.Case('tulsa-CF-2012-255')
     counts = case1.counts
-    assert len(counts) == 3
+    assert len(counts) == 2
     assert counts[0]['offense'] == '01/09/2012'
     assert counts[1]['description'] == 'CHILD ABUSE BY INJURY(CHAB)'
     assert counts[1]['violation'] == '21 O.S. 843.5 (A)'
-    assert counts[2]['party'] == 'GRAUBERGER, JAIMIE'
-    assert counts[2]['disposed'] == 'DEFERRED, 08/28/2012. Guilty Plea'
+    assert counts[1]['party'] == 'COTTON, JASON MACK'
+    assert counts[1]['disposed'] == 'CONVICTION, 06/25/2013. Guilty Plea'
 
 
 def test_live_counts_list():
@@ -83,3 +83,12 @@ def test_issue_list():
                 assert isinstance(party, dict)
                 assert 'name' in party.keys()
                 assert 'disposed' in party.keys()
+
+def test_events():
+    case = oscn.request.Case('oklahoma-FD-2018-5')
+    events = oscn.parse.events(case.text)
+    assert events == []
+
+    case = oscn.request.Case('oklahoma-FD-2012-5')
+    events = oscn.parse.events(case.text)
+    assert len(events) == 9
