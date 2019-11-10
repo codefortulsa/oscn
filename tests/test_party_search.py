@@ -2,15 +2,28 @@ import oscn
 
 
 def test_find_name():
-    # cases = oscn.find.cases(name="smith", first="bob")
-    #
-    # import ipdb; ipdb.set_trace()
+    search_params = {
+        'filed_after':'12/31/2000',
+        'filed_before':'01/01/2019',
+        'last':'dungan',
+    }
 
-    # cases = oscn.find.cases(name="AMERICAN EXPRESS")
-    cases = oscn.find.CaseIndexes(name="DISCOVER BANK")
+    cases = oscn.find.CaseIndexes(**search_params)
+    cases_list = list(cases)
+    assert len(cases_list) == 384
 
-    for case in cases:
-        print(case)
+    search_params['first'] = 'john'
+    cases = oscn.find.CaseIndexes(**search_params)
+    cases_list = list(cases)
+    assert len(cases_list) == 2
 
-    import ipdb; ipdb.set_trace()
-    pass
+def test_find_company():
+    search_params = {
+        'filed_after':'12/31/2018',
+        'filed_before':'01/30/2019',
+        'last':'DISCOVER BANK',
+    }
+
+    cases = oscn.find.CaseIndexes(**search_params)
+    cases_list = list(cases)
+    assert len(cases_list) == 330

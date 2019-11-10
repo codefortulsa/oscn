@@ -37,8 +37,6 @@ def test_list_params():
         assert case.county in counties
         assert case.type in types
         assert case.year in years
-    print('test_list_params')
-    assert len(list1_indexes) == 40
 
 def test_list_kwargs():
 

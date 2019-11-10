@@ -49,19 +49,36 @@ def ask_oscn(**kwargs):
 
     return response
 
+def add_wildcards(name_str):
+    "%25".join(name.split())
+
 
 class CaseIndexes(object):
-    def __init__(self, county="all", name="", **kwargs):
-
+    def __init__(self, county="all",
+                 last="",
+                 first="",
+                 middle="",
+                 filed_after="",
+                 filed_before="",
+                 closed_after="",
+                 closed_before="",
+                 **kwargs):
+        add_wildcards = lambda nm:"%25".join(nm.split())
         self.search =  SEARCH_PARAMS.copy()
         self.search['db']=county
-        self.search['lname'] = "%25".join(name.split())
+        self.search['lname'] = add_wildcards(last)
+        self.search['fname'] = add_wildcards(first)
+        self.search['mname'] = add_wildcards(middle)
+        self.search["FiledDateL" ] = filed_after
+        self.search["FiledDateH" ] = filed_before
+        self.search["ClosedDateL"] = closed_after
+        self.search["ClosedDateH"] = closed_before
 
-        # option kwargs
-        try:
-            new_search['fname'] = kwargs['first']
-        except KeyError:
-            pass
+
+        for kw in kwargs:
+            if kw in self.search.keys():
+                self.search[kw]=kwargs[kw]
+
         results = ask_oscn(**self.search)
         self.text = results.text
         self.source = f'{results.request.url}?{results.request.body}'

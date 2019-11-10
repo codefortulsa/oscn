@@ -12,6 +12,7 @@ def is_case_url(lnk):
         pass
     return pass_test
 
+
 def get_case_indexes(oscn_html):
     case_indexes=[]
     soup = BeautifulSoup(oscn_html, 'html.parser')
@@ -20,7 +21,6 @@ def get_case_indexes(oscn_html):
     for county in counties:
         found_county = ''
         county_indexes = []
-
         links = county.find_all('a')
         case_urls = filter(is_case_url, links)
         for link in case_urls:
