@@ -51,14 +51,14 @@ of the count. If available 'violation' and 'disposed' are added.
 #### Usage
 
 Create a CaseIndexes list using these key word arguments:
-    * county: defaults to all,
-    * last: use this for company or organization names
-    * first: optional
-    * middle: optional
-    * filed_after:   More readable than FiledDateL
-    * filed_before:  More readable than FiledDateH
-    * closed_after:  More readable than ClosedDateL
-    * closed_before: More readable than ClosedDateH
+- county: defaults to all,
+- last: use this for company or organization names
+- first: optional
+- middle: optional
+- filed_after:   More readable than FiledDateL
+- filed_before:  More readable than FiledDateH
+- closed_after:  More readable than ClosedDateL
+- closed_before: More readable than ClosedDateH
 
 #### Notes
 * The % wild card is added to all words in name, first and middle

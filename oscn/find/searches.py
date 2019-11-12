@@ -49,9 +49,6 @@ def ask_oscn(**kwargs):
 
     return response
 
-def add_wildcards(name_str):
-    "%25".join(name.split())
-
 
 class CaseIndexes(object):
     def __init__(self, county="all",
@@ -62,26 +59,32 @@ class CaseIndexes(object):
                  filed_before="",
                  closed_after="",
                  closed_before="",
+                 text="",
                  **kwargs):
-        add_wildcards = lambda nm:"%25".join(nm.split())
-        self.search =  SEARCH_PARAMS.copy()
-        self.search['db']=county
-        self.search['lname'] = add_wildcards(last)
-        self.search['fname'] = add_wildcards(first)
-        self.search['mname'] = add_wildcards(middle)
-        self.search["FiledDateL" ] = filed_after
-        self.search["FiledDateH" ] = filed_before
-        self.search["ClosedDateL"] = closed_after
-        self.search["ClosedDateH"] = closed_before
 
+        if text:
+            self.text = text
+            self.source = ""
+        else:
+            add_wildcards = lambda nm:"%25".join(nm.split())
+            self.search =  SEARCH_PARAMS.copy()
+            self.search['db']=county
+            self.search['lname'] = add_wildcards(last)
+            self.search['fname'] = add_wildcards(first)
+            self.search['mname'] = add_wildcards(middle)
+            self.search["FiledDateL" ] = filed_after
+            self.search["FiledDateH" ] = filed_before
+            self.search["ClosedDateL"] = closed_after
+            self.search["ClosedDateH"] = closed_before
 
-        for kw in kwargs:
-            if kw in self.search.keys():
-                self.search[kw]=kwargs[kw]
+            for kw in kwargs:
+                if kw in self.search.keys():
+                    self.search[kw]=kwargs[kw]
 
-        results = ask_oscn(**self.search)
-        self.text = results.text
-        self.source = f'{results.request.url}?{results.request.body}'
+            results = ask_oscn(**self.search)
+            self.text = results.text
+            self.source = f'{results.request.url}?{results.request.body}'
+
         self._indexes = self._case_indexes()
 
 

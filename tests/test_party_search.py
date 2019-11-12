@@ -17,6 +17,12 @@ def test_find_name():
     cases_list = list(cases)
     assert len(cases_list) == 2
 
+    # text text init
+    text_cases = oscn.find.CaseIndexes(text=cases.text)
+    cases_list = list(text_cases)
+    assert len(cases_list) == 2
+
+
 def test_find_company():
     search_params = {
         'filed_after':'12/31/2018',
