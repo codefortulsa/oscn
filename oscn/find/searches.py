@@ -1,6 +1,8 @@
 import datetime
 import requests
 
+from enum import Enum
+
 from requests.exceptions import ConnectionError
 
 from .. import settings
@@ -49,37 +51,33 @@ def ask_oscn(**kwargs):
 
     return response
 
+class OSCN_SearchParams(Enum):
+    county = "db"
+    last_name = "lname"
+    first_name = "fname"
+    middle_name = "mname"
+    filed_after = "FiledDateL"
+    filed_before = "FiledDateH"
+    closed_after = "ClosedDateL"
+    closed_before = "ClosedDateH"
 
 class CaseIndexes(object):
-    def __init__(self, county="all",
-                 last="",
-                 first="",
-                 middle="",
-                 filed_after="",
-                 filed_before="",
-                 closed_after="",
-                 closed_before="",
-                 text="",
-                 **kwargs):
+    def __init__(self, **kwargs):
 
-        if text:
-            self.text = text
+        if 'text' in kwargs.keys():
+            self.text = kwargs['text']
             self.source = ""
         else:
-            add_wildcards = lambda nm:"%25".join(nm.split())
             self.search =  SEARCH_PARAMS.copy()
-            self.search['db']=county
-            self.search['lname'] = add_wildcards(last)
-            self.search['fname'] = add_wildcards(first)
-            self.search['mname'] = add_wildcards(middle)
-            self.search["FiledDateL" ] = filed_after
-            self.search["FiledDateH" ] = filed_before
-            self.search["ClosedDateL"] = closed_after
-            self.search["ClosedDateH"] = closed_before
+            for kw in kwargs.keys():
+                if kw in OSCN_SearchParams.__members__:
+                    oscn_param = OSCN_SearchParams[kw].value
+                    self.search[oscn_param]=kwargs[kw]
 
-            for kw in kwargs:
-                if kw in self.search.keys():
-                    self.search[kw]=kwargs[kw]
+            name_params = ['lname', 'fname', 'mname']
+            add_wildcards = lambda nm:"%25".join(nm.split())
+            for param in name_params:
+                self.search[param] = add_wildcards(self.search[param])
 
             results = ask_oscn(**self.search)
             self.text = results.text

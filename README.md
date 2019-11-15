@@ -52,9 +52,9 @@ of the count. If available 'violation' and 'disposed' are added.
 
 Create a CaseIndexes list using these key word arguments:
 - county: defaults to all,
-- last: use this for company or organization names
-- first: optional
-- middle: optional
+- last_name: use this for company or organization names
+- first_name: optional
+- middle_name: optional
 - filed_after:   More readable than FiledDateL
 - filed_before:  More readable than FiledDateH
 - closed_after:  More readable than ClosedDateL
