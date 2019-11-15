@@ -44,8 +44,32 @@ of the count. If available 'violation' and 'disposed' are added.
 - attorneys: returns a list of dicts with these keys: name, address, and representing
 - issues: returns a list of dicts with issue information. Each issues includes a list of dicts for each party
 
-### oscn.find (experimental)
-Calls to the OSCN search application.
+### oscn.find
+
+- CaseIndexes: returns an iterator of case indexes (e.g. tulsa-CF-2019-12).
+
+#### Usage
+
+Create a CaseIndexes list using these key word arguments:
+- county: defaults to all,
+- last_name: use this for company or organization names
+- first_name: optional
+- middle_name: optional
+- filed_after:   More readable than FiledDateL
+- filed_before:  More readable than FiledDateH
+- closed_after:  More readable than ClosedDateL
+- closed_before: More readable than ClosedDateH
+
+#### Notes
+* The % wild card is added to all words in name, first and middle
+* Date arguments use MM/DD/YYY strings.
+
+
+#### OSCN search parameters
+If you are familar with the OSCN search parameters you can initialize CaseIndexes using these as key word arguments: db, number, lname, fname, mname, DoBMin, DoBMax, partytype, apct, dcct, FiledDate, FiledDateH, ClosedDateL, ClosedDateH, iLC, iLCType, iYear, iNumber, and citation
+
+Using this will override init keyword values such as first or filed_after.
+
 
 ## Development Install
 
