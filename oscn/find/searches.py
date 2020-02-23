@@ -27,7 +27,7 @@ SEARCH_PARAMS = {
     "partytype" : "",
     "apct" : "",
     "dcct" : "",
-    "FiledDateL" : "01/01/2019",
+    "FiledDateL" : "01/01/2020",
     "FiledDateH" : "",
     "ClosedDateL" : "",
     "ClosedDateH" : "",
@@ -61,18 +61,22 @@ class OSCN_SearchParams(Enum):
     closed_after = "ClosedDateL"
     closed_before = "ClosedDateH"
 
+
 class CaseIndexes(object):
     def __init__(self, **kwargs):
+        self.search =  SEARCH_PARAMS.copy()
 
         if 'text' in kwargs.keys():
             self.text = kwargs['text']
             self.source = ""
         else:
-            self.search =  SEARCH_PARAMS.copy()
             for kw in kwargs.keys():
                 if kw in OSCN_SearchParams.__members__:
                     oscn_param = OSCN_SearchParams[kw].value
                     self.search[oscn_param]=kwargs[kw]
+                elif kw in self.search.keys():
+                    self.search[kw]=kwargs[kw]
+
 
             name_params = ['lname', 'fname', 'mname']
             add_wildcards = lambda nm:"%25".join(nm.split())

@@ -249,7 +249,6 @@ class CaseList(object):
                         yield self._request_case(case_index)
                         if self.exit_year:
                             break
-        # raise StopIteration
 
     def _case_generator(self):
         request_attempts=10
@@ -270,7 +269,6 @@ class CaseList(object):
                     request_attempts -= 1
                 else:
                     self.exit_year = True
-        # raise StopIteration
 
 
     def __iter__(self):
