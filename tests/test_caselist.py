@@ -9,7 +9,8 @@ def test_string_params():
     list1 = oscn.request.CaseList(types=type,
                                   counties=county,
                                   years=year,
-                                  start=21, stop=25)
+                                  start=22,
+                                  stop=26)
 
     assert list1
     list1_indexes = []
@@ -43,7 +44,7 @@ def test_list_kwargs():
     list1 = oscn.request.CaseList(  type='CM',
                                     county='tulsa',
                                     year='2018',
-                                    start=21, stop=25)
+                                    start=22, stop=26)
     assert list1
 
     list1_indexes = []

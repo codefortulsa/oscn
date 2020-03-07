@@ -1,6 +1,5 @@
 import oscn
 
-
 def test_init_text():
     # no text should return []
     cases = oscn.find.CaseIndexes(text='')
@@ -18,7 +17,7 @@ def test_find_name():
 
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
-    assert len(cases_list) == 384
+    assert len(cases_list) == 383
 
     search_params['first_name'] = 'john'
     cases = oscn.find.CaseIndexes(**search_params)
@@ -40,7 +39,7 @@ def test_find_company():
 
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
-    assert len(cases_list) == 330
+    assert len(cases_list) == 328
 
 
 def test_find_district_type():
@@ -56,3 +55,25 @@ def test_find_district_type():
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
     assert len(cases_list) == 78
+
+
+def test_text_matches_live_query():
+
+    search_params = {'last_name': 'discover bank',
+        'first_name': '',
+        'middle_name': '',
+        'filed_before':'03/04/2020',
+        'filed_after': '03/04/2020'}
+
+
+    cases = oscn.find.CaseIndexes(**search_params)
+    cases_list = list(cases)
+
+    len_cases = len(cases_list)
+    assert len(cases_list) == 27
+
+    search_params['text'] = cases.text
+
+    saved_cases = oscn.find.CaseIndexes(**search_params)
+    cases_list = list(saved_cases)
+    assert len(cases_list) == len_cases

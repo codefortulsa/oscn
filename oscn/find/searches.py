@@ -65,24 +65,23 @@ class OSCN_SearchParams(Enum):
 class CaseIndexes(object):
     def __init__(self, **kwargs):
         self.search =  SEARCH_PARAMS.copy()
+        for kw in kwargs.keys():
+            if kw in OSCN_SearchParams.__members__:
+                oscn_param = OSCN_SearchParams[kw].value
+                self.search[oscn_param]=kwargs[kw]
+            elif kw in self.search.keys():
+                self.search[kw]=kwargs[kw]
+
+
+        name_params = ['lname', 'fname', 'mname']
+        add_wildcards = lambda nm:"%25".join(nm.split())
+        for param in name_params:
+            self.search[param] = add_wildcards(self.search[param])
 
         if 'text' in kwargs.keys():
             self.text = kwargs['text']
             self.source = ""
         else:
-            for kw in kwargs.keys():
-                if kw in OSCN_SearchParams.__members__:
-                    oscn_param = OSCN_SearchParams[kw].value
-                    self.search[oscn_param]=kwargs[kw]
-                elif kw in self.search.keys():
-                    self.search[kw]=kwargs[kw]
-
-
-            name_params = ['lname', 'fname', 'mname']
-            add_wildcards = lambda nm:"%25".join(nm.split())
-            for param in name_params:
-                self.search[param] = add_wildcards(self.search[param])
-
             results = ask_oscn(**self.search)
             self.text = results.text
             self.source = f'{results.request.url}?{results.request.body}'
