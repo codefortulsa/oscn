@@ -34,10 +34,14 @@ class Case(object):
     def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, cmid=False, **kwargs):
         if index:
             index_parts = index.split('-')
-            if len(index_parts)==4:
+            len_index_parts = len(index_parts)
+            if len_index_parts==4:
                 self.county, self.type, self.year, number_str = index_parts
                 self.number = int(number_str)
-            elif len(index_parts)==2:
+            elif len_index_parts==3:
+                self.county, self.type, number_str = index_parts
+                self.number = int(number_str)
+            elif len_index_parts==2:
                 self.county, number_str = index_parts
                 self.number = int(number_str)
                 self.type = 'IN'
@@ -61,6 +65,8 @@ class Case(object):
             elif self.bucket:
                 self._open_s3_object()
             else:
+                # default for test
+                self.text = ''
                 self._request()
 
     @property
@@ -83,14 +89,14 @@ class Case(object):
 
     @property
     def file_name(self):
-        return f'{self.path}/{self.number}.case'
+        return f'{self.path}/{self.number}.zip'
 
     @property
     def s3_key(self):
         if self.county == 'appellate':
-            return f'{self.county}/{self.number}.case'
+            return f'{self.county}/{self.number}.zip'
         else:
-            return f'{self.county}/{self.type}/{self.year}/{self.number}.case'
+            return f'{self.county}/{self.type}/{self.year}/{self.number}.zip'
 
 
     def save(self, **kwargs):

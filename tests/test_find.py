@@ -7,6 +7,7 @@ def test_find_text_in_text():
     cases = oscn.request.CaseList(  counties='bryan',years='2018',
                                     types='CF', stop=60)
     cases.find(text=search_for_text)
+
     found_index = []
     for case in cases:
         found_index.append(case.index)
@@ -40,7 +41,7 @@ def test_find_function():
 def test_find_bucket_text():
 
     cases = oscn.request.CaseList(  counties='bryan', years='2018', types='CF',
-                                    stop=60,bucket='oscn-cases')
+                                    stop=60,bucket='oscn-test-data')
 
     cases.find(text=search_for_text)
 

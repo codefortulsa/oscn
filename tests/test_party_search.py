@@ -17,7 +17,7 @@ def test_find_name():
 
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
-    assert len(cases_list) == 383
+    assert len(cases_list) > 300
 
     search_params['first_name'] = 'john'
     cases = oscn.find.CaseIndexes(**search_params)
@@ -39,7 +39,7 @@ def test_find_company():
 
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
-    assert len(cases_list) == 328
+    assert len(cases_list) > 300
 
 
 def test_find_district_type():

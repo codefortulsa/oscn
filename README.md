@@ -104,11 +104,11 @@ To request a list of cases to iterate:
 
 or with ipdb:
 
-    - `py.test -s tests/`
+    - `pytest -s tests/`
 
 specify a test:
 
-   - `py.test -s tests/test_parse.py -k 'test_events'`
+   - `pytest -s tests/test_parse.py -k 'test_events'`
 
 ## Deployment steps
 

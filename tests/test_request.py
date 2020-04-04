@@ -20,8 +20,8 @@ def test_live_request_properties():
     assert case1.oscn_number == 'CM-2019-6'
     assert case1.index == 'adair-CM-2019-6'
     assert case1.path == '/adair/CM/2019'
-    assert case1.s3_key == 'adair/CM/2019/6.case'
-    assert case1.file_name == '/adair/CM/2019/6.case'
+    assert case1.s3_key == 'adair/CM/2019/6.zip'
+    assert case1.file_name == '/adair/CM/2019/6.zip'
 
 def test_init_number():
     case1 = oscn.request.Case(county='adair', type='CM',year='2019', number=6)
