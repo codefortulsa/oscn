@@ -17,11 +17,11 @@ def find_disp(html_doc):
     return False
 
 
-
 # define the Case attr to test and the function to use
 
-cases = oscn.request.CaseList(county='tulsa', year='2017', start=1001, stop=2000).find(text=find_disp)
+cases = oscn.request.CaseList(county='tulsa', type="CF", year='2017', start=1001, stop=2000)
 
 for c in cases:
+    docket = c.docket
     import ipdb; ipdb.set_trace()
-    print (c.source)
+    print (docket.text)

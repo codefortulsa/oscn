@@ -1,7 +1,7 @@
 import re
 from bs4 import BeautifulSoup
 
-from ._helpers import find_values, lists2dict
+from ._helpers import find_values, lists2dict, MetaList
 
 # count_re = r'Count as Filed:[^A-Z]*([A-Z|\d]*),\s(.*)'
 # count_details = re.compile(count_re, re.M)
@@ -9,11 +9,13 @@ from ._helpers import find_values, lists2dict
 
 
 def counts(oscn_html):
-    count_list = []
+    count_list = MetaList()
+
     soup = BeautifulSoup(oscn_html, 'html.parser')
     counts = soup.find_all('div', 'CountsContainer')
     if counts:
         for count in counts:
+            count_list.add_text(count.get_text(separator=" "))
             count_keys = ['Count as Disposed', 'Count as Filed', 'Disposed', 'Date of Offense']
             count_values = find_values(count, count_keys)
             count_desc = (
@@ -46,6 +48,7 @@ def counts(oscn_html):
         if next_sibling:
             while next_sibling.name != 'h2':
                 if next_sibling.name == 'p':
+                    count_list.add_text(next_sibling.get_text(separator=" "))
                     next_sibling.strong.extract()
                     count_list.append(
                         {'description': next_sibling.text.strip()})

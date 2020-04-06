@@ -1,13 +1,15 @@
 from bs4 import BeautifulSoup
-from ._helpers import text_values, column_titles, lists2dict, clean_string
+from ._helpers import text_values, column_titles, lists2dict, clean_string, MetaList
 
 
 def events(oscn_html):
-    events = []
+    events = MetaList()
+
     soup = BeautifulSoup(oscn_html, 'html.parser')
     events_start = soup.find('h2', 'section events')
     events_table = events_start.find_next_sibling()
     if events_table.name == 'table':
+        events.text = events_table.get_text(separator=" ")
         thead = events_table.find('thead').find_all('th')
         event_keys = column_titles(thead)
         rows = events_table.find('tbody').find_all('tr')

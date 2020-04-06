@@ -19,7 +19,7 @@ def test_live_counts():
     assert counts[1]['violation'] == '21 O.S. 843.5 (A)'
     assert counts[1]['party'] == 'COTTON, JASON MACK'
     assert counts[1]['disposed'] == 'CONVICTION, 06/25/2013. Guilty Plea'
-
+    assert counts.text != ''
 
 def test_live_counts_list():
     cases = oscn.request.CaseList(start=15, stop=17)
@@ -30,6 +30,7 @@ def test_docket():
     case1 = oscn.request.Case('tulsa-CF-2019-03')
     docket = case1.docket
     assert isinstance(docket, list)
+    assert ('FELONY INITIAL FILING' in docket.text)
     for minute in docket:
         assert isinstance(minute, dict)
         assert minute['date'] is not ''
@@ -42,6 +43,12 @@ def test_issues():
     for issue in issues:
         assert isinstance(issue, dict)
 
+
+def test_get_parties():
+    case1 = oscn.request.Case('tulsa-CJ-2016-143')
+    parties = oscn.parse.parties(case1.text)
+    assert isinstance(parties, list)
+    assert ('CHANDLER' in parties.text)
 
 def test_parties():
     case1 = oscn.request.Case('tulsa-CJ-2016-143')
@@ -63,12 +70,13 @@ def test_attorneys():
     assert isinstance(attorneys1, list)
     assert len(attorneys1) == 1
     assert attorneys1[0]['representing'] == 'BANK OF AMERICA NA,'
+    assert 'KOZENY & MCCUBBIN' in case1.attorneys.text
 
     case2 = oscn.request.Case('mayes-PO-2015-1')
     attorneys2 = oscn.parse.attorneys(case2.text)
-
     assert isinstance(attorneys2, list)
     assert len(attorneys2) == 0
+    assert attorneys2.text == ''
 
 
 def test_issue_list():
@@ -92,3 +100,4 @@ def test_events():
     case = oscn.request.Case('oklahoma-FD-2012-5')
     events = oscn.parse.events(case.text)
     assert len(events) == 9
+    assert "PETITIONER'S APPLICATION" in events.text

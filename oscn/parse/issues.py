@@ -2,7 +2,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from ._helpers import find_values, clean_string
+from ._helpers import find_values, clean_string, MetaList
 
 
 issue_keys = ['Filed Date', 'Filed By', 'Issue']
@@ -30,10 +30,11 @@ def make_party_dict(**kwargs):
 
 
 def issues(oscn_html):
-    issue_list = []
+    issue_list = MetaList()    
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section issues')
     issue_table = start.find_next_sibling('table')
+    issue_list.text = issue_table.text
 
     while re.search('Issue #', issue_table.text):
         # find the issue details

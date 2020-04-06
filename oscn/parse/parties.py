@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 
-from ._helpers import clean_string
+from ._helpers import clean_string, MetaList
 
 
 def parties(oscn_html):
@@ -9,6 +9,10 @@ def parties(oscn_html):
     start = soup.find('h2', 'section party')
     party_p = start.find_next_sibling('p')
     party_links = party_p.find_all('a')
+    named_parties = MetaList()
+    named_parties.text = party_p.get_text(separator=" ")
+
+
     if party_links:
         names = [link.text for link in party_links]
         # party_p.strings look like "name,type,name,type"
@@ -38,7 +42,11 @@ def parties(oscn_html):
 
     raw_parties = map(Party, names, types)
 
-    return [party for party in raw_parties if party['name']]
+    for party in raw_parties:
+        if party['name']:
+            named_parties.append(party)
+
+    return named_parties
 
 # add this attribute to allow it to be added to request objects
 setattr(parties, 'target', ['Case'])

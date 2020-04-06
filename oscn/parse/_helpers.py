@@ -36,3 +36,18 @@ def find_values(soup, key_names):
         key_value = key_found.split(':')[1] if key_found else ''
         key_values.append(clean_string(key_value))
     return lists2dict(key_names, key_values)
+
+# class to allow adding metadata to returned lists
+class MetaList(list):
+    saved_text = ''
+
+    @property
+    def text(self):
+        return clean_string(self.saved_text)
+
+    @text.setter
+    def text(self, new_text):
+        self.saved_text = new_text
+
+    def add_text(self, more_text):
+        self.text += more_text
