@@ -46,6 +46,9 @@ valid_cases = [
 'appellate-WCM-118652',
 'appellate-DF-118651' ]
 
-for indx in valid_cases:
-    case = oscn.request.Case(indx)
-    assert case.valid == True
+
+def test_appellate_types():
+    for indx in valid_cases:
+        print(indx)
+        case = oscn.request.Case(indx)
+        assert case.valid == True

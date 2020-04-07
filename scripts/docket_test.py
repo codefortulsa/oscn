@@ -23,5 +23,4 @@ cases = oscn.request.CaseList(county='tulsa', type="CF", year='2017', start=1001
 
 for c in cases:
     docket = c.docket
-    import ipdb; ipdb.set_trace()
     print (docket.text)
