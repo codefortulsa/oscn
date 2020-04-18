@@ -30,11 +30,11 @@ def make_party_dict(**kwargs):
 
 
 def issues(oscn_html):
-    issue_list = MetaList()    
+    issue_list = MetaList()
     soup = BeautifulSoup(oscn_html, 'html.parser')
     start = soup.find('h2', 'section issues')
     issue_table = start.find_next_sibling('table')
-    issue_list.text = issue_table.text
+    issue_list.text = issue_table.get_text(separator=" ")
 
     while re.search('Issue #', issue_table.text):
         # find the issue details
@@ -42,6 +42,7 @@ def issues(oscn_html):
 
         # the next table should be dispositions
         disp_table = issue_table.find_next_sibling('table')
+        issue_list.add_text(disp_table.get_text(separator=" "))
 
         issue_dict['parties'] = []
         parties_rows = disp_table.find_all('tr')

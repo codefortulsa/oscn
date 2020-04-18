@@ -43,11 +43,11 @@ class MetaList(list):
 
     @property
     def text(self):
-        return clean_string(self.saved_text)
+        return self.saved_text
 
     @text.setter
     def text(self, new_text):
-        self.saved_text = new_text
+        self.saved_text = clean_string(new_text)
 
     def add_text(self, more_text):
-        self.text += more_text
+        self.text += clean_string(more_text)

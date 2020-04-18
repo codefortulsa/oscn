@@ -35,14 +35,13 @@ def test_docket():
         assert isinstance(minute, dict)
         assert minute['date'] is not ''
 
-
 def test_issues():
-    case1 = oscn.request.Case('oklahoma-PO-2015-10')
+    case1 = oscn.request.Case('tulsa-CJ-2017-5021')
     issues = oscn.parse.issues(case1.text)
     assert isinstance(issues, list)
+    assert 'Disposition' in issues.text
     for issue in issues:
         assert isinstance(issue, dict)
-
 
 def test_get_parties():
     case1 = oscn.request.Case('tulsa-CJ-2016-143')
