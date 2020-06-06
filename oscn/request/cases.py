@@ -1,5 +1,6 @@
 
-import os, errno
+import os
+import errno
 from io import BytesIO
 import gzip
 import json
@@ -14,12 +15,12 @@ from requests.exceptions import ConnectionError
 
 import boto3
 import botocore
-s3 = boto3.resource('s3')
-s3_client = boto3.client('s3')
 
 from .. import settings
-
 from ..parse import append_parsers
+
+s3 = boto3.resource('s3')
+s3_client = boto3.client('s3')
 
 oscn_url = settings.OSCN_CASE_URL
 warnings.filterwarnings("ignore")
@@ -27,21 +28,23 @@ logger = logging.getLogger('oscn')
 
 logger.setLevel(logging.INFO)
 
+
 class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
 
-    def __init__(self, index=False, type='CF', county='tulsa', year='2019', number=1, cmid=False, **kwargs):
+    def __init__(self, index=False, type='CF', county='tulsa',
+                 year='2019', number=1, cmid=False, **kwargs):
         if index:
             index_parts = index.split('-')
             len_index_parts = len(index_parts)
-            if len_index_parts==4:
+            if len_index_parts == 4:
                 self.county, self.type, self.year, number_str = index_parts
                 self.number = int(number_str)
-            elif len_index_parts==3:
+            elif len_index_parts == 3:
                 self.county, self.type, number_str = index_parts
                 self.number = int(number_str)
-            elif len_index_parts==2:
+            elif len_index_parts == 2:
                 self.county, number_str = index_parts
                 self.number = int(number_str)
                 self.type = 'IN'
@@ -97,7 +100,6 @@ class Case(object):
             return f'{self.county}/{self.number}.zip'
         else:
             return f'{self.county}/{self.type}/{self.year}/{self.number}.zip'
-
 
     def save(self, **kwargs):
         case_data = {

@@ -70,11 +70,10 @@ class CaseIndexes(object):
                 oscn_param = OSCN_SearchParams[kw].value
                 self.search[oscn_param]=kwargs[kw]
             elif kw in self.search.keys():
-                self.search[kw]=kwargs[kw]
-
+                self.search[kw] = kwargs[kw]
 
         name_params = ['lname', 'fname', 'mname']
-        add_wildcards = lambda nm:"%25".join(nm.split())
+        add_wildcards = lambda nm: "%25".join(nm.split())
         for param in name_params:
             self.search[param] = add_wildcards(self.search[param])
 
@@ -87,7 +86,6 @@ class CaseIndexes(object):
             self.source = f'{results.request.url}?{results.request.body}'
 
         self._indexes = self._case_indexes()
-
 
     def __iter__(self):
         return self
