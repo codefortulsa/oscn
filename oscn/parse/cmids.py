@@ -7,15 +7,16 @@ from urllib.parse import parse_qs
 
 
 def cmids(oscn_html):
-    soup = BeautifulSoup(oscn_html, 'html.parser')
+    soup = BeautifulSoup(oscn_html, "html.parser")
     cmids = []
-    ref_table = soup.find('table', 'multipleRecords')
+    ref_table = soup.find("table", "multipleRecords")
     if ref_table:
-        for row in ref_table.find('tbody').find_all('tr'):
-            href = row.find('a')['href']
-            cmids += parse_qs(href)['cmid']
+        for row in ref_table.find("tbody").find_all("tr"):
+            href = row.find("a")["href"]
+            cmids += parse_qs(href)["cmid"]
 
     return cmids
 
-setattr(cmids, 'target', ['Case'])
-setattr(cmids, '_default_value', [])
+
+setattr(cmids, "target", ["Case"])
+setattr(cmids, "_default_value", [])
