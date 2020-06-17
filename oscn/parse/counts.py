@@ -1,7 +1,6 @@
-import re
 from bs4 import BeautifulSoup
 
-from ._helpers import find_values, lists2dict, MetaList
+from ._helpers import find_values, MetaList
 
 # count_re = r'Count as Filed:[^A-Z]*([A-Z|\d]*),\s(.*)'
 # count_details = re.compile(count_re, re.M)

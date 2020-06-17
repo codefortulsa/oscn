@@ -265,8 +265,6 @@ class CaseList(object):
         for case in self._request_generator(self.start, self.stop):
             if case.valid:
                 request_attempts = 10
-                if self._passes_filters(case):
-                    yield case
                 if case.cmids:
                     for cmid in case.cmids:
                         cmid_index = f"{case.county}-cmid-{case.year}-{cmid}"
@@ -274,6 +272,8 @@ class CaseList(object):
                         if cmid_case.valid:
                             if self._passes_filters(cmid_case):
                                 yield cmid_case
+                elif self._passes_filters(case):
+                    yield case
             else:
                 if request_attempts > 0:
                     request_attempts -= 1

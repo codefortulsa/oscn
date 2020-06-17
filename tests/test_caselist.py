@@ -68,7 +68,7 @@ def test_retrieve_cmids():
         list1_indexes.append(case.index)
         case.save(directory="data")
 
-    assert len(list1_indexes) == 7
+    assert len(list1_indexes) == 6
 
     list2_indexes = []
     for idx in list1_indexes:
