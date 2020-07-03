@@ -192,7 +192,7 @@ class Case(object):
                 raise ConnectionError
         if self._valid_response(response):
             self.valid = True
-            self.source = f"{response.url}?{response.request.body}"
+            self.source = f"{response.url}"
             self.text = response.text
             for msg in settings.UNUSED_CASE_MESSAGES:
                 if msg in response.text:

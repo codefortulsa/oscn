@@ -23,3 +23,12 @@ def courts():
         return court_vals
     except:
         return settings.ALL_COURTS
+
+
+def get_type(type_code):
+    get_type = settings.ALL_TYPES.get(type_code, "")
+    return get_type
+
+
+def all_types():
+    return settings.ALL_TYPES

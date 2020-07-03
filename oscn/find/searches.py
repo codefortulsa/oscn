@@ -6,7 +6,6 @@ from enum import Enum
 from requests.exceptions import ConnectionError
 
 from .. import settings
-from .._meta import courts
 from .parse import get_case_indexes
 
 OSCN_URL = settings.OSCN_SEARCH_URL
@@ -41,10 +40,10 @@ SEARCH_PARAMS = {
 
 def ask_oscn(**kwargs):
     try:
-        response = requests.post(OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
+        response = requests.get(
+            OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
     except ConnectionError:
         return ""
-
     return response
 
 
