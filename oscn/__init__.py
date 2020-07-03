@@ -5,3 +5,5 @@ from . import find
 
 counties = _meta.courts()
 courts = _meta.courts()
+type = _meta.get_type
+types = _meta.all_types
