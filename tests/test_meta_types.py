@@ -8,5 +8,5 @@ def test_get_type_desc():
 
 
 def test_get_all_types():
-    dict_of_all = oscn.types()
+    dict_of_all = oscn.types
     assert isinstance(dict_of_all, dict)

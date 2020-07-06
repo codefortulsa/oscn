@@ -20,7 +20,12 @@ scripts > Python scripts showing use of the oscn package
 
 - counties: Returns a list of counties.
 - courts: Same as counties but more a accurate description.
-
+- types: returns a dict of case type codes and descriptons
+- type: function to return case type description.  Usage: 
+  ```
+  >>> oscn.type("AO")
+  'CIVIL ADMINISTRATIVE'
+  ```
 
 ### oscn.request
 
