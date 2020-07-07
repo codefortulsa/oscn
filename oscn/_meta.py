@@ -1,9 +1,25 @@
 import requests
+from requests.exceptions import ConnectionError
+
 import functools
 
 from bs4 import BeautifulSoup
 
 from . import settings
+
+OSCN_URL = settings.OSCN_SEARCH_URL
+
+
+OSCN_HEADER = settings.OSCN_REQUEST_HEADER
+
+
+def search_get(**kwargs):
+    try:
+        response = requests.get(
+            OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
+    except ConnectionError:
+        return ""
+    return response
 
 
 @functools.lru_cache()
@@ -23,6 +39,27 @@ def courts():
         return court_vals
     except:
         return settings.ALL_COURTS
+
+
+@functools.lru_cache()
+def judges():
+    try:
+        response = requests.get(
+            "https://www.oscn.net/applications/oscn/report.asp?report=WebJudicialDocketJudgeAll",
+            headers=settings.OSCN_REQUEST_HEADER,
+            verify=False,
+        )
+        soup = BeautifulSoup(response.text, "html.parser")
+        form = soup.find("form")
+        select = form.find("select")
+        options = select.find_all("option")
+        judge_numbers = [option["value"] for option in options]
+        judge_names = [option.text for option in options]
+        judges_dict = [{'number': num, 'name': name} for num, name in zip(judge_numbers, judge_names)]
+        return judges_dict
+
+    except:
+        return settings.ALL_JUDGES
 
 
 def get_type(type_code):

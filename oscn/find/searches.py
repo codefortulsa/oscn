@@ -1,15 +1,10 @@
 import datetime
-import requests
 
 from enum import Enum
 
-from requests.exceptions import ConnectionError
+from oscn._meta import search_get
 
-from .. import settings
 from .parse import get_case_indexes
-
-OSCN_URL = settings.OSCN_SEARCH_URL
-OSCN_HEADER = settings.OSCN_REQUEST_HEADER
 
 # OSCN search wildcards '%' and '_'
 # %  Smi%
@@ -36,15 +31,6 @@ SEARCH_PARAMS = {
     "iNumber": "",
     "citation": "",
 }
-
-
-def ask_oscn(**kwargs):
-    try:
-        response = requests.get(
-            OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
-    except ConnectionError:
-        return ""
-    return response
 
 
 class OSCN_SearchParams(Enum):
@@ -77,7 +63,7 @@ class CaseIndexes(object):
             self.text = kwargs["text"]
             self.source = ""
         else:
-            results = ask_oscn(**self.search)
+            results = oscn_get(**self.search)
             self.text = results.text
             self.source = f"{results.request.url}?{results.request.body}"
 
@@ -98,7 +84,7 @@ class CaseIndexes(object):
                 skip_county = county
                 county_search = self.search.copy()
                 county_search["db"] = county
-                county_results = ask_oscn(**county_search)
+                county_results = oscn_get(**county_search)
                 county_cases = get_case_indexes(county_results.text)
                 for county_idx in county_cases:
                     yield county_idx
