@@ -63,7 +63,7 @@ class CaseIndexes(object):
             self.text = kwargs["text"]
             self.source = ""
         else:
-            results = oscn_get(**self.search)
+            results = search_get(**self.search)
             self.text = results.text
             self.source = f"{results.request.url}?{results.request.body}"
 
@@ -84,7 +84,7 @@ class CaseIndexes(object):
                 skip_county = county
                 county_search = self.search.copy()
                 county_search["db"] = county
-                county_results = oscn_get(**county_search)
+                county_results = search_get(**county_search)
                 county_cases = get_case_indexes(county_results.text)
                 for county_idx in county_cases:
                     yield county_idx

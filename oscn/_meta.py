@@ -8,15 +8,24 @@ from bs4 import BeautifulSoup
 from . import settings
 
 OSCN_URL = settings.OSCN_SEARCH_URL
-
-
 OSCN_HEADER = settings.OSCN_REQUEST_HEADER
+
+OSCN_PARTY_URL = settings.OSCN_PARTY_URL
 
 
 def search_get(**kwargs):
     try:
         response = requests.get(
             OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
+    except ConnectionError:
+        return ""
+    return response
+
+
+def party_get(**kwargs):
+    try:
+        response = requests.get(
+            OSCN_PARTY_URL, kwargs, headers=OSCN_HEADER, verify=False)
     except ConnectionError:
         return ""
     return response

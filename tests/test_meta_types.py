@@ -14,9 +14,6 @@ def test_get_all_types():
 
 def test_judges():
     judges = oscn.judges
-    import ipdb
-
-    ipdb.set_trace()  # breakpoint 7528544c //
     assert isinstance(judges, list)
     assert len(judges) != 0
     assert judges[0]["number"]
@@ -25,9 +22,6 @@ def test_judges():
 
 def test_get_judge():
     judges = oscn.judges
-    import ipdb
-
-    ipdb.set_trace()  # breakpoint 7528544c //
     assert isinstance(judges, list)
     assert len(judges) != 0
     assert judges[0]["number"]

@@ -1,0 +1,1 @@
+https://www.oscn.net/applications/oscn/report.asp?report=WebJudicialDocketJudgeAll&errorcheck=true&Judge=1208&database=&db=Oklahoma&StartDate=06%2F28%2F2020&GeneralNumber=1&generalnumber1=1&GeneralCheck=on
