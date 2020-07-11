@@ -52,3 +52,14 @@ class MetaList(list):
 
     def add_text(self, more_text):
         self.text += clean_string(more_text)
+
+
+def table2dict(bs4_table):
+    get_text = lambda el: clean_string(el.text)
+    header = bs4_table.thead.find_all('th')
+    data = bs4_table.tbody.find_all('td')
+    keys = map(get_text, header)
+    values = map(get_text, data)
+    new_dict = {k: v for k, v in zip(keys, values)}
+    return new_dict
+

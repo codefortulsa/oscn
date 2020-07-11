@@ -22,10 +22,14 @@ def search_get(**kwargs):
     return response
 
 
-def party_get(**kwargs):
+def party_get(id):
+    party_params ={
+        'db': 'oklahoma',
+        'id': id
+    }
     try:
         response = requests.get(
-            OSCN_PARTY_URL, kwargs, headers=OSCN_HEADER, verify=False)
+            OSCN_PARTY_URL, party_params, headers=OSCN_HEADER, verify=False)
     except ConnectionError:
         return ""
     return response
