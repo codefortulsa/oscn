@@ -46,3 +46,4 @@ def append_parsers(obj):
     for fn in parse_functions:
         if obj.__name__ in fn.target:
             setattr(obj, fn.__name__, make_property(fn))
+    return obj

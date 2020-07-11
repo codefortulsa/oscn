@@ -36,9 +36,13 @@ scripts > Python scripts showing use of the oscn package
 
  CaseLists can be filtered using .find().  See scripts/example.py for details
 
+ - Party: Returns information on parties available on OSCN.
+
 
 ### oscn.parse
 Parsers accept the html of an OSCN case page and return python objects.
+
+#### Case Page Parsers
 - filed: returns a string of the filing date (e.g. 12/25/2017)
 - closed: returns a string of the date the case was closed.  Return None if not closed.
 - counts: returns of list of count dicts found in a case.  Keys include 'description'
@@ -49,6 +53,13 @@ of the count. If available 'violation' and 'disposed' are added.
 - events: returns a list of dicts with these keys: event, party, docket, reporter, date, description.  The keys date and description are cleaner versions of the event text.  The event key will be deprecation some day so use date and description if you are starting a project.
 - attorneys: returns a list of dicts with these keys: name, address, and representing
 - issues: returns a list of dicts with issue information. Each issues includes a list of dicts for each party
+
+#### Party Page Parsers
+- name: returns 'Requested Party'
+- alias: returns 'Alias or Alternate Names'
+- profile: returns dict of values in 'Personal Profile'
+- birth_month: returns string of 'Birth Month and Year'
+- addresses: returns a list of dicts for each address
 
 ### oscn.find
 

@@ -1,6 +1,19 @@
+import urllib.parse
+
 from bs4 import BeautifulSoup
 
 from ._helpers import clean_string, MetaList
+
+def get_party_id(link):
+    href = link['href']
+    url = urllib.parse.urlparse(href)
+    params = urllib.parse.parse_qs(url.query)
+
+    try:
+        party_id = params['id'][0]
+        return party_id
+    except KeyError:
+        return ""
 
 
 def parties(oscn_html):
@@ -13,13 +26,16 @@ def parties(oscn_html):
     named_parties.text = party_p.get_text(separator=" ")
 
     if party_links:
+
         names = [link.text for link in party_links]
+        party_ids = [get_party_id(link) for link in party_links]
         # party_p.strings look like "name,type,name,type"
         # [1::2] starts at the 2nd position and gets every other string
         types = [t[1::] for t in [s for s in party_p.strings][1::2]]
     else:
         names = []
         types = []
+        party_ids = []
 
         def get_name_and_type(string):
             # separates a line like this into name and type
@@ -36,10 +52,13 @@ def parties(oscn_html):
             names.append(name)
             types.append(party_type)
 
-    def Party(name, type_string):
-        return {"name": clean_string(name), "type": clean_string(type_string)}
+    def Party(name, type_string, id_param):
+        return {"name": clean_string(name),
+                "type": clean_string(type_string),
+                "id": id_param
+                }
 
-    raw_parties = map(Party, names, types)
+    raw_parties = map(Party, names, types, party_ids)
 
     for party in raw_parties:
         if party["name"]:

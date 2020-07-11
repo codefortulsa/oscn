@@ -28,6 +28,13 @@ logger = logging.getLogger("oscn")
 logger.setLevel(logging.INFO)
 
 
+
+# This decorators adds properties to the OSCNrequest as a shortcut
+# for parsing.  This allows access to parse results such as:
+# name = Case.judge
+# or
+# counts = Case.counts
+@append_parsers
 class Case(object):
     headers = settings.OSCN_REQUEST_HEADER
     response = False
@@ -200,14 +207,6 @@ class Case(object):
                     return
         else:
             self.valid = False
-
-
-# This next line adds properties to the OSCNrequest as a shortcut
-# for parsing.  This allows access to parse results such as:
-# name = Case.judge
-# or
-# counts = Case.counts
-append_parsers(Case)
 
 
 class CaseList(object):
