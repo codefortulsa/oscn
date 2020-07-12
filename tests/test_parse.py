@@ -49,14 +49,15 @@ def test_issues():
 
 
 def test_get_parties():
-    case1 = oscn.request.Case("tulsa-CJ-2016-143")
+    case1 = oscn.request.Case("tulsa-CJ-2020-299")
     parties = oscn.parse.parties(case1.text)
     assert isinstance(parties, list)
-    assert "CHANDLER" in parties.text
+    assert parties != []
+    assert "DISCOVER BANK" in parties.text
 
 
 def test_parties():
-    case1 = oscn.request.Case("tulsa-CJ-2016-143")
+    case1 = oscn.request.Case("tulsa-CJ-2020-299")
     issues = oscn.parse.issues(case1.text)
     assert isinstance(issues, list)
     for issue in issues:
