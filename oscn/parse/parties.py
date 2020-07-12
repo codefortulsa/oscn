@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 
 from ._helpers import clean_string, MetaList
 
+
 def get_party_id(link):
     href = link['href']
     url = urllib.parse.urlparse(href)
@@ -18,6 +19,9 @@ def get_party_id(link):
 
 def parties(oscn_html):
     names = []
+    types = []
+    party_ids = []
+
     soup = BeautifulSoup(oscn_html, "html.parser")
     start = soup.find("h2", "section party")
     party_p = start.find_next_sibling("p")
@@ -33,9 +37,6 @@ def parties(oscn_html):
         # [1::2] starts at the 2nd position and gets every other string
         types = [t[1::] for t in [s for s in party_p.strings][1::2]]
     else:
-        names = []
-        types = []
-        party_ids = []
 
         def get_name_and_type(string):
             # separates a line like this into name and type
@@ -51,6 +52,7 @@ def parties(oscn_html):
             name, party_type = get_name_and_type(party_text)
             names.append(name)
             types.append(party_type)
+            party_ids.append("")
 
     def Party(name, type_string, id_param):
         return {"name": clean_string(name),

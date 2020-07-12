@@ -40,7 +40,7 @@ scripts > Python scripts showing use of the oscn package
 
 
 ### oscn.parse
-Parsers accept the html of an OSCN case page and return python objects.
+Parsers accept the html of an OSCN page and return python objects.
 
 #### Case Page Parsers
 - filed: returns a string of the filing date (e.g. 12/25/2017)
@@ -48,9 +48,9 @@ Parsers accept the html of an OSCN case page and return python objects.
 - counts: returns of list of count dicts found in a case.  Keys include 'description'
 of the count. If available 'violation' and 'disposed' are added.
 - judge: returns a string of the judge's name
-- parties: returns a list of dicts with these keys: name, type
+- parties: returns a list of dicts with these keys: id, name, type
 - docket: returns a list of rows in a docket
-- events: returns a list of dicts with these keys: event, party, docket, reporter, date, description.  The keys date and description are cleaner versions of the event text.  The event key will be deprecation some day so use date and description if you are starting a project.
+- events: returns a list of dicts with these keys: event, party, docket, reporter, date, description.  The keys date and description are cleaner versions of the event text.  The event key will be deprecated       some day so use date and description if you are starting a project.
 - attorneys: returns a list of dicts with these keys: name, address, and representing
 - issues: returns a list of dicts with issue information. Each issues includes a list of dicts for each party
 

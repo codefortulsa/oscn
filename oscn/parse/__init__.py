@@ -5,7 +5,8 @@ from types import FunctionType
 
 
 # The following code searches for parse functions to allow them to be
-# added to objects as properties using the append_parsers function
+# added to objects as properties using the append_parsers as a decorator
+
 # it also imports them so they are available from `oscn.parse`
 
 parse_functions = []
@@ -41,7 +42,7 @@ def make_property(parse_function):
 
 
 # this function accepts a class and searches for
-# parsers to be added to
+# parsers to be added to it.  It is used as decortator for Case and Party
 def append_parsers(obj):
     for fn in parse_functions:
         if obj.__name__ in fn.target:
