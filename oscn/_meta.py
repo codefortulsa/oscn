@@ -9,8 +9,8 @@ from . import settings
 
 OSCN_URL = settings.OSCN_SEARCH_URL
 OSCN_HEADER = settings.OSCN_REQUEST_HEADER
-
 OSCN_PARTY_URL = settings.OSCN_PARTY_URL
+OSCN_DOCKET_URL = settings.OSCN_DOCKET_URL
 
 
 def search_get(**kwargs):
@@ -30,6 +30,28 @@ def party_get(id):
     try:
         response = requests.get(
             OSCN_PARTY_URL, party_params, headers=OSCN_HEADER, verify=False)
+    except ConnectionError:
+        return ""
+    return response
+
+
+def docket_get(judge_id, start_date):
+
+    params = {
+              "report": "WebJudicialDocketJudgeAll",
+              "errorcheck": "true",
+              "Judge": judge_id,
+              "database": "",
+              "db": "Oklahoma",
+              "StartDate": start_date,
+              "GeneralNumber": "1",
+              "generalnumber1": "1",
+              "GeneralCheck": "on",
+              }
+
+    try:
+        response = requests.get(
+            OSCN_DOCKET_URL, params, headers=OSCN_HEADER, verify=False)
     except ConnectionError:
         return ""
     return response

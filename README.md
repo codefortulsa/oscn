@@ -32,11 +32,11 @@ scripts > Python scripts showing use of the oscn package
 
 - Case: Returns a single case.  Case can be saved as files using Case.save() and retrieved using Case.open().
 
-- CaseList: Returns an iterator for retrieving cases for a county and year.
-
- CaseLists can be filtered using .find().  See scripts/example.py for details
+- CaseList: Returns an iterator for retrieving cases for a county and year. CaseLists can be filtered using .find().  See scripts/example.py for details
 
  - Party: Returns information on parties available on OSCN.
+
+ - Docket: Returns docket of cases for specific judges and date
 
 
 ### oscn.parse
@@ -60,6 +60,11 @@ of the count. If available 'violation' and 'disposed' are added.
 - profile: returns dict of values in 'Personal Profile'
 - birth_month: returns string of 'Birth Month and Year'
 - addresses: returns a list of dicts for each address
+
+#### Docket Page Parsers
+- cases: returns a list of case indexes
+- tables: returns the html table for each case in the docket
+
 
 ### oscn.find
 
