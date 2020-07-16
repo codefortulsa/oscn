@@ -3,7 +3,6 @@ OSCN_SEARCH_URL = "https://www.oscn.net/dockets/Results.aspx"
 OSCN_PARTY_URL = "https://www.oscn.net/dockets/GetPartyRecord.aspx"
 OSCN_DOCKET_URL ="https://www.oscn.net/applications/oscn/report.asp"
 
-
 OSCN_REQUEST_HEADER = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36",
     "Accept-Encoding": "gzip, deflate, br",
@@ -110,6 +109,22 @@ ALL_COURTS = [
     "washita",
     "woods",
     "woodward",
+]
+
+OCIS_COURTS = [
+    "adair",
+    "canadian",
+    "cleveland",
+    "comanche",
+    "ellis",
+    "garfield",
+    "logan",
+    "oklahoma",
+    "payne",
+    "pushmataha",
+    "roger mills",
+    "rogers",
+    "tulsa",
 ]
 
 ALL_TYPES = {
