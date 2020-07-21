@@ -1,6 +1,5 @@
 import requests
 
-
 from decouple import config
 
 # https://stage.oscn.net/swagger/#/
@@ -14,6 +13,9 @@ OSCN_API_ACCESS_KEY = config('OSCN_API_ACCESS_KEY')
 
 class api_request(object):
     access_key = {"k": OSCN_API_ACCESS_KEY, }
+
+    def __init__(self, **kwargs):
+        pass
 
     def __call__(self, **kwargs):
         requestor = getattr(requests, self.type)
@@ -40,6 +42,14 @@ class query_request(api_request):
 
 
 query = query_request()
+
+
+class updates_request(api_request):
+    endpoint = "ocis_updates"
+    type = "get"
+
+
+updates = updates_request()
 
 
 #  requests for single case

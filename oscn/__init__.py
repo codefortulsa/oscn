@@ -3,11 +3,14 @@ from . import request
 from . import parse
 from . import find
 
-from .query.endpoints import events, dockets
+from .query.endpoints import events, dockets, counts
 
 from .query.endpoints import style, parties, attorneys
 
-from .query.endpoints import query
+from .query.endpoints import query, updates
+
+from .query.client import client
+
 
 
 counties = _meta.courts()
