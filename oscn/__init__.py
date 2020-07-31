@@ -2,14 +2,8 @@ from . import _meta
 from . import request
 from . import parse
 from . import find
+from . import json
 
-from .query.endpoints import events, dockets, counts
-
-from .query.endpoints import style, parties, attorneys
-
-from .query.endpoints import query, updates
-
-from .query.client import client
 
 
 

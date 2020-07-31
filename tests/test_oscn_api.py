@@ -1,65 +1,30 @@
 import oscn
 
-from datetime import datetime, timedelta
 
-
-class TestElasticSearch():
-
+class TestGetCaseInfo:
     def setup_class(self):
-        changes = {
-                "query": {
-                    "range": {
-                        "lastupdate": {
-                            "gte": "now-7h"
-                        }
-                    }
-                },
-                "size": 10000,
-                "_source": [
-                    "_id",
-                    "lastupdate",
-                    "filed",
-                    "year",
-                    "number",
-                    "casetype",
-                    "county"
-                ]
-            }
 
-        self.params = {'q': changes}
+        self.endpoints = ["style"]
+        self.list_endpoints = ["docket", "events", "counts", "parties", "attorneys"]
 
-    def test_get_client(self):
+        self.case_params = {"county": "tulsa", "cn": "CF-2020-12"}
 
-        pass
+        self.case_index = {"index": "tulsa-CF-2020-12"}
 
-    def test_post_query(self):
-        response = oscn.query(**self.params)
-        print(response.text)
-        assert response.status_code == 200
-
-# "start":"2020-07-17T11:59:38-05:00","end":"2020-07-17T12:29:38-05:00",
-# "start":"2020-07-17T12:46:24-05:00","end":"2020-07-17T12:46:24-05:00",
-    def test_updates(self):
-        stop = datetime.now()
-        start = stop - timedelta(minutes=60)
-        response = oscn.updates(
-                start=start,
-                end=stop
-            )
-        print(response.text)
-        assert response.status_code == 200
-
-class TestGetCaseInfo():
-
-    def setup_class(self):
-        self.endpoints = ['dockets', 'events', 'counts',
-                          'style', 'parties', 'attorneys']
-
-        self.case_params = {'county': 'tulsa', 'cn': 'CF-2020-12'}
-
-    def test_get_case_info(self):
-
+    def test_get_case_dict(self):
         for pt in self.endpoints:
-            response = getattr(oscn, pt)(**self.case_params)
-            print(response.text)
-            assert response.status_code == 200
+            response = getattr(oscn.json, pt)(**self.case_params)
+            print(f"{pt}: {response}")
+            assert type(response) == dict
+
+    def test_get_case_lists(self):
+        for pt in self.list_endpoints:
+            response = getattr(oscn.json, pt)(**self.case_params)
+            print(f"{pt}: {response}")
+            assert type(response) == list
+
+    def test_use_case_index(self):
+        for pt in self.list_endpoints:
+            response = getattr(oscn.json, pt)(**self.case_index)
+            print(f"{pt}: {response}")
+            assert type(response) == list
