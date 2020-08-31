@@ -1,4 +1,4 @@
-  from setuptools import setup, find_packages
+from setuptools import setup, find_packages
 
 
 with open("README.md", "r") as fh:
@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 
 setup(name='oscn',
-      version='0.0.0.72',
+      version='0.0.0.73',
       description='Oklahoma State Courts Network case parsing utilities',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -19,7 +19,7 @@ setup(name='oscn',
       install_requires=[
           'requests',
           'beautifulsoup4',
-          'boto3'
+          'boto3',
           ],
       classifiers=[
           'Programming Language :: Python',

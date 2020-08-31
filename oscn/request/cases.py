@@ -28,7 +28,6 @@ logger = logging.getLogger("oscn")
 logger.setLevel(logging.INFO)
 
 
-
 # This decorators adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
 # name = Case.judge

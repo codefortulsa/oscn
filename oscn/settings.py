@@ -1,5 +1,3 @@
-from decouple import config
-
 
 OSCN_CASE_URL = "https://www.oscn.net/dockets/GetCaseInformation.aspx"
 OSCN_SEARCH_URL = "https://www.oscn.net/dockets/Results.aspx"
@@ -10,7 +8,6 @@ OSCN_DOCKET_URL ="https://www.oscn.net/applications/oscn/report.asp"
 # https://stage.oscn.net/swagger/#/
 OSCN_API_URL = "https://stage.oscn.net/api"
 OSCN_API_HEADER = {"accept": "application/json; charset=utf-8"}
-OSCN_API_ACCESS_KEY = config('OSCN_API_ACCESS_KEY')
 
 
 OSCN_REQUEST_HEADER = {
@@ -133,7 +130,7 @@ OCIS_COURTS = [
     "oklahoma",
     "payne",
     "pushmataha",
-    "roger mills",
+    "rogermills",
     "rogers",
     "tulsa",
 ]
