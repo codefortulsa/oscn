@@ -72,3 +72,35 @@ def test_find_directory_text():
         assert case.number <= 60
         assert search_for_text in case.text
     assert found_index == known_good
+
+
+def test_find_multi_funcs():
+    source_calls = 0
+    count_calls = 0
+    case_count = 0 
+
+    def log_source(source):
+        nonlocal source_calls
+        source_calls = source_calls + 1
+        return True
+
+    def log_counts(counts):
+        nonlocal count_calls
+        count_calls += 1
+        return True
+
+    cases = oscn.request.CaseList(
+        counties="bryan", years="2018", types="CF", stop=20, directory="data"
+    )
+
+    cases.find(source=log_source, counts=log_counts)
+
+    for case in cases:
+        case_count += 1
+
+    # import pdb; pdb.set_trace()
+
+    assert source_calls == case_count
+    assert count_calls == case_count
+    assert source_calls == count_calls
+

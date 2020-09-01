@@ -285,18 +285,22 @@ class CaseList(object):
         return next(self.all_cases)
 
     def _passes_filters(self, case):
-        # iter of all the tests
-        run_test = lambda test: test(case)
-        test_results = map(run_test, self.filters)
+
+        def does_it_pass(filter):
+            target, test = filter
+            target_value = getattr(case, target)
+            if isinstance(test, str):
+                return test in target_value
+            elif isinstance(test, FunctionType):
+                return test(target_value)
+
+        # run the tests
+        test_results = map(does_it_pass, self.filters)
+
         # see if they are all true
         return all(test_results)
 
     def find(self, **kwargs):
         for kw in kwargs:
-            kw_value = kwargs[kw]
-            if isinstance(kw_value, str):
-                case_test = lambda case: kw_value in getattr(case, kw)
-            elif isinstance(kw_value, FunctionType):
-                case_test = lambda case: kw_value(getattr(case, kw))
-            self.filters.append(case_test)
+            self.filters.append((kw, kwargs[kw]))
         return self
