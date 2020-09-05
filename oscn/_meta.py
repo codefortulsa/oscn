@@ -22,9 +22,9 @@ def search_get(**kwargs):
     return response
 
 
-def party_get(id):
-    party_params ={
-        'db': 'oklahoma',
+def party_get(id, db='oklahoma'):
+    party_params = {
+        'db': db,
         'id': id
     }
     try:

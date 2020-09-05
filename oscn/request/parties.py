@@ -9,10 +9,12 @@ from oscn._meta import party_get
 @append_parsers
 class Party(object):
 
-    def __init__(self, party_id):
+    def __init__(self, party_id, db='oklahoma'):
         self.id = party_id
+        self.db = db
         self._request()
 
     def _request(self):
-        response = party_get(self.id)
+        response = party_get(self.id, self.db)
+        self.source = response.request.url
         self.text = response.text
