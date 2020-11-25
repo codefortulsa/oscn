@@ -41,10 +41,10 @@ class Case(object):
     def __init__(
         self,
         index=False,
-        type="CF",
-        county="tulsa",
-        year="2019",
-        number=1,
+        type=None,
+        county=None,
+        year=None,
+        number=None,
         cmid=False,
         **kwargs,
     ):
