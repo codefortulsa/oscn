@@ -41,10 +41,10 @@ class Case(object):
     def __init__(
         self,
         index=False,
-        type="CF",
-        county="tulsa",
-        year="2019",
-        number=1,
+        type=None,
+        county=None,
+        year=None,
+        number=None,
         cmid=False,
         **kwargs,
     ):
@@ -52,19 +52,16 @@ class Case(object):
             index_parts = index.split("-")
             len_index_parts = len(index_parts)
             if len_index_parts == 4:
-                self.county, self.type, self.year, number_str = index_parts
-                self.number = int(number_str)
+                self.county, self.type, self.year, self.number = index_parts
             elif len_index_parts == 3:
-                self.county, self.type, number_str = index_parts
-                self.number = int(number_str)
+                self.county, self.type, self.number = index_parts
             elif len_index_parts == 2:
-                self.county, number_str = index_parts
-                self.number = int(number_str)
+                self.county, self.number = index_parts
                 self.type = "IN"
         else:
             self.county = county
             self.year = year
-            self.number = int(number)
+            self.number = number
             self.type = "IN" if county == "appellate" else type
 
         self.cmid = self.type == "cmid"

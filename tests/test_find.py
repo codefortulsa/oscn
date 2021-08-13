@@ -13,8 +13,9 @@ def test_find_text_in_text():
         found_index.append(case.index)
         assert case.county == "bryan"
         assert case.year == "2018"
-        assert case.number <= 60
+        assert int(case.number) <= 60
         assert search_for_text in case.text
+
     assert found_index == known_good
 
 
@@ -33,7 +34,7 @@ def test_find_function():
         found_index.append(case.index)
         assert case.county == "bryan"
         assert case.year == "2018"
-        assert case.number <= 60
+        assert int(case.number) <= 60
         assert search_for_text in case.text
     assert found_index == known_good
 
@@ -51,7 +52,7 @@ def test_find_bucket_text():
         found_index.append(case.index)
         assert case.county == "bryan"
         assert case.year == "2018"
-        assert case.number <= 60
+        assert int(case.number) <= 60
         assert search_for_text in case.text
     assert found_index == known_good
 
@@ -69,7 +70,7 @@ def test_find_directory_text():
         found_index.append(case.index)
         assert case.county == "bryan"
         assert case.year == "2018"
-        assert case.number <= 60
+        assert int(case.number) <= 60
         assert search_for_text in case.text
     assert found_index == known_good
 

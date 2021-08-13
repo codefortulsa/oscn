@@ -1,5 +1,7 @@
-beautifulsoup4==4.7.1
-boto3==1.9.95
-requests==2.21.0
+beautifulsoup4==4.9.3
+boto3==1.18.20
+requests==2.26.0
+
+
 
 
