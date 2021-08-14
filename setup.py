@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 
 setup(name='oscn',
-      version='0.0.0.77',
+      version='0.0.0.78',
       description='Oklahoma State Courts Network case parsing utilities',
       long_description=long_description,
       long_description_content_type="text/markdown",
@@ -24,5 +24,6 @@ setup(name='oscn',
       classifiers=[
           'Programming Language :: Python',
           'Programming Language :: Python :: 3.6',
+          'Programming Language :: Python :: 3.7',
           ],
       )

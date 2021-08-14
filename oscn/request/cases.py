@@ -57,14 +57,20 @@ class Case(object):
                 self.county, self.type, self.number = index_parts
             elif len_index_parts == 2:
                 self.county, self.number = index_parts
-                self.type = "IN"
+                # self.type = "IN"
         else:
             self.county = county
             self.year = year
             self.number = number
-            self.type = "IN" if county == "appellate" else type
+            self.type = type
+            # self.type = "IN" if county == "appellate" and type==None else type
 
-        self.cmid = self.type == "cmid"
+
+        if hasattr(self, 'type'):
+            self.cmid = self.type == "cmid"
+        else:
+            self.cmid = False
+
         self.source = kwargs["source"] if "source" in kwargs else False
 
         if "text" in kwargs:
@@ -84,21 +90,31 @@ class Case(object):
 
     @property
     def oscn_number(self):
-        if self.county == "appellate":
-            return f"{self.number}"
-        else:
-            return f"{self.type}-{self.year}-{self.number}"
+        key_names = ['type', 'year', 'number']
+        number_parts =[]
+        for ky in key_names:
+            if hasattr(self, ky):
+                ky_val = getattr(self,ky)
+                if ky_val:
+                    number_parts.append(str(getattr(self,ky)))
+        return "-".join(number_parts)
 
     @property
     def index(self):
         return f"{self.county}-{self.oscn_number}"
 
     @property
+    def inner_path(self):
+        path_parts = []
+        key_names = ['county', 'type', 'year']
+        for ky in key_names:
+            if hasattr(self, ky):
+                path_parts.append(getattr(self,ky))
+        return '/'.join(path_parts)
+
+    @property
     def path(self):
-        if self.county == "appellate":
-            return f"{self.directory}/{self.county}"
-        else:
-            return f"{self.directory}/{self.county}/{self.type}/{self.year}"
+        return f"{self.directory}/{self.inner_path}"
 
     @property
     def file_name(self):
@@ -106,10 +122,7 @@ class Case(object):
 
     @property
     def s3_key(self):
-        if self.county == "appellate":
-            return f"{self.county}/{self.number}.zip"
-        else:
-            return f"{self.county}/{self.type}/{self.year}/{self.number}.zip"
+        return f"{self.inner_path}/{self.number}.zip"
 
     def save(self, **kwargs):
         case_data = {
@@ -142,7 +155,7 @@ class Case(object):
                     raise e
             s3.Bucket(self.bucket).put_object(Key=self.s3_key, Body=file_data)
 
-    def _open_file(self):
+    def _open_file(self):        
         try:
             with gzip.GzipFile(self.file_name, "r") as open_file:
                 saved_data = json.loads(open_file.read().decode("utf-8"))
@@ -183,7 +196,7 @@ class Case(object):
             params["cmid"] = self.number
         else:
             params["number"] = self.oscn_number
-
+        
         try:
             response = requests.post(
                 oscn_url, params, headers=self.headers, verify=False
@@ -193,6 +206,7 @@ class Case(object):
                 return self._request(attempts_left=attempts_left - 1)
             else:
                 raise ConnectionError
+        
         if self._valid_response(response):
             self.valid = True
             self.source = f"{response.url}"
@@ -230,7 +244,8 @@ class CaseList(object):
                 directory=kwargs["directory"]
             )
         elif "bucket" in kwargs:
-            self._request_case = self._make_case_requester(bucket=kwargs["bucket"])
+            self._request_case = self._make_case_requester(
+                bucket=kwargs["bucket"])
         else:
             self._request_case = self._make_case_requester()
 

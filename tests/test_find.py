@@ -48,6 +48,7 @@ def test_find_bucket_text():
     cases.find(text=search_for_text)
 
     found_index = []
+
     for case in cases:
         found_index.append(case.index)
         assert case.county == "bryan"
