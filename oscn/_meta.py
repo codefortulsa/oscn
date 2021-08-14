@@ -15,21 +15,18 @@ OSCN_DOCKET_URL = settings.OSCN_DOCKET_URL
 
 def search_get(**kwargs):
     try:
-        response = requests.get(
-            OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
+        response = requests.get(OSCN_URL, kwargs, headers=OSCN_HEADER, verify=False)
     except ConnectionError:
         return ""
     return response
 
 
-def party_get(id, db='oklahoma'):
-    party_params = {
-        'db': db,
-        'id': id
-    }
+def party_get(id, db="oklahoma"):
+    party_params = {"db": db, "id": id}
     try:
         response = requests.get(
-            OSCN_PARTY_URL, party_params, headers=OSCN_HEADER, verify=False)
+            OSCN_PARTY_URL, party_params, headers=OSCN_HEADER, verify=False
+        )
     except ConnectionError:
         return ""
     return response
@@ -38,20 +35,21 @@ def party_get(id, db='oklahoma'):
 def docket_get(judge_id, start_date):
 
     params = {
-              "report": "WebJudicialDocketJudgeAll",
-              "errorcheck": "true",
-              "Judge": judge_id,
-              "database": "",
-              "db": "Oklahoma",
-              "StartDate": start_date,
-              "GeneralNumber": "1",
-              "generalnumber1": "1",
-              "GeneralCheck": "on",
-              }
+        "report": "WebJudicialDocketJudgeAll",
+        "errorcheck": "true",
+        "Judge": judge_id,
+        "database": "",
+        "db": "Oklahoma",
+        "StartDate": start_date,
+        "GeneralNumber": "1",
+        "generalnumber1": "1",
+        "GeneralCheck": "on",
+    }
 
     try:
         response = requests.get(
-            OSCN_DOCKET_URL, params, headers=OSCN_HEADER, verify=False)
+            OSCN_DOCKET_URL, params, headers=OSCN_HEADER, verify=False
+        )
     except ConnectionError:
         return ""
     return response
@@ -90,7 +88,10 @@ def judges():
         options = select.find_all("option")
         judge_numbers = [option["value"] for option in options]
         judge_names = [option.text for option in options]
-        judges_dict = [{'number': num, 'name': name} for num, name in zip(judge_numbers, judge_names)]
+        judges_dict = [
+            {"number": num, "name": name}
+            for num, name in zip(judge_numbers, judge_names)
+        ]
         return judges_dict
 
     except:

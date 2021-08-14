@@ -9,9 +9,7 @@ class TestGetDocket:
 
     def test_get_case_index_list(self):
         all_cases = self.docket.cases
-        
 
     def test_get_case_tables(self):
 
         all_cases = self.docket.tables
-

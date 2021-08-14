@@ -6,12 +6,12 @@ from ._helpers import clean_string, MetaList
 
 
 def get_party_id(link):
-    href = link['href']
+    href = link["href"]
     url = urllib.parse.urlparse(href)
     params = urllib.parse.parse_qs(url.query)
 
     try:
-        party_id = params['id'][0]
+        party_id = params["id"][0]
         return party_id
     except KeyError:
         return ""
@@ -55,10 +55,11 @@ def parties(oscn_html):
             party_ids.append("")
 
     def Party(name, type_string, id_param):
-        return {"name": clean_string(name),
-                "type": clean_string(type_string),
-                "id": id_param
-                }
+        return {
+            "name": clean_string(name),
+            "type": clean_string(type_string),
+            "id": id_param,
+        }
 
     raw_parties = map(Party, names, types, party_ids)
 

@@ -32,16 +32,18 @@ class TestPartyProperties:
 
     def test_party_source(self):
         party_source = self.defendant.source
-        assert party_source == "https://www.oscn.net/dockets/GetPartyRecord.aspx?db=oklahoma&id=12576087"
+        assert (
+            party_source
+            == "https://www.oscn.net/dockets/GetPartyRecord.aspx?db=oklahoma&id=12576087"
+        )
 
 
 class TestDifferentDB:
     def setup_class(self):
-        case = oscn.request.Case('kingfisher-CF-2018-16')
+        case = oscn.request.Case("kingfisher-CF-2018-16")
         defendant_id = case.parties[0]["id"]
         defendant = oscn.request.Party(defendant_id, case.county)
         self.defendant = defendant
-
 
     def test_party_db(self):
         party_name = self.defendant.name

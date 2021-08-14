@@ -48,6 +48,7 @@ def test_find_bucket_text():
     cases.find(text=search_for_text)
 
     found_index = []
+
     for case in cases:
         found_index.append(case.index)
         assert case.county == "bryan"
@@ -78,7 +79,7 @@ def test_find_directory_text():
 def test_find_multi_funcs():
     source_calls = 0
     count_calls = 0
-    case_count = 0 
+    case_count = 0
 
     def log_source(source):
         nonlocal source_calls
@@ -104,4 +105,3 @@ def test_find_multi_funcs():
     assert source_calls == case_count
     assert count_calls == case_count
     assert source_calls == count_calls
-
