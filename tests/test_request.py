@@ -16,13 +16,13 @@ def test_init_number():
     assert case1.number == 6
     case2 = oscn.request.Case(county="adair", type="CM", year="2019", number="6")
     assert type(case2.number) == str
-    assert case2.number == '6'
+    assert case2.number == "6"
     case3 = oscn.request.Case("adair-CM-2019-6")
     assert type(case3.number) == str
-    assert case3.number == '6'
+    assert case3.number == "6"
     case5 = oscn.request.Case("oklahoma-cmid-2018-00001")
     assert type(case5.number) == str
-    assert case5.number == '00001'
+    assert case5.number == "00001"
 
 
 def test_live_request_params_index():
@@ -36,7 +36,7 @@ def test_live_request_params_index():
 
 def test_live_request_appellate():
     case1 = oscn.request.Case("appellate-116264")
-    assert case1.number == '116264'
+    assert case1.number == "116264"
     assert case1.county == "appellate"
 
     case2 = oscn.request.Case(county="appellate", number=116264)
@@ -44,8 +44,9 @@ def test_live_request_appellate():
     assert case2.source == case1.source
     assert case2.style == case1.style
 
-    case3 = oscn.request.Case(county="appellate", type='F', year="2021", number=229)
+    case3 = oscn.request.Case(county="appellate", type="F", year="2021", number=229)
     assert case3.valid == True
+
 
 def test_live_request_cmid():
     case1 = oscn.request.Case("carter-cmid-2019-639922")

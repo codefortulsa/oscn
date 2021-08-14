@@ -1,4 +1,3 @@
-
 import urllib.parse as urlparse
 
 from bs4 import BeautifulSoup
@@ -11,10 +10,10 @@ def cases(oscn_html):
 
     for case in case_tables:
         case_link = case.find("a")
-        parsed = urlparse.urlparse(case_link['href'])
-        db = urlparse.parse_qs(parsed.query)['db'][0]
+        parsed = urlparse.urlparse(case_link["href"])
+        db = urlparse.parse_qs(parsed.query)["db"][0]
         cn = case_link.text
-        case_index = f'{db}-{cn}'
+        case_index = f"{db}-{cn}"
         case_list.append(case_index)
 
     return case_list

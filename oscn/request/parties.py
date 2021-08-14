@@ -6,10 +6,10 @@ from oscn._meta import party_get
 
 # ?db=tulsa&cn=CF-2020-1&id=12576087
 
+
 @append_parsers
 class Party(object):
-
-    def __init__(self, party_id, db='oklahoma'):
+    def __init__(self, party_id, db="oklahoma"):
         self.id = party_id
         self.db = db
         self._request()

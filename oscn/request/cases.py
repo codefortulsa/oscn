@@ -65,8 +65,7 @@ class Case(object):
             self.type = type
             # self.type = "IN" if county == "appellate" and type==None else type
 
-
-        if hasattr(self, 'type'):
+        if hasattr(self, "type"):
             self.cmid = self.type == "cmid"
         else:
             self.cmid = False
@@ -90,13 +89,13 @@ class Case(object):
 
     @property
     def oscn_number(self):
-        key_names = ['type', 'year', 'number']
-        number_parts =[]
+        key_names = ["type", "year", "number"]
+        number_parts = []
         for ky in key_names:
             if hasattr(self, ky):
-                ky_val = getattr(self,ky)
+                ky_val = getattr(self, ky)
                 if ky_val:
-                    number_parts.append(str(getattr(self,ky)))
+                    number_parts.append(str(getattr(self, ky)))
         return "-".join(number_parts)
 
     @property
@@ -106,11 +105,11 @@ class Case(object):
     @property
     def inner_path(self):
         path_parts = []
-        key_names = ['county', 'type', 'year']
+        key_names = ["county", "type", "year"]
         for ky in key_names:
             if hasattr(self, ky):
-                path_parts.append(getattr(self,ky))
-        return '/'.join(path_parts)
+                path_parts.append(getattr(self, ky))
+        return "/".join(path_parts)
 
     @property
     def path(self):
@@ -155,7 +154,7 @@ class Case(object):
                     raise e
             s3.Bucket(self.bucket).put_object(Key=self.s3_key, Body=file_data)
 
-    def _open_file(self):        
+    def _open_file(self):
         try:
             with gzip.GzipFile(self.file_name, "r") as open_file:
                 saved_data = json.loads(open_file.read().decode("utf-8"))
@@ -196,7 +195,7 @@ class Case(object):
             params["cmid"] = self.number
         else:
             params["number"] = self.oscn_number
-        
+
         try:
             response = requests.post(
                 oscn_url, params, headers=self.headers, verify=False
@@ -206,7 +205,7 @@ class Case(object):
                 return self._request(attempts_left=attempts_left - 1)
             else:
                 raise ConnectionError
-        
+
         if self._valid_response(response):
             self.valid = True
             self.source = f"{response.url}"
@@ -244,8 +243,7 @@ class CaseList(object):
                 directory=kwargs["directory"]
             )
         elif "bucket" in kwargs:
-            self._request_case = self._make_case_requester(
-                bucket=kwargs["bucket"])
+            self._request_case = self._make_case_requester(bucket=kwargs["bucket"])
         else:
             self._request_case = self._make_case_requester()
 
@@ -297,7 +295,6 @@ class CaseList(object):
         return next(self.all_cases)
 
     def _passes_filters(self, case):
-
         def does_it_pass(filter):
             target, test = filter
             target_value = getattr(case, target)
