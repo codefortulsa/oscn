@@ -22,7 +22,16 @@ def test_init_number():
     assert case3.number == "6"
     case5 = oscn.request.Case("oklahoma-cmid-2018-00001")
     assert type(case5.number) == str
-    assert case5.number == "00001"
+    assert case5.number == "1"
+    case5 = oscn.request.Case("oklahoma-cmid-2018-008001")
+    assert type(case5.number) == str
+    assert case5.number == "8001"
+    case5 = oscn.request.Case("oklahoma-cmid-2018-00810")
+    assert type(case5.number) == str
+    assert case5.number == "810"
+    case5 = oscn.request.Case("oklahoma-cmid-2018-000880100")
+    assert type(case5.number) == str
+    assert case5.number == "880100"
 
 
 def test_live_request_params_index():

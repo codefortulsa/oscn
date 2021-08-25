@@ -1,4 +1,5 @@
 import os
+import re
 import errno
 from io import BytesIO
 import gzip
@@ -28,6 +29,13 @@ logger = logging.getLogger("oscn")
 logger.setLevel(logging.INFO)
 
 
+# regex for index parsing
+
+get_court = re.compile(r'^(?P<court>\w+)-')
+get_type = re.compile(r'-(?P<type>\w+)-')
+get_year = re.compile(r'-(?P<year>\d{4})-')
+get_number = re.compile(r'0*(?P<number>\d+)$')
+
 # This decorators adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
 # name = Case.judge
@@ -46,24 +54,27 @@ class Case(object):
         year=None,
         number=None,
         cmid=False,
-        **kwargs,
-    ):
+        **kwargs,):
+    
         if index:
-            index_parts = index.split("-")
-            len_index_parts = len(index_parts)
-            if len_index_parts == 4:
-                self.county, self.type, self.year, self.number = index_parts
-            elif len_index_parts == 3:
-                self.county, self.type, self.number = index_parts
-            elif len_index_parts == 2:
-                self.county, self.number = index_parts
-                # self.type = "IN"
+            self.county = get_court.match(index).group('court')
+            self.number = get_number.search(index).group('number')
+
+            try:
+                self.type = get_type.search(index).group('type')
+            except AttributeError as exc:
+                self.type=None
+
+            try:
+                self.year = get_year.search(index).group('year')
+            except AttributeError as exc:
+                self.year=None
+
         else:
             self.county = county
             self.year = year
             self.number = number
             self.type = type
-            # self.type = "IN" if county == "appellate" and type==None else type
 
         if hasattr(self, "type"):
             self.cmid = self.type == "cmid"
