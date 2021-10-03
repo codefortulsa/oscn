@@ -34,7 +34,7 @@ logger.setLevel(logging.INFO)
 get_court = re.compile(r'^(?P<court>\w+)-')
 get_type = re.compile(r'-(?P<type>\w+)-')
 get_year = re.compile(r'-(?P<year>\d{4})-')
-get_number = re.compile(r'0*(?P<number>[\d\w]+)$')
+get_number = re.compile(r'0*(?P<number>\d+\w*)$')
 
 # This decorators adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
