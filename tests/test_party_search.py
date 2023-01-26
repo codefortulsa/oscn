@@ -53,7 +53,7 @@ def test_find_district_type():
 
     cases = oscn.find.CaseIndexes(**search_params)
     cases_list = list(cases)
-    assert len(cases_list) == 77
+    assert len(cases_list) == 78
 
 
 def test_text_matches_live_query():

@@ -7,7 +7,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="oscn",
-    version="0.0.0.82",
+    version="0.0.0.84",
     description="Oklahoma State Courts Network case parsing utilities",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -17,7 +17,7 @@ setup(
     license="MIT",
     packages=find_packages(),
     zip_safe=False,
-    install_requires=["requests", "beautifulsoup4", "boto3"],
+    install_requires=["requests", "beautifulsoup4", "boto3","python-decouple"],
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",

@@ -1,8 +1,12 @@
+from decouple import config
+
+default_user_agent = '"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"'
+OSCN_USER_AGENT = config("OSCN_USER_AGENT", default=default_user_agent)
+
 OSCN_CASE_URL = "https://www.oscn.net/dockets/GetCaseInformation.aspx"
 OSCN_SEARCH_URL = "https://www.oscn.net/dockets/Results.aspx"
 OSCN_PARTY_URL = "https://www.oscn.net/dockets/GetPartyRecord.aspx"
 OSCN_DOCKET_URL = "https://www.oscn.net/applications/oscn/report.asp"
-
 
 # https://stage.oscn.net/swagger/#/
 OSCN_API_URL = "https://stage.oscn.net/api"
@@ -10,7 +14,7 @@ OSCN_API_HEADER = {"accept": "application/json; charset=utf-8"}
 
 
 OSCN_REQUEST_HEADER = {
-    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36",
+    "User-Agent": OSCN_USER_AGENT,
     "Accept-Encoding": "gzip, deflate, br",
     "Accept-Language": "en-US,en;q=0.9",
 }
