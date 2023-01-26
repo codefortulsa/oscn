@@ -31,10 +31,10 @@ logger.setLevel(logging.INFO)
 
 # regex for index parsing
 
-get_court = re.compile(r'^(?P<court>\w+)-')
-get_type = re.compile(r'-(?P<type>\w+)-')
-get_year = re.compile(r'-(?P<year>\d{4})-')
-get_number = re.compile(r'0*(?P<number>\d+\w*)$')
+get_court = re.compile(r"^(?P<court>\w+)-")
+get_type = re.compile(r"-(?P<type>\w+)-")
+get_year = re.compile(r"-(?P<year>\d{4})-")
+get_number = re.compile(r"0*(?P<number>\d+\w*)$")
 
 # This decorators adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
@@ -54,21 +54,22 @@ class Case(object):
         year=None,
         number=None,
         cmid=False,
-        **kwargs,):
-    
+        **kwargs,
+    ):
+
         if index:
-            self.county = get_court.match(index).group('court')
-            self.number = get_number.search(index).group('number')
+            self.county = get_court.match(index).group("court")
+            self.number = get_number.search(index).group("number")
 
             try:
-                self.type = get_type.search(index).group('type')
+                self.type = get_type.search(index).group("type")
             except AttributeError as exc:
-                self.type=None
+                self.type = None
 
             try:
-                self.year = get_year.search(index).group('year')
+                self.year = get_year.search(index).group("year")
             except AttributeError as exc:
-                self.year=None
+                self.year = None
 
         else:
             self.county = county

@@ -37,8 +37,8 @@ def issues(oscn_html):
     issue_table = start.find_next_sibling("table")
 
     # if the next table is the docket there are no issue tables
-    is_docket = issue_table.find('thead')
-        
+    is_docket = issue_table.find("thead")
+
     if is_docket:
         next_sibling = start.find_next_sibling("p")
         if next_sibling:
