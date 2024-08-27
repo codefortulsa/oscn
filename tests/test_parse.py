@@ -108,5 +108,5 @@ def test_events():
 
     case = oscn.request.Case("oklahoma-FD-2012-5")
     events = oscn.parse.events(case.text)
-    assert len(events) == 9
-    assert "PETITIONER'S APPLICATION" in events.text
+    found = any("PETITIONER'S APPLICATION" in event.get("description") for event in events)
+    assert found

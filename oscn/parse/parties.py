@@ -9,7 +9,6 @@ def get_party_id(link):
     href = link["href"]
     url = urllib.parse.urlparse(href)
     params = urllib.parse.parse_qs(url.query)
-
     try:
         party_id = params["id"][0]
         return party_id
@@ -30,12 +29,11 @@ def parties(oscn_html):
     named_parties.text = party_p.get_text(separator=" ")
 
     if party_links:
-
         names = [link.text for link in party_links]
         party_ids = [get_party_id(link) for link in party_links]
-        # party_p.strings look like "name,type,name,type"
-        # [1::2] starts at the 2nd position and gets every other string
-        types = [t[1::] for t in [s for s in party_p.strings][1::2]]
+        party_types = [link.find_next_sibling("span") for link in party_links]
+        types = [party_type.text for party_type in party_types]
+        
     else:
 
         def get_name_and_type(string):

@@ -7,20 +7,22 @@ with open("README.md", "r") as fh:
 
 setup(
     name="oscn",
-    version="0.0.0.84",
+    version="0.0.0.85",
     description="Oklahoma State Courts Network case parsing utilities",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/codefortulsa/oscn",
-    author="Code for Tulsa",
-    author_email="code-for-tulsa@googlegroups.com",
+    author="John Dungan",
+    author_email="john@docket2me.com",
     license="MIT",
     packages=find_packages(),
     zip_safe=False,
     install_requires=["requests", "beautifulsoup4", "boto3","python-decouple"],
     classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
 )

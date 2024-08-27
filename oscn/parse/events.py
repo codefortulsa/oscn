@@ -1,10 +1,10 @@
+import json
 from bs4 import BeautifulSoup
 from ._helpers import text_values, column_titles, lists2dict, clean_string, MetaList
 
 
 def events(oscn_html):
     events = MetaList()
-
     soup = BeautifulSoup(oscn_html, "html.parser")
     events_start = soup.find("h2", "section events")
     events_table = events_start.find_next_sibling()
@@ -22,8 +22,11 @@ def events(oscn_html):
             event["date"] = event_date
             event["description"] = clean_string(cells[0].text)
             events.append(event)
+    if json_script := soup.find("script", {"id": "json_events"}):
+        json_data = json.loads(json_script.string)
+        return json_data["events"]
+    
     return events
-
 
 setattr(events, "target", ["Case"])
 setattr(events, "_default_value", [])
