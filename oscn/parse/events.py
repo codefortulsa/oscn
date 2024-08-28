@@ -1,11 +1,17 @@
 import json
+import re
+
 from bs4 import BeautifulSoup
-from ._helpers import text_values, column_titles, lists2dict, clean_string, MetaList
+from ._helpers import text_values, column_titles, lists2dict, clean_string, MetaList,string2json
 
 
 def events(oscn_html):
     events = MetaList()
-    soup = BeautifulSoup(oscn_html, "html.parser")
+    soup = BeautifulSoup(oscn_html, "html.parser")    
+    if json_script := soup.find("script", {"id": "json_events"}):
+        json_data = string2json(json_script.string)
+        return json_data["events"]
+    
     events_start = soup.find("h2", "section events")
     events_table = events_start.find_next_sibling()
     if events_table.name == "table":
@@ -22,9 +28,6 @@ def events(oscn_html):
             event["date"] = event_date
             event["description"] = clean_string(cells[0].text)
             events.append(event)
-    if json_script := soup.find("script", {"id": "json_events"}):
-        json_data = json.loads(json_script.string)
-        return json_data["events"]
     
     return events
 

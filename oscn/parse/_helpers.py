@@ -1,4 +1,5 @@
 import re
+import json
 from unicodedata import normalize
 
 
@@ -10,6 +11,15 @@ def clean_string(some_string):
     # reduce spaces
     condensed = re.sub(" +", " ", no_lines)
     return condensed.strip()
+
+def string2json(some_string):
+    raw_json_string = some_string.strip()
+    safe_string = re.sub(r'(?<!\\)([\n\t\r])', '', raw_json_string)
+    safe_string = safe_string.strip()
+    decoded_string = safe_string.encode().decode('unicode_escape')
+    json_data = json.loads(decoded_string)
+    return json_data
+
 
 
 def text_values(ResultSet):
