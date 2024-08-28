@@ -1,13 +1,11 @@
 from setuptools import setup, find_packages
 
-
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-
 setup(
     name="oscn",
-    version="0.0.0.85",
+    version="0.0.0.86",
     description="Oklahoma State Courts Network case parsing utilities",
     long_description=long_description,
     long_description_content_type="text/markdown",

@@ -13,13 +13,10 @@ def clean_string(some_string):
     return condensed.strip()
 
 def string2json(some_string):
-    raw_json_string = some_string.strip()
-    safe_string = re.sub(r'(?<!\\)([\n\t\r])', '', raw_json_string)
-    safe_string = safe_string.strip()
-    decoded_string = safe_string.encode().decode('unicode_escape')
-    json_data = json.loads(decoded_string)
-    return json_data
-
+    # Combine stripping and removing control characters into one step
+    safe_string = re.sub(r'(?<!\\)[\n\t\r]', '', some_string).strip()    
+    # Decode only if necessary (fewer operations)
+    return json.loads(safe_string.encode().decode('unicode_escape'))
 
 
 def text_values(ResultSet):

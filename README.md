@@ -137,6 +137,7 @@ specify a test:
 
 ## Deployment steps
 
+1. Edit setup.py
 1. `python3 setup.py sdist bdist_wheel`
 1. `twine upload dist/*`
 
