@@ -12,13 +12,6 @@ def clean_string(some_string):
     condensed = re.sub(" +", " ", no_lines)
     return condensed.strip()
 
-def string2json(some_string):
-    # Combine stripping and removing control characters into one step
-    safe_string = re.sub(r'(?<!\\)[\n\t\r]', '', some_string).strip()    
-    # Decode only if necessary (fewer operations)
-    return json.loads(safe_string.encode().decode('unicode_escape'))
-
-
 def text_values(ResultSet):
     return [clean_string(el.text) for el in ResultSet]
 
