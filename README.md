@@ -98,7 +98,8 @@ Using this will override init keyword values such as first or filed_after.
 
 ## Development Install
 
-1. Create and activate a Python 3.6 virtual env
+1. python3 -m venv ~/your_path/oscn
+1. source ~/your_path/oscn/bin/activate
 1. `git clone git@github.com:codefortulsa/oscn.git`
 1. `cd oscn`
 1. `pip install -e .`

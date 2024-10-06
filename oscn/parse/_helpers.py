@@ -4,13 +4,11 @@ from unicodedata import normalize
 
 
 def clean_string(some_string):
-    # removes escape chars and excess spaces
+    # Normalize unicode characters
     normal_str = normalize("NFKD", some_string)
-    # remove line breaks
-    no_lines = re.sub("\\r\\n|\\n\\n", " ", normal_str)
-    # reduce spaces
-    condensed = re.sub(" +", " ", no_lines)
-    return condensed.strip()
+    # Remove all types of whitespace by splitting and rejoining
+    condensed = ' '.join(normal_str.split())
+    return condensed
 
 def text_values(ResultSet):
     return [clean_string(el.text) for el in ResultSet]
@@ -29,13 +27,24 @@ def lists2dict(keys, values):
     return {k: v for k, v in map(lambda k, v: (k, v), keys, values)}
 
 
-def find_values(soup, key_names):
+def old_find_values(soup, key_names):
     key_values = []
     for key in key_names:
         key_found = soup.find(string=re.compile(f"{key}:"))
         key_value = key_found.split(":")[1] if key_found else ""
         key_values.append(clean_string(key_value))
     return lists2dict(key_names, key_values)
+
+
+def find_values(soup, key_names):
+    """
+    Find key word in soup and return a dictionary of key value pairs
+    """
+    return {
+        key: clean_string((match := soup.find(string=lambda text: text and f"{key}:" in text)) and match.split(":", 1)[1].strip() or "")
+        for key in key_names
+    }
+
 
 
 # class to allow adding metadata to returned lists
