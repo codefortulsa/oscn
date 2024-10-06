@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from ._helpers import clean_string, MetaList
 
 
-def attorneys(oscn_html):
+def bs4_attorneys(oscn_html):
     attorney_list = MetaList()
     soup = BeautifulSoup(oscn_html, "html.parser")
     attorneys_h2 = soup.find("h2", "section attorneys")
@@ -23,13 +23,10 @@ def attorneys(oscn_html):
             attorney_list.append(
                 {
                     "name": attorney_with_address[0],
-                    "address": attorney_with_address,
+                    "address": attorney_with_address[1:],
                     "representing": representing,
                 }
             )
     return attorney_list
 
 
-# add this attribute to allow it to be added to request objects
-setattr(attorneys, "target", ["Case"])
-setattr(attorneys, "_default_value", [])
