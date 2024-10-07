@@ -16,7 +16,7 @@ def get_party_id(link):
         return ""
 
 
-def parties(oscn_html):
+def bs4_parties(oscn_html):
     names = []
     types = []
     party_ids = []
@@ -39,6 +39,7 @@ def parties(oscn_html):
         def get_name_and_type(string):
             # separates a line like this into name and type
             # HEFFLIN,\xa0 ASHLEY\xa0 LAUREN,\r\nRespondent'
+            # import ipdb; ipdb.set_trace() # fmt: skip
             more_strings = string.split(",")
             # take the last item off the list
             get_type = more_strings.pop(-1)
@@ -66,8 +67,3 @@ def parties(oscn_html):
             named_parties.append(party)
 
     return named_parties
-
-
-# add this attribute to allow it to be added to request objects
-setattr(parties, "target", ["Case"])
-setattr(parties, "_default_value", [])
