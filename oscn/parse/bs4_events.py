@@ -52,7 +52,7 @@ def find_events(some_string):
 
     return events
 
-def events(oscn_html):
+def bs4_events(oscn_html):
     soup = BeautifulSoup(oscn_html, "html.parser")    
     if json_script := soup.find("script", {"id": "json_events"}):
         return find_events(json_script.string)
@@ -77,5 +77,3 @@ def events(oscn_html):
     
     return events
 
-setattr(events, "target", ["Case"])
-setattr(events, "_default_value", [])
