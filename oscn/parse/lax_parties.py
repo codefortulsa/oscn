@@ -2,11 +2,10 @@ import urllib.parse
 from selectolax.parser import HTMLParser
 from ._helpers import clean_string, MetaList
 
-def get_party_id(link):
+def get_party_info(link):
     href = link.attributes.get("href", "")
-    url = urllib.parse.urlparse(href)
-    params = urllib.parse.parse_qs(url.query)
-    return params.get("id", [""])[0]
+    party_id = href.split("id=")[-1] if "id=" in href else ""
+    return party_id, href
 
 def parties(oscn_html):
     party_list = MetaList()
@@ -28,56 +27,28 @@ def parties(oscn_html):
     else:
         return party_list
 
-    # Extract party links and their details
-    party_links = party_paragraph.css('a')
-    party_data = []
-    if party_links:
-        for link in party_links:
-            name = clean_string(link.text())
-            if name.lower() == 'and':
-                continue  # Skip 'AND' entries
-            party_id = get_party_id(link)
-            # Find the next sibling span with the type
-            sibling = link.next
-            party_type = ""
-            while sibling:
-                if sibling.tag == 'span' and 'parties_type' in sibling.attributes.get('class', ''):
-                    party_type = clean_string(sibling.text())
-                    break
-                sibling = sibling.next
-            party_data.append((name, party_id, party_type))
+    # Extract party details from spans within the paragraph
+    party_spans = party_paragraph.css('span.parties_party')
+    for party_span in party_spans:
+        name_span = party_span.css_first('a.parties_partyname, span.parties_partyname')
+        type_span = party_span.css_first('span.parties_type')
 
-        names, party_ids, party_types = zip(*party_data) if party_data else ([], [], [])
-    else:
-        # Handle case where there are no links but spans with name and type
-        spans = party_paragraph.css('span.parties_partyname, span.parties_type')
-        party_data = {}
-        current_name = ""
-        for span in spans:
-            span_class = span.attributes.get('class', '')
-            if 'parties_partyname' in span_class:
-                current_name = clean_string(span.text())
-                if current_name.lower() == 'and':
-                    continue  # Skip 'AND' entries
-                party_data[current_name] = {"name": current_name, "type": "", "id": ""}
-            elif 'parties_type' in span_class and current_name:
-                party_data[current_name]["type"] = clean_string(span.text())
+        if not name_span or not type_span:
+            continue
 
-        names = [party["name"] for party in party_data.values()]
-        party_types = [party["type"] for party in party_data.values()]
-        party_ids = [party["id"] for party in party_data.values()]
+        name = clean_string(name_span.text())
+        if name.lower() == 'and':
+            continue  # Skip 'AND' entries
 
-    # Create party dictionaries and add them to the list
-    raw_parties = [
-        {
+        party_id, href = get_party_info(name_span) if name_span.tag == 'a' else ("", "")
+        party_type = clean_string(type_span.text())
+
+        party_list.append({
             "name": name,
-            "type": type_string,
-            "id": id_param,
-        }
-        for name, type_string, id_param in zip(names, party_types, party_ids)
-        if name
-    ]
-    party_list.extend(raw_parties)
+            "type": party_type,
+            "id": party_id,
+            "href": href,
+        })
 
     return party_list
 

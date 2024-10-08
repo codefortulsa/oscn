@@ -24,7 +24,7 @@ def test_lax_versus_bs4():
         print(f"Case: {case.source}")
         # print(f"BS4: {bs4_result}")
         print(f"LAX: {lax_result}")
-        print(f"cas: {case.parties}")
+        # print(f"cas: {case.parties}")
         assert case.parties == lax_result
         # assert bs4_result == lax_result
 
