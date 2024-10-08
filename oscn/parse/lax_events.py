@@ -14,9 +14,11 @@ def parse_json_events(json_string):
         return []
     return []
 
-def column_names(thead_element):
-    # Find all <th> elements and return their lowercase text content
-    return [th.text().strip().lower() for th in thead_element.css('th')]
+def column_names(events_table):
+    thead = events_table.css_first('thead')
+    if thead:
+        return [th.text().strip().lower() for th in thead.css('th')]
+    return []
 
 def events(oscn_html):
     tree = HTMLParser(oscn_html)
@@ -46,18 +48,19 @@ def events(oscn_html):
 
     # Extract table content
     events.text = events_table.text(separator=" ")
-    thead = events_table.css_first('thead')
-    event_keys = column_names(thead)
+    event_keys = column_names(events_table)
     rows = events_table.css('tbody tr')
     for row in rows:
         cells = row.css('td')
         values = [clean_string(td.text()) for td in cells]
         event = lists2dict(event_keys, values)
-        event_font = cells[0].css_first('font')
-        if event_font:
-            event_date = event_font.text().strip()
-            event["date"] = event_date
-        event["description"] = clean_string(cells[0].text())
+        event_description_td = row.css_first('td.event_description')
+        if event_description_td:
+            event_font = event_description_td.css_first('font')
+            if event_font:
+                event_date = event_font.text().strip()
+                event["date"] = event_date
+            event["description"] = event_description_td.text().strip()
         events.append(event)
 
     return events

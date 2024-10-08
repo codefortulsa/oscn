@@ -40,14 +40,15 @@ def test_lax_versus_bs4():
 
         print("." * 100)
         print(f"Case: {case.source}")
-        print(f"BS4 Result: {bs4_result}")
+        # print(f"BS4 Result: {bs4_result}")
         print("." * 100)
         print(f"LAX Result: {lax_result}")
         print("." * 100)
-        print(f"BS4 Time: {bs4_duration:.6f} seconds")
-        print(f"LAX Time: {lax_duration:.6f} seconds")
+        # print(f"BS4 Time: {bs4_duration:.6f} seconds")
+        # print(f"LAX Time: {lax_duration:.6f} seconds")
         print(f"LAX is {percentage:.2f}% of BS4 time")
-        assert bs4_result == lax_result
+        # assert bs4_result == lax_result
+        assert lax_result == case.events
     print("=" * 100)
     print(f"Total LAX Time: {total_lax_time:.6f} seconds")
     
