@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from ._helpers import text_values, lists2dict, MetaList
 
 
-def docket(oscn_html):
+def bs4_docket(oscn_html):
     soup = BeautifulSoup(oscn_html, "html.parser")
     docket_table = soup.find("table", "docketlist")
     thead = docket_table.find("thead").find_all("th")
@@ -32,5 +32,3 @@ def docket(oscn_html):
     return minutes
 
 
-setattr(docket, "target", ["Case"])
-setattr(docket, "_default_value", [])
