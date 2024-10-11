@@ -11,6 +11,7 @@ def docket(oscn_html):
     thead = docket_table.css_first("thead")
     if not thead:
         return MetaList()
+    
     columns = [th.text().strip().lower() for th in thead.css("th")]
 
     rows = docket_table.css("tbody tr")
