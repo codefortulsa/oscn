@@ -17,7 +17,7 @@ def test_lax_versus_bs4():
     )
 
     total_lax_time = 0
-
+    total_bs4_time = 0
     for case in cases:
         # Measure BS4 parsing time
         start_time = time.time()
@@ -28,6 +28,8 @@ def test_lax_versus_bs4():
         start_time = time.time()
         lax_result = docket(case.text)
         lax_duration = time.time() - start_time
+
+        total_bs4_time += bs4_duration
 
         # Accumulate total LAX time
         total_lax_time += lax_duration
@@ -50,11 +52,6 @@ def test_lax_versus_bs4():
         
         # Compare each row
         for bs4_row, lax_row in zip(bs4_result, lax_result):            
-            # print("-" * 30)
-            # print(f"bs4_row:{bs4_row['html']}")
-            # print("-" * 30)
-            # print(f"lax_row:{lax_row['html']}")
-            # assert bs4_row['html']==lax_row['html']
             assert bs4_row['date']==lax_row['date']
             assert bs4_row['code']==lax_row['code']
             assert bs4_row['description']==lax_row['description']
@@ -66,4 +63,11 @@ def test_lax_versus_bs4():
         assert lax_result == case.docket
         
     print("=" * 100)
+    print(f"Total BS4 Time: {total_bs4_time:.6f} seconds")
     print(f"Total LAX Time: {total_lax_time:.6f} seconds")
+            # Calculate percentage difference
+    if total_bs4_time > 0:
+        total_percentage = (total_lax_time / total_bs4_time) * 100
+    else:
+        total_percentage = float('inf')  # Handle division by zero if bs4_duration is zero
+    print(f"Total LAX is {total_percentage:.2f}% of BS4 time")
