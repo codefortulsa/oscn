@@ -86,7 +86,7 @@ class Case(object):
 
         if "text" in kwargs:
             self.text = kwargs["text"]
-            return self
+            return
         else:
             self.directory = kwargs["directory"] if "directory" in kwargs else ""
             self.bucket = kwargs["bucket"] if "bucket" in kwargs else ""
