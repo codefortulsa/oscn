@@ -14,6 +14,7 @@ def attorneys(oscn_html):
     while next_element:
         if next_element.tag == 'table':
             attorney_table = next_element
+            attorney_list.text = attorney_table.text(strip=True)
             break
         if next_element.tag == 'h2':
             return attorney_list

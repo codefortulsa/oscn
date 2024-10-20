@@ -1,18 +1,29 @@
+import re
 import json
 from selectolax.parser import HTMLParser
 from ._helpers import lists2dict, clean_string, MetaList
+from unicodedata import normalize
 
-def parse_json_events(json_string):
-    try:
-        # Load the entire JSON data
-        data = json.loads(json_string)
-        # Extract events if they are in the expected structure
-        if "events" in data:
-            return data["events"]
-    except json.JSONDecodeError:
-        # Handle cases where JSON might not be properly formatted
-        return []
-    return []
+def get_events(json_string: str) -> list[dict]:
+    json_string = normalize('NFKD', json_string)
+    date_values = []
+    description_values = []
+    
+    date_pattern = r'"date"\s*:\s*"(.*?)"'
+    date_matches = re.findall(date_pattern, json_string)
+    date_values.extend(date_matches)
+
+    description_pattern = r'"description"\s*:\s*"(.*?)"'
+    description_matches = re.findall(description_pattern, json_string)
+    description_values.extend(description_matches)
+
+    events = [
+        {"date": date, "description": description}
+        for date, description in zip(date_values, description_values)
+    ]
+
+    return events
+
 
 def column_names(events_table):
     thead = events_table.css_first('thead')
@@ -23,11 +34,11 @@ def column_names(events_table):
 def events(oscn_html):
     tree = HTMLParser(oscn_html)
     events = MetaList()
-
     # Extract JSON events from the script tag if present
     json_script = tree.css_first("script#json_events")
-    if json_script:
-        return parse_json_events(json_script.text())
+    if json_script:    
+        if events := get_events(json_script.text().strip()):
+            return events
 
     # Proceed with table extraction if JSON is not found
     events_section = tree.css_first('h2.section.events')

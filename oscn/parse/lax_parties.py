@@ -26,7 +26,7 @@ def parties(oscn_html):
         next_element = next_element.next
     else:
         return party_list
-
+    party_list.text = party_paragraph.text().strip()
     # Extract party details from spans within the paragraph
     party_spans = party_paragraph.css('span.parties_party')
     for party_span in party_spans:
@@ -49,7 +49,6 @@ def parties(oscn_html):
             "id": party_id,
             "href": href,
         })
-
     return party_list
 
 # add this attribute to allow it to be added to request objects
