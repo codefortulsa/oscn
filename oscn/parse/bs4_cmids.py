@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import parse_qs
 
 
-def cmids(oscn_html):
+def bs4_cmids(oscn_html):
     soup = BeautifulSoup(oscn_html, "html.parser")
     cmids = []
     ref_table = soup.find("table", "multipleRecords")
@@ -18,5 +18,3 @@ def cmids(oscn_html):
     return cmids
 
 
-setattr(cmids, "target", ["Case"])
-setattr(cmids, "_default_value", [])

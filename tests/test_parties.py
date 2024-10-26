@@ -5,8 +5,6 @@ from oscn import settings
 from oscn.parse.lax_parties import parties
 from oscn.parse.parties import bs4_parties
 
-OSCN_HEADER = settings.OSCN_REQUEST_HEADER
-
 def test_lax_versus_bs4():
     cases = oscn.request.CaseList(
         types=["CJ","CM"],
