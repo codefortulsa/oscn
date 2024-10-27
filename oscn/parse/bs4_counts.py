@@ -6,7 +6,7 @@ from ._helpers import find_values, MetaList
 # count_details = re.compile(count_re, re.M)
 
 
-def counts(oscn_html):
+def bs4_counts(oscn_html):
     count_list = MetaList()
 
     soup = BeautifulSoup(oscn_html, "html.parser")
@@ -58,5 +58,3 @@ def counts(oscn_html):
     return count_list
 
 
-setattr(counts, "target", ["Case"])
-setattr(counts, "_default_value", [])
