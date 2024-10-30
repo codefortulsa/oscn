@@ -30,7 +30,7 @@ def make_party_dict(**kwargs):
     return {"type": party_type, "name": party_name, "disposed": kwargs["Disposed"]}
 
 
-def issues(oscn_html):
+def bs4_issues(oscn_html):
     issue_list = MetaList()
     soup = BeautifulSoup(oscn_html, "html.parser")
     start = soup.find("h2", "section issues")
@@ -74,8 +74,3 @@ def issues(oscn_html):
             issue_table = disp_table.find_next_sibling("table")
 
     return issue_list
-
-
-# add this attribute to allow it to be added to request objects
-setattr(issues, "target", ["Case"])
-setattr(issues, "_default_value", [])
