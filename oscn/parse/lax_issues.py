@@ -9,35 +9,29 @@ party_keys = ["Defendant", "Plaintiff", "Respondent", "Disposed"]
 
 def find_values(node, key_names):
     """
-    Find key word in node_text and return a dictionary of key value pairs
+    Find key word in node_text and return a dictionary of key-value pairs.
     """
     values = {}
     node_text = node.text()
+
+    # Create a single regex pattern to match each key followed by its value
+    key_pattern = "|".join(re.escape(key) for key in key_names)
+    pattern = rf"({key_pattern}):\s*(.*?)(?=(?:\s*(?:{key_pattern})|$))"
+
+    # Find all matches for key-value pairs in the text
+    matches = re.finditer(pattern, node_text, re.DOTALL)
+
+    for match in matches:
+        key = match.group(1)
+        value = clean_string(match.group(2).strip())
+        values[key] = value
+
+    # Ensure all keys are present in the result, even if not found in the text
     for key in key_names:
-        # Construct pattern to find the key followed by a colon and capture until the next key or end
-        pattern = rf"{key}:\s*(.*?)(?=(?:\s*{key_names[0]}|\s*{key_names[1]}|\s*{key_names[2]}|$))"
-        match = re.search(pattern, node_text, re.DOTALL)
-        if match:
-            values[key] = clean_string(match.group(1).strip())
-        else:
+        if key not in values:
             values[key] = ""
 
     return values
-
-
-def make_party_dict(issue_node):
-
-    if kwargs["Defendant"]:
-        party_type = "defendant"
-        party_name = kwargs["Defendant"]
-    elif kwargs["Plaintiff"]:
-        party_type = "plaintiff"
-        party_name = kwargs["Plaintiff"]
-    elif kwargs["Respondent"]:
-        party_type = "respondent"
-        party_name = kwargs["Respondent"]
-
-    return {"type": party_type, "name": party_name, "disposed": kwargs["Disposed"]}
 
 
 def next_tag(node, tag):
@@ -63,11 +57,11 @@ def issues(oscn_html):
     is_docket = docket_table == issue_table
 
     if is_docket:
-        next_sibling = issues_header.next
-        while next_sibling != docket_header:
-            if next_sibling.tag == "p":
-                issue_list.append(clean_string(next_sibling.text()))
-            next_sibling = next_sibling.next
+        next_element = issues_header.next
+        while next_element != docket_header:
+            if next_element.tag == "p":
+                issue_list.append(clean_string(next_element.text()))
+            next_element = next_element.next
     else:
         while issue_table and "Issue #" in issue_table.text():
             issue_dict = find_values(issue_table, issue_keys)
