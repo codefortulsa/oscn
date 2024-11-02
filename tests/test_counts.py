@@ -7,8 +7,8 @@ def test_counts():
 
     cases = oscn.request.CaseList(
         types=["CF", "CM"],
-        counties=["tulsa", "oklahoma", "bexar"],
-        years=["2024", "2020"],
+        counties=["bryan","tulsa", "oklahoma", "bexar"],
+        years=["2018","2024", "2020"],
         start=4,
         stop=6,
     )    

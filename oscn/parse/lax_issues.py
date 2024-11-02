@@ -54,19 +54,19 @@ def issues(oscn_html):
     docket_header = tree.css_first("h2.section.dockets")
     docket_table = next_tag(docket_header, "table")
 
-    is_docket = docket_table == issue_table
-
-    if is_docket:
+    if (docket_table == issue_table):
         next_element = issues_header.next
         while next_element != docket_header:
             if next_element.tag == "p":
                 issue_list.append(clean_string(next_element.text()))
             next_element = next_element.next
     else:
+        issue_list.text = issue_table.text()
         while issue_table and "Issue #" in issue_table.text():
             issue_dict = find_values(issue_table, issue_keys)
             disp_table = next_tag(issue_table, "table")
             if disp_table != docket_table:
+                issue_list.add_text(disp_table.text())
                 name_details = disp_table.css("td.countpartyname")
                 dispositions = disp_table.css("td.countdisposition")
                 issue_dict["parties"] = []

@@ -13,9 +13,10 @@ def extract_text_after_keyword(keyword, stop_keywords=None):
     return extract
 
 # Curried extract functions with pre-compiled regex patterns
-extract_count_description = extract_text_after_keyword("Count as Filed:", ["in violation of"])
+extract_count_description = extract_text_after_keyword("Count as Filed:", [", in violation of"])
+extract_count_as_disposed = extract_text_after_keyword("Count as Disposed:",["<br>"])
 extract_offense_date = extract_text_after_keyword("Date of Offense:", ["<br>"])
-extract_disposed_value = extract_text_after_keyword("Disposed:", ["Count as Disposed:"])
+extract_disposed_value = extract_text_after_keyword("Disposed:", ["<"])
 
 def parse_count_container(counts_container):
     count_info = {
@@ -49,18 +50,30 @@ def parse_count_container(counts_container):
 
         count_disposition_td = disposition_row.css_first("td.countdisposition")
         if count_disposition_td:
-            count_disposition_text = count_disposition_td.text(separator=" ")
+            count_disposition_text = count_disposition_td.html
             count_info["disposed"] = extract_disposed_value(count_disposition_text)
-
+            if count_as_disposed := extract_count_as_disposed(count_disposition_text):
+                count_info["description"] = count_as_disposed
     return count_info
 
 def counts(oscn_html):
     count_list = MetaList()
     tree = HTMLParser(oscn_html)
-    for counts_container in tree.css("div.CountsContainer"):
-        count_info = parse_count_container(counts_container)
-        if count_info:
-            count_list.append(count_info)
+    if counts := tree.css("div.CountsContainer"):
+        for count in counts:
+            count_list.add_text(count.text(separator=" "))
+            count_info = parse_count_container(count)
+            if count_info:
+                count_list.append(count_info)
+    else:
+        count_start = tree.css_first("h2.section.counts")
+        next_element = count_start.next
+        while next_element.tag != "h2":
+            if next_element.tag == "p":
+                count_description = clean_string(next_element.text())
+                count_list.append({"description": count_description})
+                
+            next_element = next_element.next
     return count_list
 
 setattr(counts, "target", ["Case"])
