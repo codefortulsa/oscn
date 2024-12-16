@@ -19,8 +19,21 @@ import botocore
 from .. import settings
 from ..parse import append_parsers
 
-s3 = boto3.resource("s3")
-s3_client = boto3.client("s3")
+# Initialize s3 and s3_client as None by default
+s3 = None
+s3_client = None
+
+# Check if all required AWS credentials are set
+required_aws_vars = ["AWS_DEFAULT_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
+
+if all(os.getenv(var) for var in required_aws_vars):
+    try:
+        s3 = boto3.resource("s3")
+        s3_client = boto3.client("s3")
+    except botocore.exceptions.ClientError:
+        pass
+    except botocore.exceptions.NoCredentialsError:
+        pass
 
 oscn_url = settings.OSCN_CASE_URL
 warnings.filterwarnings("ignore")
@@ -35,6 +48,7 @@ get_court = re.compile(r"^(?P<court>\w+)-")
 get_type = re.compile(r"-(?P<type>\w+)-")
 get_year = re.compile(r"-(?P<year>\d{4})-")
 get_number = re.compile(r"0*(?P<number>\d+\w*)$")
+
 
 # This decorators adds properties to the OSCNrequest as a shortcut
 # for parsing.  This allows access to parse results such as:
@@ -155,7 +169,7 @@ class Case(object):
             with open(self.file_name, "wb") as open_file:
                 open_file.write(file_data)
 
-        if self.bucket:
+        if self.bucket and s3 is not None:
             try:
                 s3.meta.client.head_bucket(Bucket=self.bucket)
             except botocore.exceptions.ClientError as e:
@@ -176,6 +190,11 @@ class Case(object):
             self.valid = False
 
     def _open_s3_object(self):
+        # If S3 client is not available, mark as invalid and return
+        if s3_client is None:
+            self.valid = False
+            return
+
         try:
             s3_object = s3_client.get_object(Bucket=self.bucket, Key=self.s3_key)
             bytes = BytesIO(s3_object["Body"].read())
