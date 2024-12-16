@@ -2,6 +2,10 @@
 
 A python library for scraping case information from the [Oklahoma State Courts Network](https://www.oscn.net/dockets/).
 
+# Update:
+
+- 12/16/2024: Updated to use Selectolax instead of BeautifulSoup. Most parsing functions now use Selectolax which is faster and more memory efficient.  Some BeautifulSoup functions are still used and old parsers are still in the codebase for testing.
+
 ## Contents
 
 oscn > Python package source to provide an api for retrieving and parsing case records.
