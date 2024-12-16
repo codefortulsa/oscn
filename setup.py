@@ -15,7 +15,13 @@ setup(
     license="MIT",
     packages=find_packages(),
     zip_safe=False,
-    install_requires=["requests", "beautifulsoup4", "boto3","python-decouple"],
+    install_requires=[
+        "requests",
+        "beautifulsoup4",
+        "boto3",
+        "python-decouple",
+        "selectolax",
+    ],
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
