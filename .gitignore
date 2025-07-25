@@ -7,3 +7,5 @@ data/
 /dist
 /build
 /examples
+/.vscode
+.cursorrules

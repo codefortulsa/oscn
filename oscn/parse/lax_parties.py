@@ -2,53 +2,112 @@ import urllib.parse
 from selectolax.parser import HTMLParser
 from ._helpers import clean_string, MetaList
 
-def get_party_info(link):
-    href = link.attributes.get("href", "")
-    party_id = href.split("id=")[-1] if "id=" in href else ""
-    return party_id, href
+
+def get_party_id(link):
+    try:
+        href = link.attributes.get("href", "")
+        if not href:
+            return ""
+        url = urllib.parse.urlparse(href)
+        params = urllib.parse.parse_qs(url.query)
+        party_id = params.get("id", [""])[0]
+        return party_id
+    except (KeyError, IndexError, AttributeError):
+        return ""
+
 
 def parties(oscn_html):
+    if not oscn_html:
+        return []
+
     party_list = MetaList()
-    tree = HTMLParser(oscn_html)
+    names = []
+    types = []
+    party_ids = []
 
-    section_header = tree.css_first('h2.section.party')
-    if not section_header:
-        return party_list
-
-    # Find the next paragraph or stop at the next section header
-    next_element = section_header.next
-    while next_element:
-        if next_element.tag == 'p':
-            party_paragraph = next_element
-            break
-        if next_element.tag == 'h2':
+    try:
+        parser = HTMLParser(oscn_html)
+        start = parser.css_first("h2.section.party")
+        if not start:
             return party_list
-        next_element = next_element.next
+
+        # Find the next p element after the h2
+        party_p = None
+        current = start.next
+        while current and current.tag != "p":
+            current = current.next
+        party_p = current
+
+        if not party_p:
+            return party_list
+
+        party_list.text = party_p.text().strip()
+        party_links = party_p.css("a")
+    except Exception:
+        return []
+
+    if party_links:
+        # This case has links - extract from link structure
+        for link in party_links:
+            name = link.text().strip()
+            if not name or name.lower() == "and":
+                continue
+
+            party_id = get_party_id(link)
+
+            # Find the parent span and then look for the type span within it
+            parent_span = link.parent
+            if (
+                parent_span
+                and parent_span.tag == "span"
+                and "parties_party" in parent_span.attributes.get("class", "")
+            ):
+                type_span = parent_span.css_first("span.parties_type")
+                party_type = type_span.text().strip() if type_span else ""
+            else:
+                party_type = ""
+
+            names.append(name)
+            types.append(party_type)
+            party_ids.append(party_id)
+
     else:
-        return party_list
-    party_list.text = party_paragraph.text().strip()
-    # Extract party details from spans within the paragraph
-    party_spans = party_paragraph.css('span.parties_party')
-    for party_span in party_spans:
-        name_span = party_span.css_first('a.parties_partyname, span.parties_partyname')
-        type_span = party_span.css_first('span.parties_type')
+        # This case uses span structure - parse each parties_party span
+        party_spans = party_p.css("span.parties_party")
 
-        if not name_span or not type_span:
-            continue
+        for party_span in party_spans:
+            name_span = party_span.css_first("span.parties_partyname")
+            type_span = party_span.css_first("span.parties_type")
 
-        name = clean_string(name_span.text())
-        if name.lower() == 'and':
-            continue  # Skip 'AND' entries
+            if name_span:
+                name = clean_string(name_span.text())
+                if not name or name.lower() == "and":
+                    continue
 
-        party_id, href = get_party_info(name_span) if name_span.tag == 'a' else ("", "")
-        party_type = clean_string(type_span.text())
+                party_type = clean_string(type_span.text()) if type_span else ""
 
-        party_list.append({
-            "name": name,
-            "type": party_type,
-            "id": party_id,
-            "href": href,
-        })
+                names.append(name)
+                types.append(party_type)
+                party_ids.append("")
+
+    def Party(name, type_string, id_param):
+        try:
+            return {
+                "name": clean_string(name) if name else "",
+                "type": clean_string(type_string) if type_string else "",
+                "id": id_param if id_param else "",
+            }
+        except Exception:
+            return {"name": "", "type": "", "id": ""}
+
+    try:
+        raw_parties = map(Party, names, types, party_ids)
+        for party in raw_parties:
+            if party and party.get("name"):
+                party_list.append(party)
+    except Exception:
+        pass  # Return empty list if processing fails
+
     return party_list
 
 # add this attribute to allow it to be added to request objects

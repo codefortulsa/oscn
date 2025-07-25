@@ -26,4 +26,4 @@ def judge(oscn_html):
 
 
 setattr(judge, "target", ["Case"])
-setattr(judge, "_default_value", [])
+setattr(judge, "_default_value", "")

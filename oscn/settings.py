@@ -1,7 +1,10 @@
-from decouple import config
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 default_user_agent = '"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"'
-OSCN_USER_AGENT = config("OSCN_USER_AGENT", default=default_user_agent)
+OSCN_USER_AGENT = os.getenv("OSCN_USER_AGENT", default=default_user_agent)
 
 OSCN_CASE_URL = "https://www.oscn.net/dockets/GetCaseInformation.aspx"
 OSCN_SEARCH_URL = "https://www.oscn.net/dockets/Results.aspx"
