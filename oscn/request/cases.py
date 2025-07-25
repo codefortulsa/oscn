@@ -13,27 +13,10 @@ import warnings
 import requests
 from requests.exceptions import ConnectionError
 
-import boto3
-import botocore
 
 from .. import settings
 from ..parse import append_parsers
 
-# Initialize s3 and s3_client as None by default
-s3 = None
-s3_client = None
-
-# Check if all required AWS credentials are set
-required_aws_vars = ["AWS_DEFAULT_REGION", "AWS_ACCESS_KEY_ID", "AWS_SECRET_ACCESS_KEY"]
-
-if all(os.getenv(var) for var in required_aws_vars):
-    try:
-        s3 = boto3.resource("s3")
-        s3_client = boto3.client("s3")
-    except botocore.exceptions.ClientError:
-        pass
-    except botocore.exceptions.NoCredentialsError:
-        pass
 
 oscn_url = settings.OSCN_CASE_URL
 warnings.filterwarnings("ignore")
@@ -103,11 +86,8 @@ class Case(object):
             return
         else:
             self.directory = kwargs["directory"] if "directory" in kwargs else ""
-            self.bucket = kwargs["bucket"] if "bucket" in kwargs else ""
             if self.directory:
                 self._open_file()
-            elif self.bucket:
-                self._open_s3_object()
             else:
                 # default for test
                 self.text = ""
@@ -145,10 +125,6 @@ class Case(object):
     def file_name(self):
         return f"{self.path}/{self.number}.zip"
 
-    @property
-    def s3_key(self):
-        return f"{self.inner_path}/{self.number}.zip"
-
     def save(self, **kwargs):
         case_data = {
             "source": self.source,
@@ -158,7 +134,6 @@ class Case(object):
         file_data = gzip.compress(bytes(json.dumps(case_data), "utf-8"))
 
         self.directory = kwargs["directory"] if "directory" in kwargs else ""
-        self.bucket = kwargs["bucket"] if "bucket" in kwargs else ""
         if self.directory:
             if not os.path.exists(os.path.dirname(self.file_name)):
                 try:
@@ -169,17 +144,6 @@ class Case(object):
             with open(self.file_name, "wb") as open_file:
                 open_file.write(file_data)
 
-        if self.bucket and s3 is not None:
-            try:
-                s3.meta.client.head_bucket(Bucket=self.bucket)
-            except botocore.exceptions.ClientError as e:
-                error_code = e.response["Error"]["Code"]
-                if error_code == "404" or error_code == "403":
-                    s3.create_bucket(Bucket=self.bucket)
-                else:
-                    raise e
-            s3.Bucket(self.bucket).put_object(Key=self.s3_key, Body=file_data)
-
     def _open_file(self):
         try:
             with gzip.GzipFile(self.file_name, "r") as open_file:
@@ -188,28 +152,6 @@ class Case(object):
             self.valid = True
         except FileNotFoundError:
             self.valid = False
-
-    def _open_s3_object(self):
-        # If S3 client is not available, mark as invalid and return
-        if s3_client is None:
-            self.valid = False
-            return
-
-        try:
-            s3_object = s3_client.get_object(Bucket=self.bucket, Key=self.s3_key)
-            bytes = BytesIO(s3_object["Body"].read())
-            unzipped_stream = (
-                gzip.GzipFile(None, "rb", fileobj=bytes).read().decode("utf-8")
-            )
-            saved_data = json.loads(unzipped_stream)
-            self.__init__(**saved_data)
-            self.valid = True
-        except botocore.exceptions.ClientError as e:
-            error_code = e.response["Error"]["Code"]
-            if error_code == "NoSuchKey":
-                self.valid = False
-            else:
-                raise e
 
     def _valid_response(self, response):
         if not response.ok:
@@ -273,8 +215,6 @@ class CaseList(object):
             self._request_case = self._make_case_requester(
                 directory=kwargs["directory"]
             )
-        elif "bucket" in kwargs:
-            self._request_case = self._make_case_requester(bucket=kwargs["bucket"])
         else:
             self._request_case = self._make_case_requester()
 

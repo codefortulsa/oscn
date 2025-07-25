@@ -74,12 +74,9 @@ def test_retrieve_cmids():
     for idx in list1_indexes:
         filed_case = oscn.request.Case(idx, directory="data")
         assert filed_case.valid
-        filed_case.save(bucket="oscn-test-data")
         list2_indexes.append(filed_case.index)
 
-    for idx in list2_indexes:
-        bucket_case = oscn.request.Case(idx, bucket="oscn-test-data")
-        assert bucket_case.valid
+    assert list1_indexes == list2_indexes
 
 
 def test_retrieve_parent_and_cmids():

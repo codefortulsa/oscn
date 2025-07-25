@@ -1,14 +1,11 @@
-[project]
+[tool.poetry]
 name = "oscn"
-version = "0.0.0.90"
+version = "0.0.0.91"
 description = "Oklahoma State Courts Network case parsing utilities"
-authors = [
-    {name = "John Dungan",email = "john@docket2me.com"}
-]
-license = {text = "MIT"}
+authors = ["John Dungan <john@docket2me.com>"]
+license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/codefortulsa/oscn"
-requires-python = "^3.8"
 classifiers=[
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
@@ -16,19 +13,25 @@ classifiers=[
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
 ]
-dependencies = [
-    "requests",
-    "beautifulsoup4",
-    "boto3",
-    "selectolax",
-    "python-dotenv (==0.19.2)"
-]
 
-
-[build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.dependencies]
+python = ">=3.9"
+requests = "*"
+beautifulsoup4 = "*"
+selectolax = "*"
+python-dotenv = "==0.19.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.1.0"
+pytest-xdist = "^3.8.0"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
 

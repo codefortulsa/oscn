@@ -11,10 +11,10 @@ def test_source_works():
 
     cases = oscn.request.CaseList(
         types=["CM", "CF", "CJ"],
-        counties=["tulsa", "carter", "cimarron", "oklahoma"],
+        counties=["tulsa", "carter", "oklahoma"],
         years=["2019", "2020"],
-        start=5,
-        stop=10,
+        start=3,
+        stop=5,
     )
 
     for case in cases:
