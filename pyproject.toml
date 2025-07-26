@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oscn"
-version = "0.0.0.91"
+version = "0.0.91"
 description = "Oklahoma State Courts Network case parsing utilities"
 authors = ["John Dungan <john@docket2me.com>"]
 license = "MIT"
@@ -19,7 +19,7 @@ python = ">=3.9"
 requests = "*"
 beautifulsoup4 = "*"
 selectolax = "*"
-python-dotenv = "==0.19.2"
+python-dotenv = "^1.1.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "7.1.0"

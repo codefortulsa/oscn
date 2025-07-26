@@ -100,17 +100,17 @@ If you are familar with the OSCN search parameters you can initialize CaseIndexe
 
 Using this will override init keyword values such as first or filed_after.
 
-## Development Install
+## Installation
 
-1. python3 -m venv ~/your_path/oscn
-1. source ~/your_path/oscn/bin/activate
-1. `git clone git@github.com:codefortulsa/oscn.git`
-1. `cd oscn`
-1. `pip install -e .`
+To install the latest version of this package, run the following command:
+`pip install oscn`
+
+For development, clone the repository and install the dependencies using poetry:
+`git clone git@github.com:codefortulsa/oscn.git`
+`cd oscn`
+`poetry install`
 
 ## Usage
-
-Install with `pip install oscn`
 
 Script example:
 
@@ -140,11 +140,17 @@ specify a test:
 
 - `pytest -s tests/test_parse.py -k 'test_events'`
 
+parallel testing:
+-`poetry run pytest -n auto`
+
 ## Deployment steps
 
-1. Edit setup.py
-1. `python3 setup.py sdist bdist_wheel`
-1. `twine upload dist/*`
+To deploy a new version of the package, follow these steps:
+
+1.  `poetry version patch`
+2.  `poetry build`
+3.  `poetry publish`
+
 
 ## User Agent
 
