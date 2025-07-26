@@ -5,15 +5,11 @@ load_dotenv()
 
 default_user_agent = '"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36"'
 OSCN_USER_AGENT = os.getenv("OSCN_USER_AGENT", default=default_user_agent)
-
-OSCN_CASE_URL = "https://www.oscn.net/dockets/GetCaseInformation.aspx"
-OSCN_SEARCH_URL = "https://www.oscn.net/dockets/Results.aspx"
-OSCN_PARTY_URL = "https://www.oscn.net/dockets/GetPartyRecord.aspx"
-OSCN_DOCKET_URL = "https://www.oscn.net/applications/oscn/report.asp"
-
-# https://stage.oscn.net/swagger/#/
-OSCN_API_URL = "https://stage.oscn.net/api"
-OSCN_API_HEADER = {"accept": "application/json; charset=utf-8"}
+OSCN_DOCKETS_URL = "https://www.oscn.net/dockets"
+OSCN_CASE_URL = f"{OSCN_DOCKETS_URL}/GetCaseInformation.aspx"
+OSCN_SEARCH_URL = f"{OSCN_DOCKETS_URL}/Results.aspx"
+OSCN_PARTY_URL = f"{OSCN_DOCKETS_URL}/GetPartyRecord.aspx"
+OSCN_APPLICATION_URL = "https://www.oscn.net/applications/oscn/report.asp"
 
 
 OSCN_REQUEST_HEADER = {

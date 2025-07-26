@@ -156,3 +156,23 @@ To deploy a new version of the package, follow these steps:
 
 In some cases a custom user agent is required in the header of requests.
 Setting an environmental varialbe called OSCN_USER_AGENT will override the default.
+
+This project is open-source and contributions are welcome.
+
+---
+## Release Notes
+
+### Version 0.0.92
+
+*   Added the `.documents` property to the `Case` object, which parses the case docket and returns a list of all linked documents. Each document is a dictionary with the following structure:
+
+    ```json
+    {
+      "id": 1234567,
+      "title": "MOTION TO COMPEL",
+      "url": "https://www.oscn.net/dockets/GetDocument.aspx?...",
+      "date": "01-01-2024",
+      "code": "MO",
+      "party": "PLAINTIFF"
+    }
+    ```

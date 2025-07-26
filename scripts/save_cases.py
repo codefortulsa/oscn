@@ -4,7 +4,6 @@ import oscn
 def save_cases(cases):
     for case in cases:
         print(case.index)
-        case.save(bucket="oscn-test-data")
         case.save(directory="data")
 
 
