@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "oscn"
-version = "0.0.93"
+version = "0.0.94"
 description = "Oklahoma State Courts Network case parsing utilities"
 authors = ["John Dungan <john@docket2me.com>"]
 license = "MIT"

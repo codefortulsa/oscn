@@ -1,6 +1,6 @@
 import oscn
 import time
-from oscn.parse.lax_issues import issues
+from oscn.parse.issues import issues
 from oscn.parse.bs4_issues import bs4_issues
 
 

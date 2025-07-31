@@ -2,18 +2,18 @@ import oscn
 import time
 
 from oscn import settings
-from oscn.parse.lax_parties import parties
-from oscn.parse.parties import bs4_parties
+from oscn.parse.parties import parties
+from oscn.parse.bs4_parties import bs4_parties
+
 
 def test_lax_versus_bs4():
     cases = oscn.request.CaseList(
-        types=["CJ","CM"],
-        counties=["tulsa", "oklahoma","cleveland","texas","bexar"],
-        years=["2024","2018"],
+        types=["CJ", "CM"],
+        counties=["tulsa", "oklahoma", "cleveland", "texas", "bexar"],
+        years=["2024", "2018"],
         start=4,
         stop=5,
     )
-
 
     for case in cases:
         bs4_result = bs4_parties(case.text)
@@ -25,4 +25,3 @@ def test_lax_versus_bs4():
         # print(f"cas: {case.parties}")
         assert case.parties == lax_result
         # assert bs4_result == lax_result
-

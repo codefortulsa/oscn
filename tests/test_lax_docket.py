@@ -2,7 +2,7 @@ import oscn
 import time
 
 from oscn import settings
-from oscn.parse.lax_docket import docket
+from oscn.parse.docket import docket
 from oscn.parse.bs4_docket import bs4_docket
 
 OSCN_HEADER = settings.OSCN_REQUEST_HEADER

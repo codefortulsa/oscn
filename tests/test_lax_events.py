@@ -2,7 +2,7 @@ import oscn
 import time
 
 from oscn import settings
-from oscn.parse.lax_events import events
+from oscn.parse.events import events
 from oscn.parse.bs4_events import bs4_events
 
 OSCN_HEADER = settings.OSCN_REQUEST_HEADER

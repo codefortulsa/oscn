@@ -1,5 +1,5 @@
 import pytest
-from oscn.parse.lax_counts import counts
+from oscn.parse.counts import counts
 from oscn.request.cases import Case
 
 

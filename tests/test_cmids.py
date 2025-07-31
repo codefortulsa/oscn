@@ -1,5 +1,5 @@
 import oscn
-from oscn.parse.lax_cmids import cmids
+from oscn.parse.cmids import cmids
 from oscn.parse.bs4_cmids import bs4_cmids
 
 def test_retrieve_parent_and_cmids():

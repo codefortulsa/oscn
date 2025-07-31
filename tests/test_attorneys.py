@@ -2,7 +2,7 @@ import oscn
 import time
 
 from oscn import settings
-from oscn.parse.lax_attorneys import attorneys
+from oscn.parse.attorneys import attorneys
 from oscn.parse.bs4_attorneys import bs4_attorneys
 
 OSCN_HEADER = settings.OSCN_REQUEST_HEADER

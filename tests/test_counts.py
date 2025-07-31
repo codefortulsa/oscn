@@ -1,6 +1,6 @@
 import oscn
 import time
-from oscn.parse.lax_counts import counts
+from oscn.parse.counts import counts
 from oscn.parse.bs4_counts import bs4_counts
 
 def test_counts():
