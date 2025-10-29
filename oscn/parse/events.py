@@ -65,6 +65,8 @@ def events(oscn_html):
         cells = row.css('td')
         values = [clean_string(td.text()) for td in cells]
         event = lists2dict(event_keys, values)
+
+        # Try new format first (with class="event_description")
         event_description_td = row.css_first('td.event_description')
         if event_description_td:
             event_font = event_description_td.css_first('font')
@@ -72,6 +74,16 @@ def events(oscn_html):
                 event_date = event_font.text().strip()
                 event["date"] = event_date
             event["description"] = event_description_td.text().strip()
+        else:
+            # Fallback to old format (first cell without class)
+            if cells:
+                first_cell = cells[0]
+                event_font = first_cell.css_first('font')
+                if event_font:
+                    event_date = event_font.text().strip()
+                    event["date"] = event_date
+                event["description"] = clean_string(first_cell.text())
+
         events.append(event)
 
     return events
