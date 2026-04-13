@@ -4,25 +4,61 @@ from selectolax.parser import HTMLParser
 from ._helpers import lists2dict, clean_string, MetaList
 from unicodedata import normalize
 
+def _parse_events_json(json_string: str) -> list[dict] | None:
+    """Try to parse the script payload as JSON and extract Events array.
+
+    strict=False tells json.loads to allow literal control characters
+    (newlines, tabs, etc.) inside string values — exactly what OSCN emits.
+    """
+    try:
+        data = json.loads(json_string, strict=False)
+        raw_events = data.get("Events") or data.get("events") or []
+        result = []
+        for ev in raw_events:
+            date = ev.get("date") or ev.get("Date") or ""
+            description = ev.get("description") or ev.get("Description") or ""
+            # Collapse internal whitespace in description to match table-parsed style
+            description = " ".join(description.split())
+            result.append({"date": date, "description": description})
+        return result if result else None
+    except (json.JSONDecodeError, AttributeError, TypeError):
+        return None
+
+
+def _parse_events_regex(json_string: str) -> list[dict]:
+    """
+    Fallback: extract paired (date, description) from each event object using
+    a per-object regex so date and description stay coupled and multiline
+    descriptions don't cause a count mismatch.
+    """
+    events = []
+    # Match each {...} block that looks like an event object
+    object_pattern = re.compile(r'\{[^{}]*?"date"[^{}]*?\}', re.DOTALL)
+    date_pattern = re.compile(r'"date"\s*:\s*"(.*?)"', re.DOTALL)
+    description_pattern = re.compile(r'"description"\s*:\s*"(.*?)"', re.DOTALL)
+
+    for obj_match in object_pattern.finditer(json_string):
+        obj = obj_match.group()
+        date_m = date_pattern.search(obj)
+        desc_m = description_pattern.search(obj)
+        if date_m:
+            date = date_m.group(1)
+            description = " ".join(desc_m.group(1).split()) if desc_m else ""
+            events.append({"date": date, "description": description})
+    return events
+
+
 def get_events(json_string: str) -> list[dict]:
     json_string = normalize('NFKD', json_string)
-    date_values = []
-    description_values = []
-    
-    date_pattern = r'"date"\s*:\s*"(.*?)"'
-    date_matches = re.findall(date_pattern, json_string)
-    date_values.extend(date_matches)
 
-    description_pattern = r'"description"\s*:\s*"(.*?)"'
-    description_matches = re.findall(description_pattern, json_string)
-    description_values.extend(description_matches)
+    # Primary: real JSON parse (handles all valid and lightly-malformed payloads)
+    result = _parse_events_json(json_string)
+    if result is not None:
+        return result
 
-    events = [
-        {"date": date, "description": description}
-        for date, description in zip(date_values, description_values)
-    ]
-
-    return events
+    # Fallback: per-object regex — date and description extracted together so
+    # multiline descriptions never cause a count mismatch between the two lists
+    return _parse_events_regex(json_string)
 
 
 def column_names(events_table):

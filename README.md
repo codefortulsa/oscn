@@ -4,7 +4,7 @@ A python library for scraping case information from the [Oklahoma State Courts N
 
 # Update:
 
-- 12/16/2024: Updated to use Selectolax instead of BeautifulSoup. Most parsing functions now use Selectolax which is faster and more memory efficient.  Some BeautifulSoup functions are still used and old parsers are still in the codebase for testing.
+- 12/16/2024: Updated to use Selectolax instead of BeautifulSoup. Most parsing functions now use Selectolax which is faster and more memory efficient. Some BeautifulSoup functions are still used and old parsers are still in the codebase for testing.
 
 ## Contents
 
@@ -130,18 +130,17 @@ To request a list of cases to iterate:
 
 ## Run test scripts
 
-- `pytest tests/`
+- `poetry run pytest tests/`
 
 or with ipdb:
 
-    - `pytest -s tests/`
+    - `poetry run pytest -s tests/`
 
 specify a test:
 
-- `pytest -s tests/test_parse.py -k 'test_events'`
+- `poetry run pytest -s tests/test_parse.py -k 'test_events'`
 
-parallel testing:
--`poetry run pytest -n auto`
+parallel testing: -`poetry run pytest -n auto`
 
 ## Deployment steps
 
@@ -151,7 +150,6 @@ To deploy a new version of the package, follow these steps:
 2.  `poetry build`
 3.  `poetry publish`
 
-
 ## User Agent
 
 In some cases a custom user agent is required in the header of requests.
@@ -160,19 +158,20 @@ Setting an environmental varialbe called OSCN_USER_AGENT will override the defau
 This project is open-source and contributions are welcome.
 
 ---
+
 ## Release Notes
 
 ### Version 0.0.92
 
-*   Added the `.documents` property to the `Case` object, which parses the case docket and returns a list of all linked documents. Each document is a dictionary with the following structure:
+- Added the `.documents` property to the `Case` object, which parses the case docket and returns a list of all linked documents. Each document is a dictionary with the following structure:
 
-    ```json
-    {
-      "id": 1234567,
-      "title": "MOTION TO COMPEL",
-      "url": "https://www.oscn.net/dockets/GetDocument.aspx?...",
-      "date": "01-01-2024",
-      "code": "MO",
-      "party": "PLAINTIFF"
-    }
-    ```
+  ```json
+  {
+    "id": 1234567,
+    "title": "MOTION TO COMPEL",
+    "url": "https://www.oscn.net/dockets/GetDocument.aspx?...",
+    "date": "01-01-2024",
+    "code": "MO",
+    "party": "PLAINTIFF"
+  }
+  ```
