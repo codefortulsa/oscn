@@ -1,18 +1,23 @@
 import urllib.parse as urlparse
 
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser
 
 
 def cases(oscn_html):
     case_list = []
-    soup = BeautifulSoup(oscn_html, "html.parser")
-    case_tables = soup.findAll("table", "clspg")
+    tree = HTMLParser(oscn_html)
 
-    for case in case_tables:
-        case_link = case.find("a")
-        parsed = urlparse.urlparse(case_link["href"])
-        db = urlparse.parse_qs(parsed.query)["db"][0]
-        cn = case_link.text
+    for case_table in tree.css("table.clspg"):
+        link = case_table.css_first("a")
+        if not link:
+            continue
+        href = link.attributes.get("href", "")
+        parsed = urlparse.urlparse(href)
+        params = urlparse.parse_qs(parsed.query)
+        if "db" not in params:
+            continue
+        db = params["db"][0]
+        cn = link.text().strip()
         case_index = f"{db}-{cn}"
         case_list.append(case_index)
 
@@ -25,11 +30,10 @@ setattr(cases, "_default_value", [])
 
 def tables(oscn_html):
     case_list = []
-    soup = BeautifulSoup(oscn_html, "html.parser")
-    case_tables = soup.findAll("table", "clspg")
+    tree = HTMLParser(oscn_html)
 
-    for case in case_tables:
-        case_list.append(case.get_text)
+    for case_table in tree.css("table.clspg"):
+        case_list.append(case_table.text(separator=" "))
 
     return case_list
 

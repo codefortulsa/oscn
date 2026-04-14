@@ -4,7 +4,8 @@ A python library for scraping case information from the [Oklahoma State Courts N
 
 # Update:
 
-- 12/16/2024: Updated to use Selectolax instead of BeautifulSoup. Most parsing functions now use Selectolax which is faster and more memory efficient. Some BeautifulSoup functions are still used and old parsers are still in the codebase for testing.
+- 04/2025: Completed migration to Selectolax. BeautifulSoup has been removed as a dependency. All parsers now use Selectolax.
+- 12/16/2024: Updated to use Selectolax instead of BeautifulSoup. Most parsing functions now use Selectolax which is faster and more memory efficient.
 
 ## Contents
 
@@ -160,6 +161,12 @@ This project is open-source and contributions are welcome.
 ---
 
 ## Release Notes
+
+### Version 0.0.98
+
+- Completed full migration from BeautifulSoup to Selectolax. All parsers (`parties`, `attorneys`, `counts`, `issues`, `events`, `docket`, `cmids`, `party_addresses`, `party_profile`, `party_properties`, `docket_report`, `find/parse`) now use Selectolax exclusively.
+- Removed `beautifulsoup4` as a dependency.
+- Removed global SSL warning suppression that was masking urllib3 warnings.
 
 ### Version 0.0.92
 

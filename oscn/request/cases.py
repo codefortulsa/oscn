@@ -8,7 +8,6 @@ import json
 from types import FunctionType
 
 import logging
-import warnings
 
 import requests
 from requests.exceptions import ConnectionError
@@ -19,7 +18,6 @@ from ..parse import append_parsers
 
 
 oscn_url = settings.OSCN_CASE_URL
-warnings.filterwarnings("ignore")
 logger = logging.getLogger("oscn")
 
 logger.setLevel(logging.INFO)

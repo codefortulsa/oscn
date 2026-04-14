@@ -110,3 +110,25 @@ def test_events():
     events = oscn.parse.events(case.text)
     found = any("PETITIONER'S APPLICATION" in event.get("description") for event in events)
     assert found
+
+
+def test_docket_fields():
+    case = oscn.request.Case("tulsa-CF-2019-03")
+    docket = case.docket
+    assert len(docket) > 0
+    first = docket[0]
+    assert first["date"] == "01-02-2019"
+    assert first["code"] == "TEXT"
+    assert "CRIMINAL FELONY INITIAL FILING" in first["description"]
+    assert first["count"] == "1"
+    assert first["party"] == "VEGA, VICTOR"
+    assert first["amount"] == ""
+    second = docket[1]
+    assert second["code"] == "INFORMATION"
+    assert second["party"] == "VEGA, VICTOR"
+
+
+def test_cmids():
+    case = oscn.request.Case("johnston-CF-2011-00015")
+    assert case.valid
+    assert len(case.cmids) == 4

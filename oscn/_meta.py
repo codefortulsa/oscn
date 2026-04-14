@@ -3,7 +3,7 @@ from requests.exceptions import ConnectionError
 
 import functools
 
-from bs4 import BeautifulSoup
+from selectolax.parser import HTMLParser
 
 from .settings import (
     OSCN_SEARCH_URL,
@@ -69,12 +69,11 @@ def courts():
             headers=OSCN_REQUEST_HEADER,
             verify=False,
         )
-        soup = BeautifulSoup(response.text, "html.parser")
-        form = soup.find("form", action="Results.aspx")
-        select = form.find("select", id="db")
-        options = select.find_all("option")
-        court_vals = [option["value"] for option in options]
-        court_vals.remove("all")
+        tree = HTMLParser(response.text)
+        select = tree.css_first('form[action="Results.aspx"] select#db')
+        options = select.css("option")
+        court_vals = [o.attributes.get("value", "") for o in options]
+        court_vals = [v for v in court_vals if v and v != "all"]
         return court_vals
     except:
         return ALL_COURTS
@@ -88,18 +87,14 @@ def judges():
             headers=OSCN_REQUEST_HEADER,
             verify=False,
         )
-        soup = BeautifulSoup(response.text, "html.parser")
-        form = soup.find("form")
-        select = form.find("select")
-        options = select.find_all("option")
-        judge_numbers = [option["value"] for option in options]
-        judge_names = [option.text for option in options]
+        tree = HTMLParser(response.text)
+        select = tree.css_first("form select")
+        options = select.css("option")
         judges_dict = [
-            {"number": num, "name": name}
-            for num, name in zip(judge_numbers, judge_names)
+            {"number": o.attributes.get("value", ""), "name": o.text().strip()}
+            for o in options
         ]
         return judges_dict
-
     except:
         return ALL_JUDGES
 

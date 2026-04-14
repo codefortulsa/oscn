@@ -9,3 +9,9 @@ data/
 /examples
 /.vscode
 .cursorrules
+/archive
+/plans
+.venv/
+.pytest_cache/
+.mypy_cache/
+.claude/
