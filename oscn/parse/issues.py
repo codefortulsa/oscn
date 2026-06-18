@@ -67,30 +67,35 @@ def issues(oscn_html):
             disp_table = next_tag(issue_table, "table")
             if disp_table != docket_table:
                 issue_list.add_text(disp_table.text())
-                name_details = disp_table.css("td.countpartyname")
-                dispositions = disp_table.css("td.countdisposition")
                 issue_dict["parties"] = []
-                for name_detail, disposition in zip(name_details, dispositions):
-                    name_detail_text = clean_string(name_detail.text())
-                    if not name_detail_text:
-                        continue
-                    if ":" in name_detail_text:
-                        party_type, party_name = clean_string(name_detail.text()).split(
-                            ": "
-                        )
+                # Walk the disposition table row by row so each party name stays
+                # paired with the disposition in its OWN row. OSCN sometimes
+                # renders a disposition ("Pending.") with an empty party-name
+                # cell; keep those — the disposition is the signal we want.
+                for row in disp_table.css("tr"):
+                    name_cell = row.css_first("td.countpartyname")
+                    disp_cell = row.css_first("td.countdisposition")
+                    if name_cell is None and disp_cell is None:
+                        continue  # header / spacer row
+                    name_text = clean_string(name_cell.text()) if name_cell else ""
+                    if ": " in name_text:
+                        party_type, party_name = name_text.split(": ", 1)
                     else:
                         party_type = ""
-                        party_name = name_detail_text
-                    disposition_text = disposition.text()
+                        party_name = name_text
+                    disposition_text = disp_cell.text() if disp_cell else ""
                     disposed = (
                         disposition_text.split(": ", 1)[1]
-                        if (":" in disposition_text)
-                        else disposition.text()
+                        if (": " in disposition_text)
+                        else disposition_text
                     )
+                    disposed = clean_string(disposed)
+                    if not party_name and not disposed:
+                        continue  # genuinely empty row — nothing to record
                     party = {
-                        "type": clean_string((party_type).lower()),
+                        "type": clean_string(party_type.lower()),
                         "name": clean_string(party_name),
-                        "disposed": clean_string(disposed),
+                        "disposed": disposed,
                     }
                     issue_dict["parties"].append(party)
                 issue_list.append(issue_dict)
